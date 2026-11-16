@@ -148,78 +148,143 @@ export default function CollaborationPageClient() {
 
           <aside className="flex flex-col gap-4 lg:sticky lg:top-24 h-fit" aria-label="Tentang forum komunitas">
             <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
-              <h2 className="mb-2 text-sm font-bold text-[#1A1A1A]">Dua Kategori Postingan</h2>
-              <p className="flex items-start gap-2 text-sm text-gray-700">
-                <BadgeCheck size={16} className="mt-0.5 shrink-0 text-emerald-600" aria-hidden="true" />
-                <span><strong>Aksi Terverifikasi</strong>: Kiriman aksi nyata yang telah lolos verifikasi AI BONI, dilengkapi ringkasan dampak lingkungan langsung.</span>
-              </p>
-              <p className="mt-2 flex items-start gap-2 text-sm text-gray-700">
-                <MessageSquare size={16} className="mt-0.5 shrink-0 text-gray-500" aria-hidden="true" />
-                <span><strong>Diskusi Warga</strong>: Berisi ide inovatif, agenda gotong royong, atau kabar seputar lingkungan kampung.</span>
-              </p>
-              <Link href="/dashboard/eco-action" className="mt-3 inline-block text-sm font-semibold text-[#2D5F3F] hover:underline">Verifikasi aksi Anda untuk dibagikan →</Link>
+              <h2 className="mb-3 text-sm font-bold text-[#1A1A1A]">Dua Kategori Postingan</h2>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2.5 border-b border-gray-100 pb-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[#2D5F3F]">
+                    <BadgeCheck size={15} aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold leading-6 text-[#1A1A1A]">
+                      Aksi Terverifikasi
+                    </h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
+                      Aksi hijau yang lolos verifikasi, dengan ringkasan dampaknya.
+                    </p>
+                  </div>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600">
+                    <MessageSquare size={15} aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold leading-6 text-[#1A1A1A]">
+                      Diskusi Warga
+                    </h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
+                      Ide, agenda gotong royong, dan kabar lingkungan kampung.
+                    </p>
+                  </div>
+                </li>
+              </ul>
+              <div className="mt-4 border-t border-gray-100 pt-3">
+                <Link
+                  href="/dashboard/eco-action"
+                  className="inline-flex items-center text-sm font-semibold text-[#2D5F3F] hover:underline"
+                >
+                  Verifikasi aksi Anda untuk dibagikan →
+                </Link>
+              </div>
             </section>
             {topTags.length > 0 && (
               <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
-                <h2 className="mb-2 text-sm font-bold text-[#1A1A1A]">Topik Populer</h2>
-                <ul className="flex flex-wrap gap-2">
-                  {topTags.map(([t, n]) => <li key={t} className="rounded-full bg-[#F0FAF4] px-2.5 py-1 text-xs text-[#2D5F3F]">{t} · {n}</li>)}
+                <h2 className="mb-3 text-sm font-bold text-[#1A1A1A]">Topik Populer</h2>
+                <ul className="divide-y divide-gray-100">
+                  {topTags.map(([t, n]) => (
+                    <li
+                      key={t}
+                      className="flex min-h-[38px] items-center justify-between gap-3 py-2 text-xs"
+                    >
+                      <span className="min-w-0 flex-1 break-words font-semibold leading-5 text-[#1A1A1A]">
+                        {t}
+                      </span>
+                      <span className="shrink-0 text-right font-medium tabular-nums text-gray-500">
+                        {n} postingan
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               </section>
             )}
 
             {topDistricts.length > 0 && (
               <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
-                <div className="mb-2.5 flex items-center justify-between">
-                  <h2 className="text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <h2 className="flex items-center gap-1.5 text-sm font-bold text-[#1A1A1A]">
                     <MapPin size={16} className="text-[#2D5F3F]" aria-hidden="true" />
                     Kecamatan Teraktif
                   </h2>
-                  <span className="text-[11px] font-medium text-gray-400">Total Kiriman</span>
+                  <span className="shrink-0 text-[11px] font-medium text-gray-500">Total Kiriman</span>
                 </div>
-                <div className="space-y-2">
+                <ol className="divide-y divide-gray-100">
                   {topDistricts.map(([district, count], idx) => (
-                    <div key={district} className="flex items-center justify-between text-xs py-1 border-b border-gray-100 last:border-none">
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          "flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold",
-                          idx === 0 ? "bg-amber-100 text-amber-800" :
-                          idx === 1 ? "bg-slate-100 text-slate-700" :
-                          idx === 2 ? "bg-orange-100 text-orange-800" :
-                          "bg-gray-100 text-gray-600"
-                        )}>
+                    <li
+                      key={district}
+                      className="flex min-h-[38px] items-center justify-between gap-3 py-2 text-xs"
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[11px] font-bold text-[#2D5F3F]">
                           {idx + 1}
                         </span>
-                        <span className="font-semibold text-gray-800">Kec. {district}</span>
+                        <span className="min-w-0 flex-1 break-words font-semibold leading-5 text-[#1A1A1A]">
+                          Kec. {district}
+                        </span>
                       </div>
-                      <span className="font-medium text-[#2D5F3F] bg-[#F0FAF4] px-2 py-0.5 rounded-full text-[11px]">
-                        {count} kiriman
+                      <span className="shrink-0 text-right font-bold tabular-nums text-[#0F3D2E]">
+                        {count}
                       </span>
-                    </div>
+                    </li>
                   ))}
-                </div>
+                </ol>
               </section>
             )}
 
             <section className="rounded-[12px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
-              <h2 className="mb-2.5 text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5">
+              <h2 className="mb-3 flex items-center gap-1.5 text-sm font-bold text-[#1A1A1A]">
                 <ShieldCheck size={16} className="text-[#2D5F3F]" aria-hidden="true" />
                 Pedoman Komunitas Bersih
               </h2>
-              <ul className="space-y-2.5 text-xs text-gray-600">
-                <li className="flex items-start gap-2">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-700">1</span>
-                  <span><strong>Guyub & Santun</strong>: Gunakan tutur kata sopan, hormati perbedaan, dan jalin kerukunan warga.</span>
+              <ol className="space-y-3">
+                <li className="flex items-start gap-2.5 border-b border-gray-100 pb-3">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[11px] font-bold text-[#2D5F3F]">
+                    1
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xs font-bold leading-5 text-[#1A1A1A]">
+                      Guyub & Santun
+                    </h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
+                      Gunakan tutur kata sopan, hormati perbedaan, dan jalin kerukunan warga.
+                    </p>
+                  </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-700">2</span>
-                  <span><strong>Aksi Asli & Nyata</strong>: Kirim bukti foto kegiatan nyata di Surabaya tanpa manipulasi demi transparansi poin.</span>
+                <li className="flex items-start gap-2.5 border-b border-gray-100 pb-3">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[11px] font-bold text-[#2D5F3F]">
+                    2
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xs font-bold leading-5 text-[#1A1A1A]">
+                      Aksi Asli & Nyata
+                    </h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
+                      Kirim bukti foto kegiatan nyata di Surabaya tanpa manipulasi demi transparansi poin.
+                    </p>
+                  </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-700">3</span>
-                  <span><strong>Bebas Sampah & Hoaks</strong>: Pastikan topik bermanfaat untuk kelestarian lingkungan dan terverifikasi akurat.</span>
+                <li className="flex items-start gap-2.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[11px] font-bold text-[#2D5F3F]">
+                    3
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-xs font-bold leading-5 text-[#1A1A1A]">
+                      Bebas Sampah & Hoaks
+                    </h3>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-600">
+                      Pastikan topik bermanfaat untuk kelestarian lingkungan dan terverifikasi akurat.
+                    </p>
+                  </div>
                 </li>
-              </ul>
+              </ol>
             </section>
           </aside>
         </div>

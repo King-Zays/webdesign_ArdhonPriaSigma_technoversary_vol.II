@@ -8,6 +8,17 @@ import { useHydrated } from "@/hooks/useHydrated";
 import Badge3DIcon from "@/components/common/Badge3DIcon";
 import { cn } from "@/utils/cn";
 
+const PROGRESS_UNIT_BY_BADGE: Record<string, string> = {
+  first_step: "aksi",
+  waste_warrior: "aksi",
+  jelantah_hero: "aksi",
+  tree_planter: "aksi",
+  green_commuter: "aksi",
+  watt_saver: "aksi",
+  challenge_finisher: "tantangan",
+  community_voice: "kiriman",
+};
+
 export default function Achievements({ compact = false }: { compact?: boolean }) {
   const hydrated = useHydrated();
   const actions = useGreenActionStore((s) => s.actions);
@@ -15,6 +26,82 @@ export default function Achievements({ compact = false }: { compact?: boolean })
   const badges = computeBadges({ actions: hydrated ? actions : [], challengesCompleted: hydrated ? challengesCompleted : 0 });
   const earned = badges.filter((b) => b.earned).length;
   const pct = Math.round((earned / badges.length) * 100);
+
+  if (compact) {
+    return (
+      <section aria-labelledby="badges-heading" className="rounded-2xl border border-gray-200/90 bg-white p-5 shadow-xs sm:p-6">
+        {/* Header Lencana (selaras dengan Riwayat Aksi Hijau) */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <h2 id="badges-heading" className="text-sm font-bold text-[#0F3D2E]">
+            Koleksi Lencana Prestasi Hijau
+          </h2>
+          <span className="text-xs font-medium text-gray-500">
+            {earned} dari {badges.length} diraih
+          </span>
+        </div>
+
+        {/* Grid Lencana Responsif */}
+        <ul
+          className="grid gap-3"
+          style={{ gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))" }}
+        >
+          {badges.map((b) => {
+            const unit = PROGRESS_UNIT_BY_BADGE[b.id] ?? "aksi";
+            const requirementText = `Syarat ${b.points.toLocaleString("id-ID")} poin`;
+
+            return (
+              <li
+                key={b.id}
+                className={cn(
+                  "flex h-full min-w-0 flex-col items-center rounded-xl p-3.5 text-center transition-colors",
+                  b.earned
+                    ? "border border-emerald-200/80 bg-[#F0FAF4]/50"
+                    : "border border-gray-200/80 bg-[#F9FAFB]"
+                )}
+                title={`${b.description} · ${requirementText}`}
+              >
+                <div className="flex shrink-0 items-center justify-center py-0.5">
+                  <Badge3DIcon id={b.id} earned={b.earned} size={56} />
+                </div>
+
+                <span
+                  className={cn(
+                    "mt-2 flex min-h-[2.25rem] items-center justify-center break-words text-xs font-bold leading-snug",
+                    b.earned ? "text-[#0F3D2E]" : "text-gray-800"
+                  )}
+                >
+                  {b.name}
+                </span>
+
+                <div className="mt-auto flex min-h-[2.5rem] w-full flex-col items-center justify-start gap-1 pt-2.5">
+                  {b.earned ? (
+                    <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                      Diraih
+                    </span>
+                  ) : (
+                    <>
+                      <span className="text-[11px] font-semibold leading-tight text-gray-700">
+                        {b.current}/{b.target} {unit}
+                      </span>
+                      <span className="text-[11px] font-normal leading-tight text-gray-500">
+                        {requirementText}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                <span className="sr-only">
+                  {b.earned
+                    ? `Lencana telah diraih, ${requirementText}`
+                    : `Terkunci, progres ${b.current} dari ${b.target} ${unit}, ${requirementText}`}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    );
+  }
 
   return (
     <section aria-labelledby="badges-heading" className="rounded-2xl border border-gray-200/90 bg-white p-5 shadow-xs sm:p-6">

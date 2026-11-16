@@ -12,7 +12,7 @@ export default function CommunityActivity() {
 
   return (
     <section aria-labelledby="community-heading" className="rounded-2xl border border-gray-200/90 bg-white p-5 shadow-xs sm:p-6">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <h2 id="community-heading" className="text-sm font-bold text-[#0F3D2E]">
           Aktivitas Komunitas Warga
         </h2>
@@ -20,19 +20,24 @@ export default function CommunityActivity() {
           Buka Jaringan Komunitas →
         </Link>
       </div>
-      <ul className="flex flex-col divide-y divide-gray-100">
+      <ul className="divide-y divide-gray-100">
         {(hydrated ? posts.slice(0, 4) : []).map((p) => (
           <li key={p.id} className="flex items-start gap-3 py-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-[#0F3D2E]" aria-hidden="true">
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-[#0F3D2E]"
+              aria-hidden="true"
+            >
               {p.author.initials}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs sm:text-sm font-bold text-gray-800">{p.author.name}</span>
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="break-words text-sm font-bold text-gray-800">{p.author.name}</span>
                 <PostKindBadge post={p} />
               </div>
-              <p className="line-clamp-2 text-xs text-gray-600 mt-0.5 leading-relaxed">{p.content}</p>
-              <p className="text-[11px] text-gray-500 mt-1">{p.author.kecamatan}, {timeAgo(p.createdAt)}</p>
+              <p className="mt-0.5 text-xs font-medium text-gray-500">
+                {p.author.kecamatan} · {timeAgo(p.createdAt)}
+              </p>
+              <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-gray-600">{p.content}</p>
             </div>
           </li>
         ))}
