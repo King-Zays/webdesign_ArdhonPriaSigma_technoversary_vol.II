@@ -1,4 +1,9 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { ArrowUp } from "lucide-react";
 import MeadowRiseFooter, {
   type MeadowColumn,
   type MeadowLink,
@@ -65,37 +70,101 @@ const BONI_MEADOW_PALETTE: MeadowPaletteOverrides = {
 };
 
 export default function Footer() {
+  const footerRef = useRef<HTMLDivElement>(null);
+  const isFooterInView = useInView(footerRef, { amount: 0.12 });
+  const [showTopBtn, setShowTopBtn] = useState(false);
+  const [expandTopBtn, setExpandTopBtn] = useState(false);
+
+  useEffect(() => {
+    if (!isFooterInView) {
+      setShowTopBtn(false);
+      setExpandTopBtn(false);
+      return;
+    }
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShowTopBtn(true);
+      setExpandTopBtn(true);
+      return;
+    }
+    const showTimer = setTimeout(() => setShowTopBtn(true), 1450);
+    const expandTimer = setTimeout(() => setExpandTopBtn(true), 1950);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(expandTimer);
+    };
+  }, [isFooterInView]);
+
+  const handleScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <MeadowRiseFooter
-      name={siteConfig.name}
-      brandHref="/"
-      logo={
-        <Image
-          src="/logo-white.png"
-          alt="BONI"
-          width={124}
-          height={40}
-          className="h-8 w-auto object-contain object-left transition-opacity duration-200 hover:opacity-90"
-        />
-      }
-      showBrandName={false}
-      heading={"Mulai aksi *hijau*\ndari rumah hari ini."}
-      subheading="Pilah sampah dari rumah, verifikasi foto, dan tukar EcoPoints di UMKM Surabaya."
-      cta={{ label: "Coba demo BONI", href: "/login?role=warga" }}
-      tagline={`${siteConfig.fullName} · Kota Surabaya`}
-      newsletter
-      placeholder="Simulasi buletin warga (demo)"
-      successMessage="Simulasi berhasil. Alamat email tidak dikirim ke server."
-      columns={FOOTER_COLUMNS}
-      socials={[]}
-      copyright={`© 2026 ${siteConfig.name} · Tim ${teamConfig.teamName} (${teamConfig.institutionShort})`}
-      legal={LEGAL_LINKS}
-      preset="meadow"
-      palette={BONI_MEADOW_PALETTE}
-      seed={7}
-      height="920px"
-      heroHeight="clamp(440px, 60svh, 580px)"
-      fontFamily="var(--font-jakarta), system-ui, sans-serif"
-    />
+    <div ref={footerRef} className="relative">
+      <MeadowRiseFooter
+        name={siteConfig.name}
+        brandHref="/"
+        logo={
+          <Image
+            src="/logo-white.png"
+            alt="BONI"
+            width={124}
+            height={40}
+            className="h-8 w-auto object-contain object-left transition-opacity duration-200 hover:opacity-90"
+          />
+        }
+        showBrandName={false}
+        heading={"Mulai aksi *hijau*\ndari rumah hari ini."}
+        subheading="Pilah sampah dari rumah, verifikasi foto, dan tukar EcoPoints di UMKM Surabaya."
+        cta={{ label: "Coba demo BONI", href: "/login?role=warga" }}
+        tagline={`${siteConfig.fullName} · Kota Surabaya`}
+        newsletter
+        placeholder="Simulasi buletin warga (demo)"
+        successMessage="Simulasi berhasil. Alamat email tidak dikirim ke server."
+        columns={FOOTER_COLUMNS}
+        socials={[]}
+        copyright={`© 2026 ${siteConfig.name} · Tim ${teamConfig.teamName} (${teamConfig.institutionShort})`}
+        legal={LEGAL_LINKS}
+        preset="meadow"
+        palette={BONI_MEADOW_PALETTE}
+        seed={7}
+        height="920px"
+        heroHeight="clamp(440px, 60svh, 580px)"
+        fontFamily="var(--font-jakarta), system-ui, sans-serif"
+      />
+
+      <AnimatePresence>
+        {showTopBtn && (
+          <motion.button
+            type="button"
+            onClick={handleScrollTop}
+            aria-label="Kembali ke atas halaman"
+            title="Kembali ke atas"
+            initial={{ opacity: 0, y: 16, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.9 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              gridTemplateColumns: expandTopBtn ? "16px 1fr" : "16px 0fr",
+            }}
+            className="group fixed bottom-6 right-6 z-40 grid h-11 items-center overflow-hidden rounded-full border border-emerald-300/30 bg-[#0F3D2E] px-[13px] text-white shadow-[0_12px_28px_-8px_rgba(7,23,14,0.65)] transition-[grid-template-columns,background-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-[#1D9E75]"
+          >
+            <ArrowUp
+              size={16}
+              aria-hidden="true"
+              className="shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+            />
+            <span className="min-w-0 overflow-hidden">
+              <span
+                className={`block whitespace-nowrap pl-2 pr-0.5 text-xs font-bold tracking-tight transition-opacity duration-300 ${
+                  expandTopBtn ? "opacity-100 delay-100" : "opacity-0"
+                }`}
+              >
+                Kembali ke atas
+              </span>
+            </span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

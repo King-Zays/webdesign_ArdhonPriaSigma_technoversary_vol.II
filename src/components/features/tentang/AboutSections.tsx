@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import {
   Camera,
   Check,
@@ -195,8 +195,11 @@ export default function AboutSections() {
   const [aktifTahap, setAktifTahap] = useState(0);
   const [showMaterialUnit, setShowMaterialUnit] = useState(false);
   const [stageStep, setStageStep] = useState(0);
+  const flowFrameRef = useRef<HTMLDivElement>(null);
+  const isFlowInView = useInView(flowFrameRef, { once: true, amount: 0.25 });
 
   useEffect(() => {
+    if (!isFlowInView) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setStageStep(3);
       return;
@@ -210,7 +213,7 @@ export default function AboutSections() {
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [aktifTahap]);
+  }, [aktifTahap, isFlowInView]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -224,6 +227,7 @@ export default function AboutSections() {
   }, []);
 
   useEffect(() => {
+    if (!isFlowInView) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
@@ -231,7 +235,7 @@ export default function AboutSections() {
       setAktifTahap((i) => (i + 1) % depositStages.length);
     }, 4000);
     return () => clearTimeout(id);
-  }, [aktifTahap]);
+  }, [aktifTahap, isFlowInView]);
 
   const tahap = depositStages[aktifTahap];
 
@@ -463,6 +467,7 @@ export default function AboutSections() {
 
           {/* Windowed App Frame (Titlebar + Left App Sidebar + Right App Workspace Canvas) */}
           <motion.div
+            ref={flowFrameRef}
             initial={{ opacity: 0, y: 42 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.18 }}
