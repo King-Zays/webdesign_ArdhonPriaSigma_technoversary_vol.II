@@ -62,12 +62,12 @@ export function PWAInstallBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 80, opacity: 0 }}
           transition={{ type: "spring", damping: 24, stiffness: 280 }}
-          className="fixed bottom-4 left-4 right-4 z-[9999] flex justify-center"
+          className="pointer-events-none fixed bottom-4 left-4 right-4 z-[9999] flex justify-center"
         >
           <motion.div
             layout
             transition={{ type: "spring", stiffness: 260, damping: 28 }}
-            className={`flex items-center overflow-hidden rounded-2xl border border-[#A8D5BA] bg-white shadow-2xl ${
+            className={`pointer-events-auto flex items-center overflow-hidden rounded-2xl border border-[#A8D5BA] bg-white shadow-2xl ${
               expanded ? "w-full max-w-sm gap-3 px-4 py-3.5" : "gap-0 p-2"
             }`}
           >
