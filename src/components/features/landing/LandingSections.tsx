@@ -1,10 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { competitionConfig, sdgAlignment, teamConfig } from "@/config/site";
 import HeroConsole from "./HeroConsole";
 import PlatformShowcase from "./PlatformShowcase";
 export { PlatformShowcase };
+
+const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 /* ── 1. Hero Section (Video Latar Belakang & Panggung Kaca Kristal) ── */
 export function Hero() {
@@ -26,36 +32,58 @@ export function Hero() {
 
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
         <div className="max-w-3xl">
-          <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[54px]">
+          <motion.h1
+            initial={{ opacity: 0, y: 34, filter: "blur(6px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+            className="text-4xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[54px]"
+          >
             Jaga kebersihan dari rumah, <span className="text-[#1D9E75]">hidupkan lingkungan Surabaya.</span>
-          </h1>
+          </motion.h1>
 
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#2D5542] sm:text-lg">
+          <motion.p
+            initial={{ opacity: 0, y: 30, filter: "blur(5px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.05, delay: 0.16, ease: EASE_OUT_EXPO }}
+            className="mt-5 max-w-2xl text-base leading-relaxed text-[#2D5542] sm:text-lg"
+          >
             Pilah botol plastik dan kardus, simpan minyak jelantah, serta rawat tanaman pekarangan. Setiap kebiasaan
             baik warga dicatat transparan dan kembali menjadi voucher belanja UMKM kampung.
-          </p>
+          </motion.p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-5">
+          <motion.div
+            initial={{ opacity: 0, y: 26, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 1.05, delay: 0.32, ease: EASE_OUT_EXPO }}
+            className="mt-8 flex flex-wrap items-center gap-5"
+          >
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-colors hover:bg-[#18533F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#18533F] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2"
             >
               <span>Mulai eksplorasi demo</span>
             </Link>
             <Link
               href="/#gateway"
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
+              className="group inline-flex items-center gap-1.5 text-sm font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
             >
               <span>Pilih portal peran</span>
-              <span aria-hidden="true">→</span>
+              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                →
+              </span>
             </Link>
-          </div>
+          </motion.div>
         </div>
 
         {/* Jendela Aplikasi Jurnal Aksi Lingkungan */}
-        <div className="mt-12 sm:mt-14">
+        <motion.div
+          initial={{ opacity: 0, y: 48, scale: 0.985 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 1.2, delay: 0.42, ease: EASE_OUT_EXPO }}
+          className="mt-12 sm:mt-14"
+        >
           <HeroConsole />
-        </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -68,29 +96,29 @@ export function Problem() {
       nomor: "01",
       kategori: "Dapur Rumah Tangga",
       judul: "Sampah dapur tercampur sejak dari rumah",
-      info: "Sisa makanan basah dan kemasan plastik dibuang ke satu tempat sampah yang sama sehingga material daur ulang ikut kotor.",
-      akibat: "1.800 ton sampah masuk setiap hari ke TPA Benowo tanpa terpilah.",
+      info: "Sisa makanan basah dan kemasan plastik dibuang ke satu wadah yang sama.",
+      akibat: "Material daur ulang ikut terkontaminasi dan langsung menjadi beban residu di TPA Benowo.",
     },
     {
       nomor: "02",
       kategori: "Saluran Air Kampung",
       judul: "Minyak jelantah dibuang ke selokan",
-      info: "Minyak sisa penggorengan dibuang ke wastafel dan membeku menjadi kerak yang menyumbat aliran got warga.",
-      akibat: "Saluran drainase menyempit dan memicu genangan saat hujan tinggi.",
+      info: "Minyak sisa penggorengan dituang ke wastafel dan mengalir ke got permukiman.",
+      akibat: "Lemak membeku menjadi kerak penyumbat saluran dan memicu genangan saat hujan tinggi.",
     },
     {
       nomor: "03",
       kategori: "Kebiasaan Harian Warga",
       judul: "Semangat warga cepat padam",
-      info: "Kerja bakti atau lomba kebersihan sering ramai sesaat tanpa manfaat ekonomi yang dirasakan langsung oleh keluarga.",
-      akibat: "Partisipasi berhenti begitu acara usai, belum menjadi kebiasaan mandiri.",
+      info: "Kerja bakti atau lomba kebersihan sering ramai sesaat tanpa timbal balik harian bagi keluarga.",
+      akibat: "Partisipasi berhenti begitu acara usai dan belum terbentuk menjadi kebiasaan mandiri.",
     },
     {
       nomor: "04",
       kategori: "Kebersihan Sudut Kota",
       judul: "Titik tumpukan sampah tersebar liar",
-      info: "Tumpukan liar di sudut jalan sulit terpantau cepat oleh petugas tanpa laporan lokasi langsung dari warga sekitar.",
-      akibat: "Pengangkutan armada kebersihan menjadi lambat dan lingkungan tercemar.",
+      info: "Tumpukan liar di sudut jalan sulit terpantau cepat tanpa laporan berkoordinat dari warga.",
+      akibat: "Penanganan petugas kebersihan menjadi terlambat dan mencemari lingkungan sekitar.",
     },
   ];
 
@@ -118,58 +146,86 @@ export function Problem() {
   return (
     <section id="tantangan" className="scroll-mt-16 border-b border-emerald-900/10 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <h2 className="max-w-3xl text-2xl font-bold leading-[1.3] tracking-tight text-[#0F3D2E] sm:text-3xl">
+        <motion.h2
+          initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+          className="max-w-3xl text-2xl font-bold leading-[1.3] tracking-tight text-[#0F3D2E] sm:text-3xl"
+        >
           <span>Kebersihan kota berawal dari kebiasaan kecil di rumah.</span>{" "}
           <span className="font-normal text-[#426352]">
             Ketika botol plastik, kardus, dan minyak jelantah dipisahkan dari sampah basah, beban lingkungan Surabaya
             berkurang dan berubah menjadi manfaat bagi warga.
           </span>
-        </h2>
+        </motion.h2>
 
-        {/* 3 Pilar Angka Lingkungan */}
+        {/* 3 Pilar Angka Lingkungan (Gambar 1) */}
         <div className="mt-12 grid border-y border-emerald-900/12 sm:grid-cols-3 sm:divide-x sm:divide-emerald-900/12">
-          {ringkasanKota.map(({ label, angka, judul, deskripsi }) => (
-            <div key={label} className="border-b border-emerald-900/10 py-7 last:border-b-0 sm:border-b-0 sm:px-7 sm:first:pl-0 sm:last:pr-0">
+          {ringkasanKota.map(({ label, angka, judul, deskripsi }, idx) => (
+            <motion.div
+              key={label}
+              initial={{ opacity: 0, y: 36, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 1.0, delay: idx * 0.18, ease: EASE_OUT_EXPO }}
+              className="border-b border-emerald-900/10 py-7 last:border-b-0 sm:border-b-0 sm:px-7 sm:first:pl-0 sm:last:pr-0"
+            >
               <span className="text-xs font-semibold text-[#1D9E75]">{label}</span>
               <p className="mt-3 text-2xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-3xl">
                 {angka}
               </p>
               <h3 className="mt-2 text-base font-bold text-[#0F3D2E]">{judul}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-[#426352]">{deskripsi}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* 4 Tantangan Lingkungan */}
-        <div className="mt-12 grid gap-5 sm:grid-cols-2">
-          {tantangan.map(({ nomor, kategori, judul, info, akibat }) => (
-            <div
-              key={nomor}
-              className="flex flex-col justify-between rounded-2xl border border-emerald-900/12 bg-white p-6 shadow-2xs"
-            >
-              <div>
-                <div className="flex items-center justify-between text-xs font-semibold text-[#1D9E75]">
-                  <span>{nomor}</span>
-                  <span className="text-[#527362]">{kategori}</span>
-                </div>
-                <h3 className="mt-3 text-lg font-bold text-[#0F3D2E]">{judul}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-[#426352]">{info}</p>
-              </div>
+        {/* Opsi 1: Baris Sebab–Akibat Terbuka (Editorial Hairline Rows — Menyatu dengan Gambar 1) */}
+        <div className="mt-12">
+          <div className="hidden border-b border-emerald-900/15 pb-3 text-xs font-semibold text-[#527362] md:grid md:grid-cols-[200px_1.15fr_1fr] md:gap-8">
+            <span>Titik Masalah</span>
+            <span>Kondisi di Hulu</span>
+            <span>Dampak di Kota</span>
+          </div>
 
-              <div className="mt-5 rounded-xl border border-emerald-950/20 bg-gradient-to-br from-[#0B2516] to-[#0F3320] px-4 py-3.5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
-                  Dampak Lapangan
-                </p>
-                <p className="mt-1 text-xs font-medium leading-relaxed text-emerald-100/95 sm:text-[13px]">{akibat}</p>
-              </div>
-            </div>
-          ))}
+          <ol className="divide-y divide-emerald-900/12 border-b border-emerald-900/12">
+            {tantangan.map(({ nomor, kategori, judul, info, akibat }, idx) => (
+              <motion.li
+                key={nomor}
+                initial={{ opacity: 0, y: 30, filter: "blur(4px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.95, delay: idx * 0.15, ease: EASE_OUT_EXPO }}
+                className="group grid gap-3 py-6 transition-colors hover:bg-emerald-950/[0.015] md:grid-cols-[200px_1.15fr_1fr] md:items-baseline md:gap-8"
+              >
+                <div className="flex items-baseline gap-2.5">
+                  <span className="font-mono text-xs font-bold text-[#1D9E75]">{nomor}</span>
+                  <span className="text-xs font-semibold text-[#527362]">{kategori}</span>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold text-[#0F3D2E]">{judul}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-[#426352]">{info}</p>
+                </div>
+
+                <div className="flex items-baseline gap-2.5 pt-1 md:pt-0">
+                  <span
+                    aria-hidden="true"
+                    className="font-mono text-xs font-bold text-[#1D9E75] transition-transform duration-200 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
+                  <p className="text-sm font-medium leading-relaxed text-[#0F3D2E]">{akibat}</p>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
         </div>
       </div>
     </section>
   );
 }
-
 /* ── 2b. Cara Kerja Demo BONI (Alur Pilah → Setor/Jemput → Timbang → Verifikasi) ── */
 export function CaraKerjaDemo() {
   const kolomLaporan = [
@@ -269,10 +325,18 @@ export function CaraKerjaDemo() {
     },
   ];
 
+  const [sorotStatus, setSorotStatus] = useState<string | null>(null);
+
   return (
     <section id="cara-kerja" className="scroll-mt-24 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12">
+        <motion.div
+          initial={{ opacity: 0, y: 38, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+          className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12"
+        >
           <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-[#0F3D2E] sm:text-5xl">
             Pelaporan warga <br />
             dan tindak lanjut kota
@@ -286,17 +350,25 @@ export function CaraKerjaDemo() {
             <div className="mt-5 flex flex-wrap items-center gap-5">
               <Link
                 href="/gov/login"
-                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
+                className="group inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
               >
                 <span>Buka pratinjau portal Pemkot</span>
-                <span aria-hidden="true">→</span>
+                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                  →
+                </span>
               </Link>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Pratinjau Papan Tiket Laporan Sampah Asli (/dashboard/laporan-sampah & /gov/dashboard) */}
-        <div className="mt-12 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.14)]">
+        <motion.div
+          initial={{ opacity: 0, y: 44, scale: 0.985 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, amount: 0.18 }}
+          transition={{ duration: 1.15, delay: 0.14, ease: EASE_OUT_EXPO }}
+          className="mt-12 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.14)]"
+        >
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 bg-[#F8FAF9] px-4 py-2.5 text-xs">
             <div className="flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
@@ -306,52 +378,87 @@ export function CaraKerjaDemo() {
                 boni.app/gov/dashboard · Tiket Laporan Sampah
               </span>
             </div>
-            <span className="font-mono text-[11px] text-neutral-500">31 Kecamatan Surabaya</span>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              {["Semua", "Menunggu", "Ditindaklanjuti", "Selesai"].map((st) => {
+                const aktif = (st === "Semua" && sorotStatus === null) || sorotStatus === st;
+                return (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => setSorotStatus(st === "Semua" ? null : st)}
+                    className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                      aktif
+                        ? "bg-[#0F3D2E] text-white"
+                        : "bg-white text-neutral-500 hover:bg-emerald-50 hover:text-[#0F3D2E]"
+                    }`}
+                  >
+                    {st}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0">
-            {kolomLaporan.map((kol) => (
-              <div key={kol.status} className="p-4 sm:p-5">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
-                    <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
-                    <span>{kol.status}</span>
-                  </div>
-                  <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
-                </div>
-
-                <div className="mt-3.5 space-y-2.5">
-                  {kol.tiket.map((t) => (
-                    <div
-                      key={t.id}
-                      className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-colors hover:border-[#2D5F3F]/30"
-                    >
-                      <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
-                        <span>{t.id}</span>
-                        <span>{t.lokasi}</span>
-                      </div>
-                      <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
-                        {t.judul}
-                      </p>
-                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
-                        <span className="truncate text-neutral-600">{t.kategori}</span>
-                        <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
-                          {t.keparahan}
-                        </span>
-                      </div>
+            {kolomLaporan.map((kol, colIdx) => {
+              const redup = sorotStatus !== null && sorotStatus !== kol.status;
+              return (
+                <motion.div
+                  key={kol.status}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ duration: 0.95, delay: 0.18 + colIdx * 0.16, ease: EASE_OUT_EXPO }}
+                  className={`p-4 transition-opacity duration-300 sm:p-5 ${redup ? "opacity-45" : "opacity-100"}`}
+                >
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
+                      <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
+                      <span>{kol.status}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                    <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
+                  </div>
+
+                  <div className="mt-3.5 space-y-2.5">
+                    {kol.tiket.map((t) => (
+                      <motion.div
+                        key={t.id}
+                        whileHover={{ y: -2 }}
+                        transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
+                        className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-all hover:border-[#2D5F3F]/35 hover:bg-white hover:shadow-sm"
+                      >
+                        <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                          <span>{t.id}</span>
+                          <span>{t.lokasi}</span>
+                        </div>
+                        <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
+                          {t.judul}
+                        </p>
+                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+                          <span className="truncate text-neutral-600">{t.kategori}</span>
+                          <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
+                            {t.keparahan}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        </div>
+        </motion.div>
 
         {/* 4 Langkah Alur */}
         <ol className="mt-10 grid border-t border-emerald-900/15 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-emerald-900/15">
-          {langkah.map(({ nomor, judul, deskripsi, status, href }) => (
-            <li
+          {langkah.map(({ nomor, judul, deskripsi, status, href }, idx) => (
+            <motion.li
               key={nomor}
+              initial={{ opacity: 0, y: 34, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.95, delay: idx * 0.16, ease: EASE_OUT_EXPO }}
               className="flex flex-col justify-between border-b border-emerald-900/10 py-6 last:border-b-0 sm:px-5 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
             >
               <div>
@@ -364,12 +471,14 @@ export function CaraKerjaDemo() {
               </div>
               <Link
                 href={href}
-                className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] hover:text-[#1D9E75]"
+                className="group mt-4 inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
               >
                 <span>Buka halaman</span>
-                <span aria-hidden="true">→</span>
+                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                  →
+                </span>
               </Link>
-            </li>
+            </motion.li>
           ))}
         </ol>
       </div>
@@ -660,7 +769,13 @@ export function BuiltForSurabaya() {
   return (
     <section id="surabaya" className="scroll-mt-16 border-b border-white/10 bg-gradient-to-br from-[#0B2618] via-[#0F3623] to-[#092014] px-4 py-20 text-white sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12">
+        <motion.div
+          initial={{ opacity: 0, y: 38, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+          className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12"
+        >
           <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-white sm:text-5xl">
             Melengkapi semangat <br />
             bank sampah & gotong royong
@@ -670,18 +785,22 @@ export function BuiltForSurabaya() {
             Warga Surabaya sudah lama mandiri menjaga kebersihan kampungnya. BONI hadir memperkuat tradisi ini agar
             setiap kebaikan tercatat rapi dan memberi manfaat timbal balik bagi keluarga.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-14 grid border-y border-white/15 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-white/15">
-          {pilar.map(({ kode, judul, info }) => (
-            <div
+          {pilar.map(({ kode, judul, info }, idx) => (
+            <motion.div
               key={judul}
-              className="border-b border-white/15 py-7 last:border-b-0 sm:px-6 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
+              initial={{ opacity: 0, y: 36, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 1.0, delay: idx * 0.16, ease: EASE_OUT_EXPO }}
+              className="border-b border-white/15 py-7 transition-colors hover:bg-white/[0.02] last:border-b-0 sm:px-6 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
             >
               <span className="text-xs font-bold text-[#7AC74F]">{kode}</span>
               <h3 className="mt-3 text-base font-bold text-white">{judul}</h3>
               <p className="mt-2 text-sm leading-relaxed text-emerald-100/80">{info}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -847,7 +966,13 @@ export function FinalCta() {
   return (
     <section id="gateway" className="scroll-mt-16 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
       <div id="team" className="scroll-mt-20 mx-auto max-w-6xl">
-        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-end md:gap-12">
+        <motion.div
+          initial={{ opacity: 0, y: 38, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.25 }}
+          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+          className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-end md:gap-12"
+        >
           <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-[#0F3D2E] sm:text-5xl">
             Mulai jelajahi <br />
             ekosistem BONI
@@ -856,13 +981,17 @@ export function FinalCta() {
             Uji coba sistem interaktif warga atau akses portal pemerintah kota langsung di peramban tanpa instalasi
             aplikasi.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-12 grid overflow-hidden rounded-2xl border border-emerald-900/15 bg-white shadow-sm md:grid-cols-2 md:divide-x md:divide-emerald-900/12">
-          {gerbang.map(({ kode, judul, deskripsi, butir, href, tombol, utama }) => (
-            <div
+          {gerbang.map(({ kode, judul, deskripsi, butir, href, tombol, utama }, idx) => (
+            <motion.div
               key={judul}
-              className="flex flex-col justify-between gap-8 border-b border-emerald-900/10 p-7 last:border-b-0 sm:p-9 md:border-b-0"
+              initial={{ opacity: 0, y: 38, filter: "blur(5px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 1.05, delay: idx * 0.18, ease: EASE_OUT_EXPO }}
+              className="flex flex-col justify-between gap-8 border-b border-emerald-900/10 p-7 transition-colors hover:bg-[#FAFDFB] last:border-b-0 sm:p-9 md:border-b-0"
             >
               <div>
                 <span className="text-xs font-bold text-[#1D9E75]">{kode}</span>
@@ -880,16 +1009,18 @@ export function FinalCta() {
 
               <Link
                 href={href}
-                className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2 ${
+                className={`group inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2 ${
                   utama
                     ? "bg-[#0F3D2E] text-white hover:bg-[#18533F]"
                     : "border border-[#0F3D2E]/25 text-[#0F3D2E] hover:bg-emerald-50/70"
                 }`}
               >
                 <span>{tombol}</span>
-                <span aria-hidden="true">→</span>
+                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
+                  →
+                </span>
               </Link>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Camera,
   CheckCircle2,
@@ -98,7 +99,18 @@ export default function HeroConsole() {
             {/* EcoPoints Pill from Sidebar */}
             <div className="mt-4 flex items-center justify-between rounded-xl border border-emerald-900/10 bg-[#F0FAF4] px-3 py-2 text-xs">
               <span className="font-medium text-[#2D5F3F]">EcoPoints</span>
-              <span className="font-extrabold text-[#0F3D2E] transition-all">{tampilSaldo}</span>
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={tampilSaldo}
+                  initial={{ y: -8, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 8, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-extrabold text-[#0F3D2E]"
+                >
+                  {tampilSaldo}
+                </motion.span>
+              </AnimatePresence>
             </div>
 
             <nav aria-label="Pratinjau menu warga" className="mt-4 space-y-1 text-xs font-medium text-neutral-600">
@@ -152,32 +164,51 @@ export default function HeroConsole() {
                 {GREEN_ACTION_LIST.map((a) => {
                   const active = a.type === aktif;
                   return (
-                    <button
+                    <motion.button
                       key={a.type}
                       type="button"
                       role="tab"
                       aria-selected={active}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                       onClick={() => pilihKategori(a.type)}
-                      className={`flex flex-col items-start gap-1 rounded-xl border-2 p-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D5F3F] ${
+                      className={`relative flex flex-col items-start gap-1 rounded-xl border-2 p-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D5F3F] ${
                         active
                           ? "border-[#2D5F3F] bg-[#F0FAF4]"
                           : "border-[#E5E7EB] bg-white hover:border-[#A8D5BA]"
                       }`}
                     >
+                      {active && (
+                        <motion.span
+                          layoutId="hero-active-action-pill"
+                          transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                          className="pointer-events-none absolute inset-0 rounded-[10px] ring-2 ring-[#2D5F3F]/20"
+                        />
+                      )}
                       <GreenActionIcon type={a.type} size={20} />
                       <span className="text-xs font-bold leading-tight text-[#1A1A1A]">{a.labelId}</span>
                       <span className="mt-auto text-[11px] font-semibold text-[#2D5F3F]">
                         +{a.ecoPoints} EcoPoints
                       </span>
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
 
-              <p className="mt-2.5 rounded-lg bg-[#F9FAFB] px-3 py-2 text-xs text-neutral-600">
-                <span className="font-semibold text-neutral-700">Kriteria bukti:</span> {aksi.evidenceRequirement}{" "}
-                <span className="text-neutral-400">· Batas {aksi.dailyLimit} kali per hari</span>
-              </p>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.p
+                  key={aktif}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                  className="mt-2.5 rounded-lg bg-[#F9FAFB] px-3 py-2 text-xs text-neutral-600"
+                >
+                  <span className="font-semibold text-neutral-700">Kriteria bukti:</span> {aksi.evidenceRequirement}{" "}
+                  <span className="text-neutral-400">· Batas {aksi.dailyLimit} kali per hari</span>
+                </motion.p>
+              </AnimatePresence>
             </div>
 
             {/* 2. UNGGAH FOTO BUKTI + 3. KUANTITAS (Side-by-side compact preview) */}
@@ -252,29 +283,38 @@ export default function HeroConsole() {
             </div>
 
             <div className="mt-2.5 divide-y divide-neutral-100 text-xs">
-              <div className="flex items-center justify-between gap-2 py-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <GreenActionIcon type={aktif} size={18} />
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="font-bold text-[#1A1A1A]">{aksi.labelId}</span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                          fase === "terverifikasi"
-                            ? "bg-emerald-50 text-[#15803D]"
-                            : "bg-amber-50 text-amber-700"
-                        }`}
-                      >
-                        {fase === "terverifikasi" ? "✓ Terverifikasi" : "Memeriksa..."}
-                      </span>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`${aktif}-${fase}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center justify-between gap-2 py-2"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <GreenActionIcon type={aktif} size={18} />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-bold text-[#1A1A1A]">{aksi.labelId}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                            fase === "terverifikasi"
+                              ? "bg-emerald-50 text-[#15803D]"
+                              : "bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {fase === "terverifikasi" ? "✓ Terverifikasi" : "Memeriksa..."}
+                        </span>
+                      </div>
+                      <p className="truncate text-[11px] text-neutral-500">
+                        {kuantitas} {aksi.quantity.unit} · Wonokromo · Baru saja
+                      </p>
                     </div>
-                    <p className="truncate text-[11px] text-neutral-500">
-                      {kuantitas} {aksi.quantity.unit} · Wonokromo · Baru saja
-                    </p>
                   </div>
-                </div>
-                <span className="shrink-0 font-bold text-[#15803D]">+{aksi.ecoPoints} poin</span>
-              </div>
+                  <span className="shrink-0 font-bold text-[#15803D]">+{aksi.ecoPoints} poin</span>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </div>

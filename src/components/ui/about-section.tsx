@@ -21,49 +21,53 @@ export default function AboutSection3() {
       opacity: 1,
       filter: "blur(0px)",
       transition: {
-        delay: i * 0.4,
-        duration: 0.5,
+        delay: Math.min(i * 0.08, 0.45),
+        duration: 0.85,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       },
     }),
     hidden: {
-      filter: "blur(10px)",
-      y: -20,
+      filter: "blur(6px)",
+      y: 18,
       opacity: 0,
     },
   };
   const scaleVariants = {
-    visible: (i: number) => ({
+    visible: () => ({
       opacity: 1,
+      scale: 1,
       filter: "blur(0px)",
       transition: {
-        delay: i * 0.4,
-        duration: 0.5,
+        delay: 0.12,
+        duration: 0.95,
+        ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
       },
     }),
     hidden: {
-      filter: "blur(10px)",
+      filter: "blur(6px)",
+      scale: 0.985,
       opacity: 0,
     },
   };
   return (
-    <section className="py-8 px-4 bg-[#f9f9f9]" ref={heroRef}>
-      <div className="max-w-6xl mx-auto">
+    <section className="border-b border-emerald-900/10 bg-[#F5FAF7] px-4 py-10 sm:px-6 sm:py-14" ref={heroRef}>
+      <div className="mx-auto max-w-6xl">
         <div className="relative">
-          {/* Header with social icons */}
-          <div className="flex justify-between items-center mb-8 w-[85%] absolute lg:top-4 md:top-0 sm:-top-2 -top-3 z-10">
-            <div className="flex items-center gap-2  text-xl">
-              <span className="text-red-500 animate-spin">✱</span>
+          {/* Header dengan label ekosistem & tautan kanal */}
+          <div className="absolute -top-3 z-10 mb-8 flex w-[85%] items-center justify-between sm:-top-2 md:top-0 lg:top-4">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#1D9E75]" aria-hidden="true" />
               <TimelineContent
                 as="span"
                 animationNum={0}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="text-sm font-medium text-gray-600"
+                className="font-mono text-xs font-bold uppercase tracking-wider text-[#0F3D2E]"
               >
                 TENTANG BONI
               </TimelineContent>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {socialChannels.map((channel) => (
                 <TimelineContent
                   key={channel.icon}
@@ -72,9 +76,9 @@ export default function AboutSection3() {
                   timelineRef={heroRef}
                   customVariants={revealVariants}
                   href="#kolaborasi"
-                  className="md:w-8 md:h-8 sm:w-6 w-5 sm:h-6 h-5 border border-gray-200 bg-gray-100 rounded-lg flex items-center justify-center cursor-pointer"
+                  className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg border border-emerald-900/15 bg-white/90 transition-colors hover:border-[#1D9E75] hover:bg-emerald-50 md:h-8 md:w-8"
                 >
-                  <Image src={channel.icon} alt={channel.name} width={24} height={24} />
+                  <Image src={channel.icon} alt={channel.name} width={20} height={20} />
                 </TimelineContent>
               ))}
             </div>
@@ -114,154 +118,155 @@ export default function AboutSection3() {
                 href="/media/hero-planting-poster.jpg"
               ></image>
             </svg>
-            <figcaption className="pointer-events-none absolute bottom-3 left-[10%] rounded-full border border-white/40 bg-black/55 px-3 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-              Ilustrasi penghijauan lokal (menunggu foto kegiatan warga)
+            <figcaption className="pointer-events-none absolute bottom-3 left-[10%] rounded-full border border-emerald-300/30 bg-[#081C11]/75 px-3 py-1 text-[11px] font-medium text-emerald-50 backdrop-blur-sm">
+              Ilustrasi penghijauan lokal Surabaya · Ekosistem BONI
             </figcaption>
           </TimelineContent>
 
           {/* Stats */}
-          <div className="flex flex-wrap lg:justify-start justify-between items-center py-3 text-sm">
+          <div className="flex flex-wrap items-center justify-between py-4 text-sm lg:justify-start">
             <TimelineContent
               as="div"
-              animationNum={5}
+              animationNum={2}
               timelineRef={heroRef}
               customVariants={revealVariants}
               className="flex gap-4"
             >
-              <div className="flex items-center gap-2 mb-2 sm:text-base text-xs">
-                <span className="text-red-500 font-bold">2</span>
-                <span className="text-gray-600">material awal</span>
-                <span className="text-gray-300">|</span>
+              <div className="mb-2 flex items-center gap-2 text-xs sm:text-base">
+                <span className="font-extrabold text-[#1D9E75]">5</span>
+                <span className="text-[#426352]">kategori aksi hijau</span>
+                <span className="text-emerald-900/20">|</span>
               </div>
-              <div className="flex items-center gap-2 mb-2 sm:text-base text-xs">
-                <span className="text-red-500 font-bold">2</span>
-                <span className="text-gray-600">cara setor</span>
+              <div className="mb-2 flex items-center gap-2 text-xs sm:text-base">
+                <span className="font-extrabold text-[#1D9E75]">31</span>
+                <span className="text-[#426352]">kecamatan Surabaya</span>
               </div>
             </TimelineContent>
-            <div className="lg:absolute right-0 bottom-16 flex lg:flex-col flex-row-reverse lg:gap-0 gap-4">
+            <div className="right-0 bottom-16 flex flex-row-reverse gap-4 lg:absolute lg:flex-col lg:gap-0">
               <TimelineContent
                 as="div"
-                animationNum={6}
+                animationNum={3}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="flex xl:text-4xl sm:text-3xl text-2xl items-center gap-2 mb-2"
+                className="mb-2 flex items-center gap-2 text-2xl sm:text-3xl xl:text-4xl"
               >
-                <span className="text-red-500 font-semibold">4</span>
-                <span className="text-gray-600 uppercase">tahap utama</span>
+                <span className="font-extrabold text-[#0F3D2E]">3</span>
+                <span className="font-semibold uppercase text-[#426352]">peran utama</span>
               </TimelineContent>
               <TimelineContent
                 as="div"
-                animationNum={7}
+                animationNum={4}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="flex items-center gap-2 mb-2 sm:text-base text-xs"
+                className="mb-2 flex items-center gap-2 text-xs sm:text-base"
               >
-                <span className="text-red-500 font-bold">Surabaya</span>
-                <span className="text-gray-600">wilayah fokus</span>
-                <span className="text-gray-300 lg:hidden block">|</span>
+                <span className="font-bold text-[#1D9E75]">Surabaya</span>
+                <span className="text-[#426352]">wilayah fokus</span>
+                <span className="block text-emerald-900/20 lg:hidden">|</span>
               </TimelineContent>
             </div>
           </div>
         </div>
         {/* Main Content */}
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-4 grid gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
-            <h1 className="sm:text-4xl md:text-5xl text-2xl !leading-[110%] font-semibold text-gray-900 mb-8">
+            <h1 className="mb-6 text-2xl font-extrabold !leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl md:text-5xl">
               <VerticalCutReveal
                 splitBy="words"
-                staggerDuration={0.1}
+                staggerDuration={0.07}
                 staggerFrom="first"
                 reverse={true}
                 transition={{
                   type: "spring",
-                  stiffness: 250,
-                  damping: 30,
-                  delay: 3,
+                  stiffness: 180,
+                  damping: 26,
+                  delay: 0.15,
                 }}
               >
-                Dari sampah terpilah menjadi nilai bagi warga.
+                Dari kebiasaan baik di rumah menjadi manfaat bagi Surabaya.
               </VerticalCutReveal>
             </h1>
 
             <TimelineContent
               as="div"
-              animationNum={9}
+              animationNum={4}
               timelineRef={heroRef}
               customVariants={revealVariants}
-              className="grid md:grid-cols-2 gap-8 text-gray-600"
+              className="grid gap-6 text-[#2D5542] md:grid-cols-2 md:gap-8"
             >
               <TimelineContent
                 as="div"
-                animationNum={10}
+                animationNum={5}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="sm:text-base text-xs"
+                className="text-xs sm:text-base"
               >
-                <p className="leading-relaxed text-justify">
+                <p className="leading-relaxed">
                   Sampah rumah tangga yang langsung tercampur sisa makanan sulit
-                  dipilah kembali dan sering berakhir menjadi residu. Memisahkan
-                  botol PET dan kardus sejak di rumah menjaga material tetap
-                  layak dikumpulkan.
+                  dipilah kembali dan berakhir menjadi beban TPA Benowo. Memilah
+                  plastik, kardus, dan minyak jelantah sejak di rumah menjaga nilai
+                  material sekaligus mencegah saluran air tersumbat.
                 </p>
               </TimelineContent>
               <TimelineContent
                 as="div"
-                animationNum={11}
+                animationNum={6}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="sm:text-base text-xs"
+                className="text-xs sm:text-base"
               >
-                <p className="leading-relaxed text-justify">
-                  BONI menghubungkan warga yang memilah dari rumah, pengepul dan
-                  bank sampah yang memeriksa serta menimbang material, dan
-                  pengelola program yang memantau partisipasi wilayah.
+                <p className="leading-relaxed">
+                  BONI menghubungkan aksi bersih warga yang terverifikasi foto,
+                  jaringan pengepul serta bank sampah, pelaku UMKM lokal, dan
+                  pemantauan agregat 31 kecamatan oleh Pemerintah Kota Surabaya.
                 </p>
               </TimelineContent>
             </TimelineContent>
           </div>
 
           <div className="md:col-span-1">
-            <div className="text-right">
+            <div className="md:text-right">
               <TimelineContent
                 as="div"
-                animationNum={12}
+                animationNum={5}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="text-red-500 text-2xl font-bold mb-2"
+                className="mb-1 text-2xl font-black tracking-tight text-[#0F3D2E]"
               >
                 BONI
               </TimelineContent>
               <TimelineContent
                 as="div"
-                animationNum={13}
+                animationNum={6}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="text-gray-600 text-sm mb-8"
+                className="mb-6 text-sm font-medium text-[#1D9E75]"
               >
-                Ekosistem Pilah &amp; Setor | Surabaya
+                Ekosistem Aksi Hijau &amp; Setoran · Surabaya
               </TimelineContent>
 
               <TimelineContent
                 as="div"
-                animationNum={14}
+                animationNum={7}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="mb-6"
+                className="mb-5"
               >
-                <p className="text-gray-900 font-medium mb-4">
-                  Ingin menjajaki uji coba pemilahan dan rute setoran bersama tim kami?
+                <p className="text-sm font-medium leading-relaxed text-[#2D5542]">
+                  Ingin menjajaki uji coba pemilahan dan kolaborasi ekosistem lokal bersama tim kami?
                 </p>
               </TimelineContent>
 
               <TimelineContent
                 as="a"
-                animationNum={15}
+                animationNum={8}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
                 href="#kolaborasi"
-                className="bg-neutral-900 hover:bg-neutral-950 shadow-lg shadow-neutral-900 border border-neutral-700 flex w-fit ml-auto gap-2 hover:gap-4 transition-all duration-300 ease-in-out text-white px-5 py-3 rounded-lg cursor-pointer font-semibold"
+                className="group inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#18533F] md:ml-auto"
               >
-                AJAK KOLABORASI <ArrowRight className="" />
+                <span>Ajak kolaborasi</span>
+                <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-1" />
               </TimelineContent>
             </div>
           </div>
