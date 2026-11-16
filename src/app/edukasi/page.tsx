@@ -321,35 +321,8 @@ export default function EducationPage() {
           </ScrollReveal>
         </section>
 
-        {/* 4. Section 02: Cek Kesiapan Mandiri Interaktif */}
-        <section className={`${styles.softSection} px-4 py-20 sm:px-6 sm:py-28`}>
-          <div className="mx-auto max-w-6xl">
-            <ScrollReveal className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
-              <div className="md:col-span-5">
-                <h2 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px]">
-                  Cek kesiapan<br />
-                  <span className="text-[#1D9E75]">sebelum setor</span>
-                </h2>
-              </div>
-              <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#2D5542]">
-                  Pilih jenis material di panel interaktif berikut untuk memastikan botol PET maupun kardus telah memenuhi tiga syarat pemilahan mandiri.
-                </p>
-                <a
-                  href="#setor-atau-jemput"
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
-                >
-                  <span>Lanjut ke opsi setor</span>
-                  <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.08}>
-              <SortingReadinessCheck />
-            </ScrollReveal>
-          </div>
-        </section>
+        {/* 4. Section 02: Cek Kesiapan Mandiri Interaktif — Full-bleed dark emerald carousel (1:1 Beranda PlatformShowcase) */}
+        <SortingReadinessCheck />
 
         {/* 5. Section 03: Setor atau Jemput — Vercel/Mintlify asymmetric showcase */}
         <section id="setor-atau-jemput" className="scroll-mt-24 px-4 py-20 sm:px-6 sm:py-28">

@@ -1,536 +1,631 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import {
-  Bell,
-  Camera,
-  Check,
-  FileText,
-  Link2,
-  Scale,
-  ShieldAlert,
-  ShieldCheck,
-  Sparkles,
-  Wrench,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Circle,
+  Clock,
+  FileCode2,
+  ListChecks,
 } from "lucide-react";
+import LinearRuleColumns, { type LinearRuleTopic } from "./LinearRuleColumns";
 
-type VerificationTabKey = "frame" | "ai-checks" | "manual-review" | "active-demo";
+type VerificationWindowKey = "queue" | "spec";
 
-interface DocSectionTab {
-  key: VerificationTabKey;
-  step: string;
-  kicker: string;
-  summary: string;
-  breadcrumb: string;
-  badgeText: string;
-  badgeTone: "amber" | "emerald" | "neutral";
-  docTitle: string;
-  metaLine: string;
-  actors: readonly { handle: string; tone: "teal" | "amber" | "emerald" }[];
+const AUTO_SWITCH_MS = 4800;
+
+interface QueueTicket {
+  id: string;
+  title: string;
+  tone: "emerald" | "amber" | "muted";
+  tag: string;
 }
 
-const DOC_TABS: readonly DocSectionTab[] = [
-  {
-    key: "frame",
-    step: "01",
-    kicker: "STANDAR 1 FOTO TIMBANGAN",
-    summary:
-      "Material terpilah dan angka layar timbangan digital wajib terlihat tajam dalam satu bingkai foto transaksi.",
-    breadcrumb: "Panduan foto timbangan",
-    badgeText: "Ilustrasi 1 Frame",
-    badgeTone: "amber",
-    docTitle: "Posisi foto bukti saat penimbangan",
-    metaLine: "Rancangan Alur Setor · Warga & Pengepul",
-    actors: [
-      { handle: "@warga", tone: "emerald" },
-      { handle: "@pengepul", tone: "teal" },
-    ],
-  },
-  {
-    key: "ai-checks",
-    step: "02",
-    kicker: "PEMERIKSAAN AI (RANCANGAN)",
-    summary:
-      "Empat pemeriksaan berbantuan AI disiapkan untuk menyaring foto sebelum diverifikasi tim lapangan.",
-    breadcrumb: "Tahapan penyaringan AI",
-    badgeText: "Rancangan AI",
-    badgeTone: "neutral",
-    docTitle: "Empat langkah pemeriksaan foto setoran",
-    metaLine: "AI-01 s.d. AI-04 · Pratinjau rancangan",
-    actors: [
-      { handle: "@vision-ai", tone: "teal" },
-      { handle: "@ocr-timbang", tone: "amber" },
-    ],
-  },
-  {
-    key: "manual-review",
-    step: "03",
-    kicker: "PENINJAUAN MANUAL & FISIK",
-    summary:
-      "Bila bukti foto meragukan, transaksi tetap mengandalkan pengecekan fisik pengepul dan peninjauan admin.",
-    breadcrumb: "Jika bukti meragukan",
-    badgeText: "Kontrol Lapangan",
-    badgeTone: "amber",
-    docTitle: "Pemeriksaan fisik & mitigasi kesalahan",
-    metaLine: "Pengepul Mitra & Admin Verifikator",
-    actors: [
-      { handle: "@pengepul", tone: "amber" },
-      { handle: "@admin-boni", tone: "teal" },
-    ],
-  },
-  {
-    key: "active-demo",
-    step: "04",
-    kicker: "JALUR AKTIF DEMO WARGA",
-    summary:
-      "Berbeda dari OCR timbangan yang masih dirancang, verifikasi foto Aksi Hijau sudah dapat dicoba di Portal Warga.",
-    breadcrumb: "Status demo saat ini",
-    badgeText: "Demo Aktif",
-    badgeTone: "emerald",
-    docTitle: "Verifikasi Aksi Hijau aktif di demo Warga",
-    metaLine: "Portal Warga · Pengujian interaktif terbuka",
-    actors: [
-      { handle: "@portal-warga", tone: "emerald" },
-      { handle: "@sha-256", tone: "teal" },
-    ],
-  },
-] as const;
+interface QueueGroup {
+  status: string;
+  count: number;
+  dotColor: string;
+  items: QueueTicket[];
+}
 
-const AI_QUEUE_STEPS = [
+const QUEUE_GROUPS: QueueGroup[] = [
   {
-    code: "AI-01",
-    tag: "Klasifikasi",
-    title: "Membaca jenis material",
-    detail: "Mengenali kesesuaian visual botol plastik PET (kode 1) atau tumpukan kardus kering.",
+    status: "Dalam Verifikasi",
+    count: 3,
+    dotColor: "text-[#1D9E75]",
+    items: [
+      {
+        id: "VRF-01",
+        title: "PET kode 1 & angka layar 3.45 kg dalam 1 frame",
+        tone: "emerald",
+        tag: "AI-01",
+      },
+      {
+        id: "VRF-02",
+        title: "Pembacaan berat aktual timbangan digital (OCR)",
+        tone: "emerald",
+        tag: "AI-02",
+      },
+      {
+        id: "VRF-03",
+        title: "Cek ketajaman, pencahayaan, & hash SHA-256",
+        tone: "emerald",
+        tag: "AI-03/04",
+      },
+    ],
   },
   {
-    code: "AI-02",
-    tag: "OCR Digital",
-    title: "Membaca angka timbangan",
-    detail: "Mengekstrak angka kilogram pada layar timbangan digital untuk dicocokkan dengan catatan.",
+    status: "Perlu Tinjauan",
+    count: 2,
+    dotColor: "text-amber-500",
+    items: [
+      {
+        id: "VRF-04",
+        title: "Foto timbangan buram atau tertutup bayangan",
+        tone: "amber",
+        tag: "Cek Ulang",
+      },
+      {
+        id: "VRF-05",
+        title: "Pengepul & admin lakukan verifikasi fisik manual",
+        tone: "amber",
+        tag: "Lapangan",
+      },
+    ],
   },
   {
-    code: "AI-03",
-    tag: "Kelayakan Frame",
-    title: "Memeriksa kualitas foto",
-    detail: "Memastikan ketajaman gambar, pencahayaan cukup, serta material & layar dalam 1 frame.",
+    status: "Siap Dikonversi",
+    count: 2,
+    dotColor: "text-[#426352]",
+    items: [
+      {
+        id: "VRF-06",
+        title: "Uji verifikasi foto 5 Aksi Hijau di Portal Warga",
+        tone: "muted",
+        tag: "Demo Aktif",
+      },
+      {
+        id: "VRF-07",
+        title: "Siapkan konversi poin ke voucher UMKM mitra",
+        tone: "muted",
+        tag: "Rancangan",
+      },
+    ],
   },
-  {
-    code: "AI-04",
-    tag: "Anti-Duplikasi",
-    title: "Menandai indikasi duplikasi",
-    detail: "Memeriksa sidik jari gambar (hash SHA-256) agar foto transaksi lama tidak diajukan ulang.",
-  },
-] as const;
+];
 
-const MANUAL_STEPS = [
+interface SpecDiffLine {
+  num: string;
+  leftText: string;
+  rightText: string;
+  tone: "neutral" | "removed" | "added" | "dim";
+}
+
+const SPEC_DIFF_LINES: SpecDiffLine[] = [
   {
-    step: "01",
-    role: "Pengepul Mitra",
-    title: "Pemeriksaan fisik langsung di titik setor / jemput",
-    detail: "Memastikan botol PET bebas cairan dan kardus tidak basah sebelum ditimbang.",
+    num: "01",
+    leftText: "frame: '1_bingkai_utuh'",
+    rightText: "status: 'rancangan_setoran'",
+    tone: "dim",
   },
   {
-    step: "02",
-    role: "Admin Verifikator",
-    title: "Peninjauan manual untuk foto berstatus ragu",
-    detail: "Bukti foto yang buram atau angka timbangan terhalang ditinjau ulang secara manual.",
+    num: "02",
+    leftText: "resolusi_min >= 320px",
+    rightText: "exif_lokasi: dihapus_otomatis",
+    tone: "dim",
   },
   {
-    step: "03",
-    role: "Pencatatan Sah",
-    title: "Konversi berat aktual ke rencana EcoPoints",
-    detail: "Hanya transaksi yang lolos cek fisik & validasi yang masuk rekap insentif UMKM.",
+    num: "03",
+    leftText: "- material & timbangan difoto terpisah",
+    rightText: "- ditolak: wajib 1 frame sama",
+    tone: "removed",
   },
-] as const;
+  {
+    num: "04",
+    leftText: "+ PET kode 1 / kardus tampak utuh di pelat",
+    rightText: "+ lolos_ai_01: jenis_material",
+    tone: "added",
+  },
+  {
+    num: "05",
+    leftText: "- angka layar buram / tertutup bayangan",
+    rightText: "- ditahan: tinjauan_manual",
+    tone: "removed",
+  },
+  {
+    num: "06",
+    leftText: "+ angka digital 3.45 kg terbaca tajam",
+    rightText: "+ lolos_ai_02: ocr_timbangan",
+    tone: "added",
+  },
+  {
+    num: "07",
+    leftText: "hash: sha256(berkas_foto)",
+    rightText: "anti_duplikasi: aktif",
+    tone: "neutral",
+  },
+  {
+    num: "08",
+    leftText: "fallback: cek_fisik_pengepul()",
+    rightText: "uji_demo: '/login?role=warga'",
+    tone: "neutral",
+  },
+];
+
+const FEATURE_COL_1: LinearRuleTopic[] = [
+  {
+    id: "one-frame",
+    label: "1 Bingkai Timbang",
+    summary:
+      "Material terpilah dan angka layar timbangan digital wajib terekam jelas dalam satu foto yang sama.",
+  },
+  {
+    id: "ai-screening",
+    label: "Penyaringan AI (01–04)",
+    summary:
+      "Membantu memeriksa jenis material, membaca angka timbangan (OCR), ketajaman foto, dan indikasi duplikasi.",
+  },
+  {
+    id: "accept-reject",
+    label: "Aturan Layak vs Tinjau",
+    summary:
+      "Foto yang buram, terpotong, atau diambil terpisah otomatis diarahkan ke pemeriksaan manual tanpa langsung gagal permanen.",
+  },
+];
+
+const FEATURE_COL_2: LinearRuleTopic[] = [
+  {
+    id: "sha256-hash",
+    label: "Pemeriksaan Hash SHA-256",
+    summary:
+      "Setiap berkas foto diperiksa sidik jarinya agar foto transaksi yang sama tidak diajukan berulang kali.",
+  },
+  {
+    id: "manual-fallback",
+    label: "Cek Fisik Pengepul",
+    summary:
+      "AI hanya menjadi penyaring awal; pengepul mitra dan admin tetap memeriksa fisik material di lapangan.",
+  },
+  {
+    id: "active-demo",
+    label: "Demo Aksi Hijau Aktif",
+    summary:
+      "Sambil menunggu alur setoran pengepul aktif, verifikasi foto 5 kebiasaan hijau sudah bisa dicoba langsung di Portal Warga.",
+  },
+];
 
 /**
- * Linear `/plan`-inspired collaborative specification showcase for #setelah-ditimbang:
- * left 4-topic selector rail paired with a docked, fixed-height right specification sheet
- * so switching tabs never causes layout jumps.
+ * Showcase `#setelah-ditimbang` menyamai 1:1 mekanisme Switch Card 3D & tombol
+ * `MaterialShowcaseStage.tsx` / `PlanningAndRouteStage.tsx`:
+ * - Segmented glide switch (Antrean Verifikasi | Aturan Foto & Diff)
+ * - Auto-switch halus (4,8 detik, terjeda hanya saat kursor menyentuh area kartu)
+ * - Stepper `01/02 < >` pada jendela depan & indikator dot progres di bawah deck.
  */
 export default function VerificationShowcaseStage() {
-  const [activeKey, setActiveKey] = useState<VerificationTabKey>("frame");
-  const activeIndex = DOC_TABS.findIndex((tab) => tab.key === activeKey);
-  const current = DOC_TABS[activeIndex >= 0 ? activeIndex : 0];
+  const [frontWindow, setFrontWindow] = useState<VerificationWindowKey>("spec");
+  const [isStageHovered, setIsStageHovered] = useState(false);
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+  const hasEnteredView = useInView(stageRef, { once: true, amount: 0.2 });
 
-  const badgeClass =
-    current.badgeTone === "emerald"
-      ? "border-emerald-300/80 bg-[#E6F8EE] text-[#0F3D2E]"
-      : current.badgeTone === "amber"
-        ? "border-amber-300/80 bg-amber-50 text-amber-900"
-        : "border-emerald-950/12 bg-[#F2F8F4] text-[#2D5542]";
+  const isQueueFront = frontWindow === "queue";
+  const autoSwitchPaused =
+    Boolean(shouldReduceMotion) || !hasEnteredView || isStageHovered;
+
+  useEffect(() => {
+    if (autoSwitchPaused) return;
+    const id = setTimeout(() => {
+      setFrontWindow((prev) => (prev === "spec" ? "queue" : "spec"));
+    }, AUTO_SWITCH_MS);
+    return () => clearTimeout(id);
+  }, [autoSwitchPaused, frontWindow]);
+
+  function switchTo(target: VerificationWindowKey) {
+    setFrontWindow(target);
+  }
+
+  function toggleWindow() {
+    switchTo(frontWindow === "spec" ? "queue" : "spec");
+  }
+
+  const windowsOrder: { key: VerificationWindowKey; label: string }[] = [
+    { key: "queue", label: "Antrean Verifikasi" },
+    { key: "spec", label: "Aturan Foto & Diff" },
+  ];
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-emerald-900/12 bg-gradient-to-b from-[#F2F8F4] to-[#EBF5EF] px-4 pt-5 pb-5 shadow-[0_16px_40px_-18px_rgba(15,61,46,0.10)] sm:px-7 sm:pt-8 md:pb-0 lg:px-10 lg:pt-10">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-center lg:gap-9">
-        {/* Left Interactive Topic Selector Rail */}
+    <div>
+      {/* Clean 2-Segment Gliding Switch matching MaterialShowcaseStage & PlanningAndRouteStage */}
+      <div className="mb-5 flex justify-end">
         <div
           role="tablist"
-          aria-label="Pilih detail verifikasi setelah ditimbang"
-          className="space-y-2.5 md:col-span-5 md:pb-10"
+          aria-label="Pilih tampilan spesifikasi verifikasi"
+          className="inline-flex w-fit items-center gap-1 rounded-2xl border border-emerald-950/10 bg-white p-1 shadow-[inset_0_1px_2px_rgba(15,61,46,0.05)]"
         >
-          {DOC_TABS.map((tab) => {
-            const isActive = tab.key === activeKey;
+          {windowsOrder.map(({ key, label }) => {
+            const isSelected = frontWindow === key;
+            const Icon = key === "queue" ? ListChecks : FileCode2;
+
             return (
               <button
-                key={tab.key}
+                key={key}
                 type="button"
                 role="tab"
-                aria-selected={isActive}
-                onClick={() => setActiveKey(tab.key)}
-                className={`group relative block w-full rounded-2xl px-4 py-3.5 text-left transition-all duration-200 ${
-                  isActive
-                    ? "border border-emerald-900/12 bg-white shadow-[0_12px_28px_-14px_rgba(15,61,46,0.16)]"
-                    : "border border-transparent opacity-75 hover:bg-white/60 hover:opacity-100"
+                aria-selected={isSelected}
+                onClick={() => switchTo(key)}
+                className={`relative flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] ${
+                  isSelected
+                    ? "text-white"
+                    : "text-[#426352] hover:text-[#0F3D2E]"
                 }`}
               >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`h-3.5 w-1 rounded-full transition-colors ${
-                        isActive ? "bg-[#1D9E75]" : "bg-emerald-950/15 group-hover:bg-[#1D9E75]/50"
-                      }`}
-                    />
-                    <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-[#0F3D2E]">
-                      {tab.kicker}
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-bold tabular-nums text-[#426352]/70">
-                    {tab.step}
-                  </span>
-                </div>
-                <p
-                  className={`mt-1.5 pl-3 text-xs leading-relaxed ${
-                    isActive ? "text-[#2D5542]" : "text-[#426352]"
-                  }`}
-                >
-                  {tab.summary}
-                </p>
+                {isSelected && (
+                  <motion.span
+                    layoutId="verification-segmented-active"
+                    transition={
+                      shouldReduceMotion
+                        ? { duration: 0.01 }
+                        : { type: "spring", stiffness: 360, damping: 30 }
+                    }
+                    className="absolute inset-0 rounded-xl bg-[#0F3D2E] shadow-sm shadow-[#0F3D2E]/20"
+                  />
+                )}
+
+                <span className="relative z-10 inline-flex items-center gap-1.5">
+                  <Icon
+                    size={13}
+                    className={isSelected ? "text-[#6EE7B7]" : "text-[#1D9E75]"}
+                    aria-hidden="true"
+                  />
+                  <span>{label}</span>
+                </span>
               </button>
             );
           })}
         </div>
+      </div>
 
-        {/* Right Docked Document Specification Sheet */}
+      {/* Overlapping Two-Window Linear Stage with Hover-Only Pause & Bottom Dots */}
+      <div
+        ref={stageRef}
+        onMouseEnter={() => setIsStageHovered(true)}
+        onMouseLeave={() => setIsStageHovered(false)}
+      >
         <div
-          role="tabpanel"
-          className="flex flex-col justify-between overflow-hidden rounded-2xl border border-emerald-900/12 bg-white shadow-[0_20px_48px_-18px_rgba(15,61,46,0.14)] md:col-span-7 md:min-h-[464px] md:rounded-b-none md:border-b-0"
+          className="relative min-h-[415px] w-full overflow-hidden rounded-2xl pt-2 [--qa-x:0%] [--qb-back-x:8%] [--qb-front-x:8%] md:min-h-[380px] md:[--qa-x:5%] md:[--qb-back-x:53%] md:[--qb-front-x:51%]"
+          style={{ perspective: 1200 }}
         >
-          {/* Top Document Chrome Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900/10 bg-[#FAFDFB] px-5 py-3 sm:px-6">
-            <div className="flex items-center gap-2 text-xs text-[#426352]">
-              <Wrench size={12} className="text-[#1D9E75]" aria-hidden="true" />
-              <span className="font-bold text-[#0F3D2E]">verifikasi-boni</span>
-              <span aria-hidden="true" className="text-[#426352]/50">›</span>
-              <span className="font-medium text-[#2D5542]">{current.breadcrumb}</span>
-            </div>
-
-            <div className="flex items-center gap-2.5">
-              <span
-                className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${badgeClass}`}
-              >
-                {current.badgeText}
-              </span>
-              <div className="hidden items-center gap-1.5 text-[#426352]/60 sm:flex" aria-hidden="true">
-                <Bell size={13} />
-                <Link2 size={13} />
+        {/* Window A: Left Verification Queue / Status List (mirrors Linear "In Review / In Progress / Todo") */}
+        <motion.div
+          initial={false}
+          animate={{
+            x: isQueueFront ? "var(--qa-x)" : "0%",
+            y: isQueueFront ? 0 : 26,
+            scale: isQueueFront ? 1 : 0.94,
+            opacity: isQueueFront ? 1 : 0.76,
+            zIndex: isQueueFront ? 20 : 10,
+          }}
+          whileHover={
+            isQueueFront || shouldReduceMotion
+              ? undefined
+              : { y: 20, opacity: 0.94 }
+          }
+          transition={
+            shouldReduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 230, damping: 26, mass: 0.9 }
+          }
+          style={{ transformOrigin: "top left" }}
+          onClick={isQueueFront ? undefined : () => switchTo("queue")}
+          role={isQueueFront ? undefined : "button"}
+          tabIndex={isQueueFront ? undefined : 0}
+          aria-label={
+            isQueueFront
+              ? undefined
+              : "Tampilkan kartu Antrean Verifikasi ke depan"
+          }
+          onKeyDown={
+            isQueueFront
+              ? undefined
+              : (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    switchTo("queue");
+                  }
+                }
+          }
+          className={`absolute left-0 top-0 w-[92%] rounded-2xl border p-4 transition-shadow duration-300 sm:p-5 md:w-[58%] ${
+            isQueueFront
+              ? "border-emerald-950/15 bg-white shadow-[0_28px_64px_-20px_rgba(15,61,46,0.22)]"
+              : "cursor-pointer border-emerald-950/10 bg-[#FAFDFB] shadow-[0_14px_32px_-18px_rgba(15,61,46,0.16)]"
+          }`}
+        >
+          <div className="mb-3 flex items-center justify-between border-b border-emerald-950/[0.07] pb-2.5 text-xs">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#0F3D2E]">
+              <ListChecks size={13} className="text-[#1D9E75]" aria-hidden="true" />
+              <span>antrean-verifikasi</span>
+            </span>
+            {isQueueFront ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-semibold tabular-nums text-[#426352]/75">
+                  01/02
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleWindow}
+                  aria-label="Lihat tampilan sebelumnya"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-950/12 bg-[#FAFDFB] text-[#0F3D2E] transition-colors hover:border-[#1D9E75]/40 hover:bg-[#EFF8F3]"
+                >
+                  <ChevronLeft size={13} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleWindow}
+                  aria-label="Lihat tampilan berikutnya"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-950/12 bg-[#FAFDFB] text-[#0F3D2E] transition-colors hover:border-[#1D9E75]/40 hover:bg-[#EFF8F3]"
+                >
+                  <ChevronRight size={13} aria-hidden="true" />
+                </button>
               </div>
-            </div>
+            ) : (
+              <span className="text-[11px] font-semibold text-[#1D9E75]">
+                Klik kartu →
+              </span>
+            )}
           </div>
 
-          {/* Animated Document Body */}
-          <div className="flex flex-1 flex-col justify-between p-5 sm:px-7 sm:py-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeKey}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-1 flex-col justify-between gap-4"
-              >
-                {/* Header & Narrative Block */}
-                <div>
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-900/10 bg-[#F4FAF6] text-[#1D9E75]">
-                        {activeKey === "frame" ? (
-                          <Camera size={15} aria-hidden="true" />
-                        ) : activeKey === "manual-review" ? (
-                          <ShieldAlert size={15} aria-hidden="true" />
-                        ) : activeKey === "active-demo" ? (
-                          <Sparkles size={15} aria-hidden="true" />
-                        ) : (
-                          <FileText size={15} aria-hidden="true" />
-                        )}
-                      </span>
-                      <div>
-                        <h3 className="text-lg font-extrabold tracking-tight text-[#0F3D2E] sm:text-xl">
-                          {current.docTitle}
-                        </h3>
-                        <p className="text-[11.5px] font-medium text-[#426352]">
-                          {current.metaLine}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Collaborator chips like Linear /plan */}
-                    <div className="flex items-center gap-1.5">
-                      {current.actors.map((actor) => (
-                        <span
-                          key={actor.handle}
-                          className={`rounded-md px-2 py-0.5 text-[10.5px] font-bold ${
-                            actor.tone === "amber"
-                              ? "bg-amber-100/90 text-amber-900"
-                              : actor.tone === "teal"
-                                ? "bg-[#E2F5EC] text-[#0F3D2E]"
-                                : "bg-[#1D9E75] text-white"
-                          }`}
-                        >
-                          {actor.handle}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tab-specific Inline Highlighted Paragraph */}
-                  {activeKey === "frame" && (
-                    <p className="mt-3.5 text-[13px] leading-relaxed text-[#2D5542]">
-                      Warga mengambil satu foto transaksi yang memastikan{" "}
-                      <mark className="rounded bg-[#E6F6EE] px-1.5 py-0.5 font-semibold text-[#0F3D2E]">
-                        material terpilah terlihat jelas
-                      </mark>{" "}
-                      di atas pelat timbang sekaligus{" "}
-                      <mark className="rounded bg-amber-100/85 px-1.5 py-0.5 font-semibold text-amber-950">
-                        angka timbang terbaca tajam
-                      </mark>{" "}
-                      tanpa tertutup bayangan.
-                    </p>
-                  )}
-
-                  {activeKey === "ai-checks" && (
-                    <p className="mt-3.5 text-[13px] leading-relaxed text-[#2D5542]">
-                      Pada alur setoran yang sedang dirancang,{" "}
-                      <mark className="rounded bg-[#E6F6EE] px-1.5 py-0.5 font-semibold text-[#0F3D2E]">
-                        empat pemeriksaan AI otomatis
-                      </mark>{" "}
-                      menyaring kelayakan bukti foto sebelum{" "}
-                      <mark className="rounded bg-amber-100/85 px-1.5 py-0.5 font-semibold text-amber-950">
-                        validasi akhir pengepul
-                      </mark>{" "}
-                      di lapangan.
-                    </p>
-                  )}
-
-                  {activeKey === "manual-review" && (
-                    <p className="mt-3.5 text-[13px] leading-relaxed text-[#2D5542]">
-                      Verifikasi AI berperan sebagai penyaring awal. Keputusan penerimaan material tetap mengandalkan{" "}
-                      <mark className="rounded bg-amber-100/85 px-1.5 py-0.5 font-semibold text-amber-950">
-                        pemeriksaan fisik &amp; manual
-                      </mark>{" "}
-                      oleh pengepul mitra dan admin bila foto meragukan.
-                    </p>
-                  )}
-
-                  {activeKey === "active-demo" && (
-                    <p className="mt-3.5 text-[13px] leading-relaxed text-[#2D5542]">
-                      Pengajuan setor dan OCR timbangan disiapkan untuk tahap mitra berikutnya, sedangkan{" "}
-                      <mark className="rounded bg-[#E6F6EE] px-1.5 py-0.5 font-semibold text-[#0F3D2E]">
-                        verifikasi foto 5 Aksi Hijau sudah aktif
-                      </mark>{" "}
-                      untuk diuji langsung di Portal Warga.
-                    </p>
-                  )}
+          <div className="space-y-3.5 text-xs">
+            {QUEUE_GROUPS.map((group) => (
+              <div key={group.status}>
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className={`inline-flex items-center ${group.dotColor}`}>
+                    {group.status === "Dalam Verifikasi" ? (
+                      <CheckCircle2 size={12} aria-hidden="true" />
+                    ) : group.status === "Perlu Tinjauan" ? (
+                      <Clock size={12} aria-hidden="true" />
+                    ) : (
+                      <Circle size={11} aria-hidden="true" />
+                    )}
+                  </span>
+                  <span className="text-[11.5px] font-bold text-[#0F3D2E]">
+                    {group.status}
+                  </span>
+                  <span className="font-mono text-[11px] text-[#527362]">
+                    {group.count}
+                  </span>
                 </div>
 
-                {/* Tab-specific Structured Visual Block (Compact & Height-Matched) */}
-                {activeKey === "frame" && (
-                  <div className="rounded-2xl border border-emerald-950/15 bg-[#0D3528] p-3.5 text-white">
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-12">
-                      {/* Left Zone: Material */}
-                      <div className="flex flex-col justify-between rounded-xl border border-dashed border-emerald-400/35 bg-white/[0.06] p-3 sm:col-span-7">
-                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-                          <span>Zona A · Objek Material</span>
-                          <span className="text-[#6EE7B7]">✓ Utuh</span>
-                        </div>
-                        <div className="my-2 grid grid-cols-2 gap-2">
-                          <div className="rounded-lg bg-white/[0.08] px-2.5 py-1.5">
-                            <p className="text-[11px] font-bold text-white">Botol PET 1</p>
-                            <p className="text-[10px] text-emerald-200/80">Bening &amp; kering</p>
-                          </div>
-                          <div className="rounded-lg bg-white/[0.08] px-2.5 py-1.5">
-                            <p className="text-[11px] font-bold text-white">Kardus Lipat</p>
-                            <p className="text-[10px] text-emerald-200/80">Rata &amp; diikat</p>
-                          </div>
-                        </div>
-                        <p className="text-[10px] text-emerald-100/75">
-                          Berada di atas pelat timbangan yang sama
-                        </p>
-                      </div>
-
-                      {/* Right Zone: Scale LCD */}
-                      <div className="flex flex-col justify-between rounded-xl border border-emerald-400/40 bg-[#062118] p-3 sm:col-span-5">
-                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-emerald-300">
-                          <span>Zona B · Layar LCD</span>
-                          <Scale className="h-3 w-3 text-[#6EE7B7]" aria-hidden="true" />
-                        </div>
-                        <div className="my-1.5 rounded-lg border border-emerald-400/30 bg-[#041610] py-2 text-center">
-                          <span className="block text-[9px] font-bold uppercase tracking-widest text-emerald-300/75">
-                            Berat Aktual
-                          </span>
-                          <span className="text-2xl font-extrabold tabular-nums tracking-tight text-[#6EE7B7]">
-                            3.45 <span className="text-xs font-bold">kg</span>
-                          </span>
-                        </div>
-                        <p className="text-center text-[10px] text-emerald-100/80">
-                          <span className="font-semibold text-[#6EE7B7]">Angka tajam</span>
-                          <span className="mx-1.5 text-emerald-400/50">·</span>
-                          <span>Bebas bayangan</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-2.5 text-[10.5px] text-emerald-100/85">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Check size={12} className="text-[#6EE7B7]" />
-                        <span>1 bingkai memuat material &amp; layar angka</span>
-                      </span>
-                      <span className="text-emerald-300/90">EXIF lokasi rumah dibersihkan</span>
-                    </div>
-                  </div>
-                )}
-
-                {activeKey === "ai-checks" && (
-                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                    {AI_QUEUE_STEPS.map((step) => (
-                      <div
-                        key={step.code}
-                        className="flex flex-col justify-between rounded-xl border border-emerald-900/10 bg-[#FAFDFB] p-3 transition-colors hover:border-[#1D9E75]/35"
-                      >
-                        <div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="rounded bg-[#E6F6EE] px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums text-[#0F3D2E]">
-                              {step.code}
-                            </span>
-                            <span className="text-[10px] font-semibold text-[#1D9E75]">
-                              {step.tag}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-xs font-bold text-[#0F3D2E]">
-                            {step.title}
-                          </p>
-                        </div>
-                        <p className="mt-1 text-[11px] leading-relaxed text-[#426352]">
-                          {step.detail}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {activeKey === "manual-review" && (
-                  <div className="space-y-2">
-                    {MANUAL_STEPS.map((item) => (
-                      <div
-                        key={item.step}
-                        className="flex items-start gap-3 rounded-xl border border-emerald-900/10 bg-[#FAFDFB] p-3"
-                      >
-                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-[#E6F6EE] text-[11px] font-extrabold tabular-nums text-[#0F3D2E]">
-                          {item.step}
+                <div className="space-y-1 pl-1">
+                  {group.items.map((ticket) => (
+                    <div
+                      key={ticket.id}
+                      className="flex items-center justify-between gap-2 rounded-lg px-2 py-1 text-[11.5px] hover:bg-[#F2F8F4]/70"
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        <span className="shrink-0 font-mono text-[10.5px] text-[#527362]">
+                          {ticket.id}
                         </span>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-1">
-                            <p className="text-xs font-bold text-[#0F3D2E]">{item.title}</p>
-                            <span className="rounded-full border border-emerald-900/10 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#1D9E75]">
-                              {item.role}
-                            </span>
-                          </div>
-                          <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#426352]">
-                            {item.detail}
-                          </p>
-                        </div>
+                        <span
+                          aria-hidden="true"
+                          className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                            ticket.tone === "emerald"
+                              ? "bg-[#1D9E75]"
+                              : ticket.tone === "amber"
+                                ? "bg-amber-500"
+                                : "bg-emerald-950/25"
+                          }`}
+                        />
+                        <span className="truncate font-medium text-[#0F3D2E]">
+                          {ticket.title}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                )}
-
-                {activeKey === "active-demo" && (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                      <div className="rounded-xl border border-emerald-300/60 bg-[#F2FAF6] p-3.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1D9E75]">
-                            Aktif Dicoba
-                          </span>
-                          <ShieldCheck size={14} className="text-[#1D9E75]" />
-                        </div>
-                        <p className="mt-1.5 text-xs font-bold text-[#0F3D2E]">
-                          Verifikasi Foto 5 Aksi Hijau
-                        </p>
-                        <p className="mt-1 text-[11px] leading-relaxed text-[#2D5542]">
-                          Unggah foto aksi, cek hash SHA-256, dan peroleh simulasi EcoPoints di Portal Warga.
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-emerald-900/10 bg-[#FAFDFB] p-3.5">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800">
-                            Tahap Rancangan
-                          </span>
-                          <Scale size={14} className="text-amber-700" />
-                        </div>
-                        <p className="mt-1.5 text-xs font-bold text-[#0F3D2E]">
-                          Setor, Jemput &amp; OCR Timbangan
-                        </p>
-                        <p className="mt-1 text-[11px] leading-relaxed text-[#426352]">
-                          Pencatatan berat pengepul &amp; konversi poin per kg disiapkan untuk uji lapangan.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-900/10 bg-[#FAFDFB] px-4 py-2.5">
-                      <span className="text-xs font-semibold text-[#0F3D2E]">
-                        Ingin mencoba simulasi unggah foto sekarang?
+                      <span className="shrink-0 whitespace-nowrap rounded border border-emerald-950/[0.08] bg-[#FAFDFB] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[#426352]">
+                        {ticket.tag}
                       </span>
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href="/tentang#rencana-setoran"
-                          className="text-xs font-bold text-[#426352] underline underline-offset-4 hover:text-[#0F3D2E]"
-                        >
-                          Rencana setoran
-                        </Link>
-                        <Link
-                          href="/login?role=warga"
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#0F3D2E] px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#18533F]"
-                        >
-                          <span>Masuk Portal Warga</span>
-                          <span aria-hidden="true">→</span>
-                        </Link>
-                      </div>
                     </div>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Consistent Bottom Document Status Line */}
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-emerald-900/10 pt-3 text-[11px] text-[#426352]">
-              <span>
-                Bagian {current.step} dari 04 · Alur setoran masih rancangan, Aksi Hijau aktif di demo
-              </span>
-              <Link
-                href="/login?role=warga"
-                className="font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
-              >
-                Uji Aksi Hijau <span aria-hidden="true">→</span>
-              </Link>
-            </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
+        </motion.div>
+
+        {/* Window B: Right Diff / Spec Inspection Window (mirrors Linear code/diff panel) */}
+        <motion.div
+          initial={false}
+          animate={{
+            x: isQueueFront ? "var(--qb-back-x)" : "var(--qb-front-x)",
+            y: isQueueFront ? 26 : 0,
+            scale: isQueueFront ? 0.94 : 1,
+            opacity: isQueueFront ? 0.76 : 1,
+            zIndex: isQueueFront ? 10 : 20,
+          }}
+          whileHover={
+            !isQueueFront || shouldReduceMotion
+              ? undefined
+              : { y: 20, opacity: 0.94 }
+          }
+          transition={
+            shouldReduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 230, damping: 26, mass: 0.9 }
+          }
+          style={{ transformOrigin: "top right" }}
+          onClick={!isQueueFront ? undefined : () => switchTo("spec")}
+          role={!isQueueFront ? undefined : "button"}
+          tabIndex={!isQueueFront ? undefined : 0}
+          aria-label={
+            !isQueueFront
+              ? undefined
+              : "Tampilkan kartu Aturan Foto dan Diff ke depan"
+          }
+          onKeyDown={
+            !isQueueFront
+              ? undefined
+              : (e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    switchTo("spec");
+                  }
+                }
+          }
+          className={`absolute left-0 top-0 w-[92%] overflow-hidden rounded-2xl border transition-shadow duration-300 md:w-[66%] ${
+            !isQueueFront
+              ? "border-emerald-950/15 bg-white shadow-[0_28px_64px_-20px_rgba(15,61,46,0.24)]"
+              : "cursor-pointer border-emerald-950/10 bg-[#FAFDFB] shadow-[0_14px_32px_-18px_rgba(15,61,46,0.16)]"
+          }`}
+        >
+          {/* Diff Window Chrome Bar */}
+          <div className="flex items-center justify-between gap-2 border-b border-emerald-950/[0.08] bg-[#F7FBF9] px-4 py-2.5 text-xs">
+            <div className="flex min-w-0 items-center gap-2">
+              <FileCode2
+                size={13}
+                className="shrink-0 text-[#1D9E75]"
+                aria-hidden="true"
+              />
+              <span className="truncate text-[11px] font-bold text-[#0F3D2E]">
+                boni-verifikasi/foto-timbangan.spec
+              </span>
+            </div>
+
+            {!isQueueFront ? (
+              <div className="flex shrink-0 items-center gap-1.5">
+                <span className="text-[11px] font-semibold tabular-nums text-[#426352]/75">
+                  02/02
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleWindow}
+                  aria-label="Lihat tampilan sebelumnya"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-950/12 bg-white text-[#0F3D2E] transition-colors hover:border-[#1D9E75]/40 hover:bg-[#EFF8F3]"
+                >
+                  <ChevronLeft size={13} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleWindow}
+                  aria-label="Lihat tampilan berikutnya"
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-emerald-950/12 bg-white text-[#0F3D2E] transition-colors hover:border-[#1D9E75]/40 hover:bg-[#EFF8F3]"
+                >
+                  <ChevronRight size={13} aria-hidden="true" />
+                </button>
+              </div>
+            ) : (
+              <span className="shrink-0 text-[11px] font-semibold text-[#1D9E75]">
+                Klik kartu →
+              </span>
+            )}
+          </div>
+
+          {/* 2-Column Diff/Inspection Code Lines (matching Linear diff view) */}
+          <div className="divide-y divide-emerald-950/[0.04] py-2 font-mono text-[11px] leading-relaxed">
+            {SPEC_DIFF_LINES.map((line) => {
+              const rowBg =
+                line.tone === "removed"
+                  ? "bg-rose-500/[0.08] text-rose-950"
+                  : line.tone === "added"
+                    ? "bg-emerald-500/[0.11] text-[#0F3D2E]"
+                    : line.tone === "dim"
+                      ? "text-[#426352]/65"
+                      : "text-[#0F3D2E]";
+
+              const statusBadgeColor =
+                line.tone === "removed"
+                  ? "text-rose-700"
+                  : line.tone === "added"
+                    ? "text-[#15803D] font-semibold"
+                    : "text-[#426352]/80";
+
+              return (
+                <div
+                  key={line.num}
+                  className={`grid grid-cols-[26px_1fr] gap-2 px-3.5 py-1.5 sm:grid-cols-[26px_1.35fr_1fr] sm:px-4 ${rowBg}`}
+                >
+                  <span className="select-none text-[10px] tabular-nums text-[#527362]/55">
+                    {line.num}
+                  </span>
+                  <span className="truncate font-medium">{line.leftText}</span>
+                  <span
+                    className={`hidden truncate sm:block ${statusBadgeColor}`}
+                  >
+                    {line.rightText}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+          {/* Soft bottom dissolve vignette matching Linear "Build, review, and ship" */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-20 bg-gradient-to-t from-[#F2F8F4] via-[#F2F8F4]/75 to-transparent"
+          />
+        </div>
+
+        {/* Bottom Carousel Dots Indicator matching MaterialShowcaseStage & PlanningAndRouteStage */}
+        <div
+          role="tablist"
+          aria-label="Navigasi titik jendela verifikasi"
+          className="mt-4 flex items-center justify-center gap-2"
+        >
+          {windowsOrder.map(({ key, label }) => {
+            const isActive = frontWindow === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-label={`Tampilkan kartu ${label}`}
+                onClick={() => switchTo(key)}
+                className={`relative h-2 overflow-hidden rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] ${
+                  isActive
+                    ? "w-8 bg-[#0F3D2E]/15"
+                    : "w-2 bg-emerald-950/20 hover:bg-[#1D9E75]/60"
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    key={`${frontWindow}-${autoSwitchPaused ? "paused" : "run"}`}
+                    initial={{ scaleX: shouldReduceMotion ? 1 : 0 }}
+                    animate={{
+                      scaleX: shouldReduceMotion ? 1 : autoSwitchPaused ? 0.35 : 1,
+                    }}
+                    transition={
+                      shouldReduceMotion || autoSwitchPaused
+                        ? { duration: 0.2 }
+                        : { duration: AUTO_SWITCH_MS / 1000, ease: "linear" }
+                    }
+                    style={{ transformOrigin: "left" }}
+                    className="block h-full w-full rounded-full bg-[#1D9E75]"
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {/* Bottom 3-Column Feature Strip (mirrors Linear "Features | 3 + 3 expandable items") */}
+      <LinearRuleColumns
+        defaultOpenId="one-frame"
+        leftColumn={
+          <div className="space-y-1.5">
+            <p className="text-xs font-bold text-[#0F3D2E]">
+              Pemeriksaan &amp; Validasi
+            </p>
+            <p className="text-xs leading-relaxed text-[#426352]">
+              Kombinasi 1 bingkai foto timbang, penyaringan AI, cek hash SHA-256, dan pemeriksaan fisik mitra.
+            </p>
+          </div>
+        }
+        col1={FEATURE_COL_1}
+        col2={FEATURE_COL_2}
+      />
     </div>
   );
 }

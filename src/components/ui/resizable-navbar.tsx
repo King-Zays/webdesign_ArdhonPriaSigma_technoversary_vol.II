@@ -97,8 +97,8 @@ export const NavBody = ({ children, className, visible = false }: NavBodyProps) 
     <motion.div
       initial={false}
       animate={{
-        width: visible ? "74%" : "100%",
-        maxWidth: visible ? "900px" : "2400px",
+        width: visible ? "82%" : "100%",
+        maxWidth: visible ? "980px" : "2400px",
         y: visible ? 14 : 0,
         borderRadius: visible ? 9999 : 0,
         paddingTop: visible ? 10 : 16,
@@ -145,7 +145,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-1 text-sm font-semibold text-neutral-600 lg:flex",
+        "relative hidden flex-1 flex-row items-center justify-center space-x-1 text-sm font-semibold text-neutral-600 lg:flex",
         className
       )}
     >
