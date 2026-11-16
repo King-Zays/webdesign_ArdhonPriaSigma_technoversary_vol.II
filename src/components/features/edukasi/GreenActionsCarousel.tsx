@@ -351,7 +351,7 @@ export default function GreenActionsCarousel() {
             Aturan umum untuk kelima kategori Aksi Hijau di demo Portal Warga.
           </p>
           <Link
-            href="/dashboard/eco-action"
+            href="/login?role=warga"
             className="inline-flex items-center gap-1 pt-1 text-xs font-semibold text-[#0F3D2E] transition-colors hover:text-[#1F6A4A]"
           >
             <span>Uji di Portal Warga</span>

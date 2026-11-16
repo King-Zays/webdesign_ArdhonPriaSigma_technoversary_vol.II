@@ -252,7 +252,7 @@ export default function SortingReadinessCheck() {
                   </button>
                 )}
                 <Link
-                  href="/dashboard/eco-action"
+                  href="/login?role=warga"
                   aria-label="Uji bukti foto di Aksi Hijau"
                   title="Uji bukti foto di Aksi Hijau"
                   className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#0F3D2E] text-white transition-colors hover:bg-[#18533F]"
@@ -400,7 +400,7 @@ export default function SortingReadinessCheck() {
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <Link
-                href="/dashboard/eco-action"
+                href="/login?role=warga"
                 className="inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
               >
                 <span>Uji bukti foto di Aksi Hijau</span>

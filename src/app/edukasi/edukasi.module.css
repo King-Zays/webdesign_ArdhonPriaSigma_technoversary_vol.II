@@ -11,6 +11,101 @@
   );
 }
 
+.softSection {
+  background-image: linear-gradient(
+    to bottom,
+    rgb(220 234 226 / 0),
+    rgb(220 234 226 / 0.28) 24% 76%,
+    rgb(220 234 226 / 0)
+  );
+}
+
+.referenceViewport {
+  width: 100%;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-block: 0.35rem;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.referenceTrack {
+  display: flex;
+  width: max-content;
+  animation: reference-marquee linear infinite;
+  will-change: transform;
+}
+
+.referenceTrackReverse {
+  animation-direction: reverse;
+}
+
+.referenceGroup {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.75rem 0.25rem 0;
+  white-space: nowrap;
+}
+
+@keyframes reference-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (hover: hover) {
+  .referenceViewport:hover .referenceTrack {
+    animation-play-state: paused;
+  }
+}
+
+.referenceViewport:is([data-paused="true"], :has(:focus-visible)) {
+  overflow: visible;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.referenceViewport:is([data-paused="true"], :has(:focus-visible)) .referenceTrack {
+  width: auto;
+  animation-name: none;
+}
+
+.referenceViewport:is([data-paused="true"], :has(:focus-visible)) .referenceGroup {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  padding-right: 0;
+  white-space: normal;
+}
+
+.referenceViewport:is([data-paused="true"], :has(:focus-visible)) .referenceCopy {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .referenceViewport {
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  .referenceTrack {
+    width: auto;
+    animation-name: none;
+  }
+
+  .referenceGroup {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    padding-right: 0;
+    white-space: normal;
+  }
+
+  .referenceCopy {
+    display: none;
+  }
+}
+
 .heroPerspectiveContainer {
   position: relative;
 }

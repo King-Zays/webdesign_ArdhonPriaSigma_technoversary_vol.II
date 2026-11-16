@@ -1,104 +1,101 @@
-import Link from "next/link";
 import Image from "next/image";
+import MeadowRiseFooter, {
+  type MeadowColumn,
+  type MeadowLink,
+  type MeadowPaletteOverrides,
+} from "@/components/ui/meadow-rise-footer";
 import { siteConfig, teamConfig } from "@/config/site";
 
-const SOLUTION_LINKS = [
-  { label: "Verifikasi Aksi Hijau", href: "/dashboard/eco-action" },
-  { label: "Bursa Diskon UMKM", href: "/dashboard/marketplace" },
-  { label: "Peta 31 Kecamatan", href: "/dashboard/map" },
-  { label: "Laporan Titik Sampah", href: "/dashboard/laporan-sampah" },
-  { label: "Cek Struk Listrik", href: "/dashboard/tracker" },
+const FOOTER_COLUMNS: MeadowColumn[] = [
+  {
+    title: "Halaman Publik",
+    links: [
+      { label: "Beranda", href: "/" },
+      { label: "Tentang BONI", href: "/tentang" },
+      { label: "Edukasi & Pilah", href: "/edukasi" },
+      { label: "Kontak & FAQ", href: "/kontak" },
+    ],
+  },
+  {
+    title: "Fitur Warga",
+    links: [
+      { label: "Masuk Demo Warga", href: "/login?role=warga" },
+      { label: "Verifikasi Aksi Hijau", href: "/dashboard/eco-action" },
+      { label: "Bursa Diskon UMKM", href: "/dashboard/marketplace" },
+      { label: "Peta 31 Kecamatan", href: "/dashboard/map" },
+      { label: "Laporan Titik Sampah", href: "/dashboard/laporan-sampah" },
+    ],
+  },
+  {
+    title: "Pemerintah Kota",
+    links: [
+      { label: "Portal Pemkot (Demo)", href: "/gov/login" },
+      { label: "Monitoring Wilayah", href: "/gov/dashboard" },
+      { label: "Panduan Kolaborasi", href: "/kontak/kolaborasi" },
+      { label: "Pusat Bantuan", href: "/kontak/bantuan" },
+    ],
+  },
 ];
 
-const GOV_LINKS = [
-  { label: "Portal Pemkot Surabaya (Demo)", href: "/gov/login" },
-  { label: "Monitoring Wilayah", href: "/gov/dashboard" },
-  { label: "Disposisi Petugas DLH", href: "/gov/dashboard" },
+const LEGAL_LINKS: MeadowLink[] = [
+  { label: "Kota Surabaya, Jawa Timur", href: "/tentang" },
+  { label: "Repositori GitHub", href: siteConfig.repositoryUrl },
 ];
+
+const BONI_MEADOW_PALETTE: MeadowPaletteOverrides = {
+  sky: ["#FAFDFB", "#ECF7F0"],
+  haze: "#E3F2E9",
+  glow: "#FFFBEF",
+  hills: [
+    ["#CFE3D7", "#B8D3C3"],
+    ["#ADD0BC", "#90BA9F"],
+    ["#7DB294", "#5D9676"],
+    ["#468864", "#2F6B4B"],
+    ["#265D3F", "#16412A"],
+    ["#133924", "#0A2315"],
+  ],
+  ground: "#07170E",
+  ink: "#0B3326",
+  sub: "#174837",
+  pill: "#FFFFFF",
+  pillInk: "#0B3326",
+  text: "#F3FAF6",
+  muted: "#C4DDD0",
+  line: "rgba(243, 250, 246, 0.18)",
+};
 
 export default function Footer() {
   return (
-    <footer className="w-full border-t border-emerald-950/40 bg-[#07170E] text-white">
-      {/* Konten Utama Footer */}
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12">
-          {/* Kolom 1: Profil Brand & Deskripsi */}
-          <div className="flex flex-col gap-4 lg:col-span-5">
-            <Image
-              src="/logo-white.png"
-              alt="BONI"
-              width={124}
-              height={40}
-              className="h-8 w-auto object-contain object-left"
-            />
-            
-            <p className="text-sm font-semibold text-white/95">
-              {siteConfig.fullName}
-            </p>
-
-            <p className="text-xs sm:text-sm leading-relaxed text-emerald-100/75 max-w-md">
-              Platform aksi komunitas untuk lingkungan Kota Surabaya. Menghubungkan kebiasaan pilah sampah dan rawat lingkungan warga dengan verifikasi cerdas serta perputaran manfaat ekonomi di warung UMKM sekitar.
-            </p>
-          </div>
-
-          {/* Kolom 2: Fitur Warga */}
-          <div className="flex flex-col gap-3 lg:col-span-3">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
-              Fitur Warga
-            </h3>
-            <ul className="flex flex-col gap-2.5 text-xs sm:text-sm">
-              {SOLUTION_LINKS.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-emerald-100/70 transition-colors hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Kolom 3: Pemerintah Kota */}
-          <div className="flex flex-col gap-3 lg:col-span-2">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
-              Pemerintah Kota
-            </h3>
-            <ul className="flex flex-col gap-2.5 text-xs sm:text-sm">
-              {GOV_LINKS.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-emerald-100/70 transition-colors hover:text-white"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Kolom 4: Inisiatif */}
-          <div className="flex flex-col gap-3 lg:col-span-2">
-            <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400">
-              Inisiatif
-            </h3>
-            <div className="text-xs text-emerald-100/80 space-y-1">
-              <p className="font-semibold text-white">{teamConfig.teamName}</p>
-              <p className="text-emerald-100/60">UPN &quot;Veteran&quot; Jawa Timur</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Garis Bawah Hak Cipta & Kota */}
-      <div className="border-t border-white/10 bg-black/20">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 text-xs text-emerald-100/60">
-          <p>© 2026 BONI · Bank Observasi Nol Emisi Kota, Warga Aktif Nikmati Insentif.</p>
-          <p>Kota Surabaya, Jawa Timur, Indonesia</p>
-        </div>
-      </div>
-    </footer>
+    <MeadowRiseFooter
+      name={siteConfig.name}
+      brandHref="/"
+      logo={
+        <Image
+          src="/logo-white.png"
+          alt="BONI"
+          width={124}
+          height={40}
+          className="h-8 w-auto object-contain object-left transition-opacity duration-200 hover:opacity-90"
+        />
+      }
+      showBrandName={false}
+      heading={"Mulai aksi *hijau*\ndari rumah hari ini."}
+      subheading="Pilah sampah dari rumah, verifikasi foto, dan tukar EcoPoints di UMKM Surabaya."
+      cta={{ label: "Coba demo BONI", href: "/login?role=warga" }}
+      tagline={`${siteConfig.fullName} · Kota Surabaya`}
+      newsletter
+      placeholder="Simulasi buletin warga (demo)"
+      successMessage="Simulasi berhasil. Alamat email tidak dikirim ke server."
+      columns={FOOTER_COLUMNS}
+      socials={[]}
+      copyright={`© 2026 ${siteConfig.name} · Tim ${teamConfig.teamName} (${teamConfig.institutionShort})`}
+      legal={LEGAL_LINKS}
+      preset="meadow"
+      palette={BONI_MEADOW_PALETTE}
+      seed={7}
+      height="920px"
+      heroHeight="clamp(440px, 60svh, 580px)"
+      fontFamily="var(--font-jakarta), system-ui, sans-serif"
+    />
   );
 }

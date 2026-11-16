@@ -1,5 +1,35 @@
 # Riwayat pembaruan BONI
 
+## Calon pendukung untuk pembahasan lanjutan
+
+Bagian instansi dan calon pendukung ditunda dari halaman Edukasi. Daftar ini menyimpan usulan peran dari riset awal tim.
+
+- Dinas Lingkungan Hidup Surabaya untuk pembinaan aksi lingkungan dan koordinasi bank sampah. [Profil DLH](https://www.surabaya.go.id/id/page/0/23763/dinas-lingkungan-hidup)
+- Dinas Komunikasi dan Informatika Surabaya untuk konsultasi integrasi layanan. [Profil Dinkominfo](https://surabaya.go.id/id/page/0/8082/dinas-komunikasi-dan-informatik)
+- Dinas Perhubungan Surabaya untuk kampanye transportasi rendah emisi. [Profil Dishub](https://surabaya.go.id/id/page/0/8084/dinas-perhubungan)
+- Dinas Koperasi, UKM dan Perdagangan Surabaya untuk menjajaki insentif bersama UMKM. [Profil Dinkopumdag](https://surabaya.go.id/id/page/0/8090/dinas-koperasi-usaha-kecil-dan)
+- Dinas Ketahanan Pangan dan Pertanian Surabaya untuk penghijauan dan pertanian perkotaan. [Profil DKPP](https://surabaya.go.id/id/page/0/8083/dinas-ketahanan-pangan-dan-pert)
+- Kecamatan, kelurahan, dan pengurus RW untuk uji coba lingkungan dan pelibatan warga.
+- Kementerian Lingkungan Hidup / BPLH untuk pendampingan aksi iklim dan pengukuran dampak. [Situs KLH/BPLH](https://kemenlh.go.id/)
+- Perusahaan melalui program CSR untuk dukungan kampanye, fasilitas, dan insentif.
+
+## Kandidat Edukasi yang menunggu tautan
+
+Ketiga kandidat dari riset awal BONI berikut disimpan untuk pembahasan lanjutan.
+
+- Bank sampah unit tingkat RW untuk lokasi uji coba pemilahan dan penimbangan.
+- Karang Taruna tingkat kelurahan untuk menggerakkan partisipasi pemuda.
+- SIMAKMUR untuk rancangan registrasi pedagang CFD. Aset logo tersedia di `public/images/kolaborasi/simakmur.webp`.
+
+## 16 November 2026 — Transisi halaman Edukasi dan Kontak
+
+- Garis batas di bawah pratinjau dashboard dihapus agar gradasinya menyatu dengan latar deretan logo.
+- Garis pemisah antarbagian Edukasi dihapus. Latar hijau pada cek kesiapan, bukti timbang, dan bagian ajakan kini memudar di kedua tepi.
+- Bagian pembuka dan FAQ di Kontak berbagi latar yang sama. Bagian ajakan memakai gradasi hijau dengan tepi yang memudar.
+- Galeri Edukasi mengalir langsung ke ajakan di footer. Pilihan portal tersedia di bawah galeri, dan warna langit di tepi footer menyatu dengan latar halaman.
+- Layout publik memakai warna dasar yang sama dengan tepi atas footer. Jarak penutup Beranda, Tentang, dan Kontak diselaraskan dengan Edukasi.
+- CSS footer dipindahkan ke stylesheet agar pengodean tanda kutip pada HTML server tidak menimbulkan error hydration di browser.
+
 ## 15 November 2026 — Impor ke repo Techno Versary Vol. II
 
 Kode aplikasi berasal dari arsip `BONI-Bank-Observasi-Nol-Emisi-Warga-Aktif-Nikmati-Insentif-main.zip`. README repo memuat petunjuk menjalankan aplikasi dan identitas tim Techno Versary.

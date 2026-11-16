@@ -12,12 +12,16 @@ const questions: FaqItem[] = [
     question: "Apa yang bisa saya coba di BONI?",
     answer:
       "Demo warga menyediakan pencatatan Aksi Hijau, unggah bukti foto, EcoPoints, katalog hadiah, laporan titik sampah, dan peta dampak. Kamu dapat langsung mencoba Portal Warga maupun Portal Pemkot Surabaya.",
+    tag: "Demo Aktif",
+    dotColor: "#1D9E75",
     links: [{ label: "Pilih portal demo", href: "/#gateway" }],
   },
   {
     question: "Bagaimana status fitur setor dan jemput oleh pengepul?",
     answer:
       "Untuk versi demo saat ini, pengajuan setor, penjemputan rutin, dan Portal Pengepul masih dalam rancangan pengembangan. Sambil menunggu alur penimbangan aktif, kamu tetap dapat mempelajari kriteria material dan menguji checklist kesiapan dari rumah.",
+    tag: "Tahap Lanjutan",
+    dotColor: "#D97706",
     links: [
       { label: "Buka panduan pilah", href: "/edukasi#material-setoran" },
       { label: "Cek kesiapan", href: "/edukasi#cek-kesiapan" },
@@ -27,12 +31,16 @@ const questions: FaqItem[] = [
     question: "Bagaimana BONI memeriksa bukti foto?",
     answer:
       "Verifikasi foto Aksi Hijau sudah berjalan di demo Warga menggunakan pemeriksaan AI dan validasi teknis foto (ukuran, resolusi, usia foto, dan duplikasi hash). Untuk foto timbangan transaksi PET dan kardus bersama pengepul, mekanismenya masih tersimpan sebagai rancangan.",
+    tag: "Verifikasi AI",
+    dotColor: "#10B981",
     links: [{ label: "Lihat syarat bukti foto", href: "/edukasi#aksi-hijau" }],
   },
   {
     question: "Apakah EcoPoints di demo dapat ditukar di toko?",
     answer:
       "Belum dapat ditukar secara nyata. EcoPoints, katalog hadiah, dan voucher mitra di demo ini seluruhnya memakai data simulasi.",
+    tag: "Simulasi",
+    dotColor: "#0F766E",
   },
 ];
 

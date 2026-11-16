@@ -964,7 +964,7 @@ export function FinalCta() {
   ];
 
   return (
-    <section id="gateway" className="scroll-mt-16 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
+    <section id="gateway" className="scroll-mt-16 bg-[#FAFDFB] px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28">
       <div id="team" className="scroll-mt-20 mx-auto max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 38, filter: "blur(6px)" }}

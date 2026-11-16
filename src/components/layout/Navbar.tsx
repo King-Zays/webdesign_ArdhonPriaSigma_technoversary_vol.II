@@ -2,29 +2,29 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import { useAuthStore } from "@/store/auth.store";
 import { useAuth } from "@/hooks/useAuth";
 import { useHydrated } from "@/hooks/useHydrated";
 import { PUBLIC_NAV } from "@/config/navigation";
-import { teamConfig } from "@/config/site";
+import FloatingMenu from "@/components/ui/liquid-morph-floating-menu";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const hydrated = useHydrated();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { logoutMutation } = useAuth();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
 
   const signedIn = hydrated && isAuthenticated;
+  const mobileMenuItems = PUBLIC_NAV.map((link) => ({
+    label: link.label,
+    href: link.href,
+    active:
+      link.href === "/"
+        ? pathname === "/"
+        : pathname === link.href || pathname.startsWith(`${link.href}/`),
+  }));
 
   return (
     <>
@@ -107,121 +107,63 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Tombol Menu Mobile */}
-          <button
-            type="button"
-            className="rounded-xl border border-gray-200 p-2.5 text-[#0F3D2E] hover:bg-gray-100 lg:hidden"
-            aria-label="Buka menu"
-            aria-expanded={open}
-            onClick={() => setOpen(true)}
-          >
-            <Menu size={20} />
-          </button>
+          {/* Menu Morph Liquid Mobile (Tetap di Kanan Atas) */}
+          <div className="lg:hidden">
+            <FloatingMenu
+              placement="top-right"
+              items={mobileMenuItems}
+              closedWidth={108}
+              closedHeight={42}
+              openWidth={276}
+              openHeight={368}
+              footer={(close) => (
+                <div className="flex flex-col gap-2">
+                  {signedIn ? (
+                    <>
+                      <Link
+                        href="/dashboard"
+                        onClick={close}
+                        className="rounded-full bg-[#1D9E75] py-2.5 text-center text-xs font-bold text-white transition-colors hover:bg-[#17825F]"
+                      >
+                        Buka Portal Warga
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          close();
+                          logoutMutation.mutate();
+                        }}
+                        disabled={logoutMutation.isPending}
+                        className="rounded-full border border-white/25 py-2.5 text-center text-xs font-bold text-rose-200 transition-colors hover:bg-white/10 disabled:opacity-50"
+                      >
+                        Keluar Akun
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/#gateway"
+                        onClick={close}
+                        className="inline-flex items-center justify-center gap-1.5 rounded-full bg-[#1D9E75] py-2.5 text-center text-xs font-bold text-white transition-colors hover:bg-[#17825F]"
+                      >
+                        <span>Eksplorasi Demo</span>
+                        <ArrowRight size={13} />
+                      </Link>
+                      <Link
+                        href="/login"
+                        onClick={close}
+                        className="rounded-full border border-white/25 py-2.5 text-center text-xs font-bold text-[#F5FAF7] transition-colors hover:bg-white/10"
+                      >
+                        Masuk Akun
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
+            />
+          </div>
         </nav>
       </header>
-
-      {/* Drawer Mobile Rapi */}
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-xs"
-              onClick={() => setOpen(false)}
-            />
-            <motion.div
-              key="drawer"
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "tween", duration: 0.25 }}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Menu"
-              className="fixed inset-y-0 left-0 z-[70] flex w-[280px] flex-col bg-white shadow-2xl"
-            >
-              <div className="flex h-[72px] items-center justify-between border-b border-gray-100 px-6">
-                <Image
-                  src="/logo.png"
-                  alt="BONI"
-                  width={110}
-                  height={36}
-                  className="h-8 w-auto object-contain"
-                />
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  aria-label="Tutup menu"
-                  className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <ul className="flex-1 overflow-y-auto p-4 space-y-1">
-                {PUBLIC_NAV.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-emerald-50 hover:text-[#0F3D2E]"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex flex-col gap-2.5 border-t border-gray-100 p-5">
-                {signedIn ? (
-                  <>
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setOpen(false)}
-                      className="rounded-full bg-[#0F3D2E] py-3 text-center text-sm font-bold text-white shadow-xs"
-                    >
-                      Buka Portal Warga
-                    </Link>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpen(false);
-                        logoutMutation.mutate();
-                      }}
-                      className="rounded-full border border-gray-200 py-3 text-center text-sm font-bold text-red-600 hover:bg-red-50"
-                    >
-                      Keluar Akun
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/#gateway"
-                      onClick={() => setOpen(false)}
-                      className="rounded-full bg-[#0F3D2E] py-3 text-center text-sm font-bold text-white shadow-xs"
-                    >
-                      Eksplorasi Demo
-                    </Link>
-                    <Link
-                      href="/login"
-                      onClick={() => setOpen(false)}
-                      className="rounded-full border border-gray-200 py-3 text-center text-sm font-bold text-[#0F3D2E]"
-                    >
-                      Masuk Akun
-                    </Link>
-                  </>
-                )}
-                <p className="mt-2 text-center text-[10px] text-gray-400">
-                  © 2026 BONI · {teamConfig.teamName}
-                </p>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </>
   );
 }

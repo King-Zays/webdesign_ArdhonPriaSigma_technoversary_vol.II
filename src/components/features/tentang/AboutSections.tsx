@@ -291,7 +291,7 @@ export default function AboutSections() {
       </section>
 
       {/* 4. Peluang Kolaborasi & Kontak (#kolaborasi) */}
-      <section id="kolaborasi" aria-labelledby="kolaborasi-title" className="scroll-mt-24 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
+      <section id="kolaborasi" aria-labelledby="kolaborasi-title" className="scroll-mt-24 bg-[#FAFDFB] px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 32, filter: "blur(5px)" }}
