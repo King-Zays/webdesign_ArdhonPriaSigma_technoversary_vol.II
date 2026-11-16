@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
 import { competitionConfig, sdgAlignment, teamConfig } from "@/config/site";
 import HeroConsole from "./HeroConsole";
@@ -237,16 +237,29 @@ export function CaraKerjaDemo() {
         {
           id: "wr-demo-02",
           judul: "Sampah plastik tersangkut di bantaran sungai",
+          detail: "Kemasan menumpuk di belokan saluran dekat jembatan penyeberangan.",
           lokasi: "Semampir",
           kategori: "Sampah sungai",
           keparahan: "Kritis",
+          infoTambahan: "22 dukungan warga",
         },
         {
           id: "wr-demo-05",
           judul: "Lahan terbuka berubah menjadi pembuangan liar",
+          detail: "Sampah rumah tangga mulai dibuang di lahan samping jalan utama.",
           lokasi: "Gayungan",
           kategori: "TPS/TPA liar",
           keparahan: "Berat",
+          infoTambahan: "6 dukungan warga",
+        },
+        {
+          id: "wr-demo-06",
+          judul: "Serpihan styrofoam & plastik di jalan pesisir",
+          detail: "Sekitar 100 meter bahu jalan pesisir dipenuhi serpihan kemasan.",
+          lokasi: "Bulak",
+          kategori: "Sampah jalan",
+          keparahan: "Ringan",
+          infoTambahan: "3 dukungan warga",
         },
       ],
     },
@@ -258,16 +271,29 @@ export function CaraKerjaDemo() {
         {
           id: "wr-demo-01",
           judul: "Tumpukan sampah meluber di pinggir jalan",
+          detail: "Kantong sampah meluber ke trotoar dan mengganggu pejalan kaki.",
           lokasi: "Wonokromo",
           kategori: "Tim Truk Pengangkut Sampah DLH",
           keparahan: "Berat",
+          infoTambahan: "14 dukungan warga",
+        },
+        {
+          id: "wr-demo-04",
+          judul: "Drum cairan tanpa label di lahan kosong",
+          detail: "Beberapa drum berbau menyengat ditemukan dekat kawasan permukiman.",
+          lokasi: "Rungkut",
+          kategori: "Unit Khusus Penanganan Limbah B3",
+          keparahan: "Kritis",
+          infoTambahan: "31 dukungan warga",
         },
         {
           id: "wr-demo-10",
           judul: "Sampah jajanan berserakan di gerbang sekolah",
+          detail: "Bungkus plastik makanan ringan menumpuk di trotoar tiap pagi.",
           lokasi: "Sukolilo",
           kategori: "Kelompok Relawan Lingkungan Warga",
           keparahan: "Ringan",
+          infoTambahan: "5 dukungan warga",
         },
       ],
     },
@@ -279,16 +305,29 @@ export function CaraKerjaDemo() {
         {
           id: "wr-demo-07",
           judul: "Saluran drainase tersumbat tumpukan sampah",
+          detail: "Saluran drainase telah dikeruk oleh regu SDA dan air kembali lancar.",
           lokasi: "Tambaksari",
           kategori: "Satuan Saluran & Drainase Dinas SDA",
           keparahan: "Selesai dikeruk",
+          infoTambahan: "19 dukungan warga",
         },
         {
           id: "wr-demo-08",
           judul: "Bak sampah meluber di pintu pasar tradisional",
+          detail: "Jadwal ritase truk pengangkut sampah DLH di area pasar telah ditambah.",
           lokasi: "Bubutan",
           kategori: "Tim Truk Pengangkut Sampah DLH",
           keparahan: "Ritase ditambah",
+          infoTambahan: "11 dukungan warga",
+        },
+        {
+          id: "wr-demo-03",
+          judul: "Sampah berserakan di sekitar taman kota",
+          detail: "Area bangku taman kota telah dibersihkan oleh Pasukan Kuning.",
+          lokasi: "Wonokromo",
+          kategori: "Pasukan Kuning Kebersihan Taman",
+          keparahan: "Taman bersih",
+          infoTambahan: "8 dukungan warga",
         },
       ],
     },
@@ -386,11 +425,12 @@ export function CaraKerjaDemo() {
                   <button
                     key={st}
                     type="button"
+                    aria-pressed={aktif}
                     onClick={() => setSorotStatus(st === "Semua" ? null : st)}
-                    className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors ${
+                    className={`cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all active:scale-95 ${
                       aktif
-                        ? "bg-[#0F3D2E] text-white"
-                        : "bg-white text-neutral-500 hover:bg-emerald-50 hover:text-[#0F3D2E]"
+                        ? "bg-[#0F3D2E] text-white shadow-xs"
+                        : "bg-white text-neutral-600 hover:bg-emerald-50 hover:text-[#0F3D2E]"
                     }`}
                   >
                     {st}
@@ -400,54 +440,117 @@ export function CaraKerjaDemo() {
             </div>
           </div>
 
-          <div className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0">
-            {kolomLaporan.map((kol, colIdx) => {
-              const redup = sorotStatus !== null && sorotStatus !== kol.status;
-              return (
-                <motion.div
-                  key={kol.status}
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.2 }}
-                  transition={{ duration: 0.95, delay: 0.18 + colIdx * 0.16, ease: EASE_OUT_EXPO }}
-                  className={`p-4 transition-opacity duration-300 sm:p-5 ${redup ? "opacity-45" : "opacity-100"}`}
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
-                      <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
-                      <span>{kol.status}</span>
+          <AnimatePresence mode="wait" initial={false}>
+            {sorotStatus === null ? (
+              <motion.div
+                key="board-all"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
+                className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0"
+              >
+                {kolomLaporan.map((kol) => (
+                  <div key={kol.status} className="p-4 sm:p-5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
+                        <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
+                        <span>{kol.status}</span>
+                      </div>
+                      <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
                     </div>
-                    <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
-                  </div>
 
-                  <div className="mt-3.5 space-y-2.5">
-                    {kol.tiket.map((t) => (
-                      <motion.div
-                        key={t.id}
-                        whileHover={{ y: -2 }}
-                        transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
-                        className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-all hover:border-[#2D5F3F]/35 hover:bg-white hover:shadow-sm"
-                      >
-                        <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
-                          <span>{t.id}</span>
-                          <span>{t.lokasi}</span>
-                        </div>
-                        <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
-                          {t.judul}
-                        </p>
-                        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
-                          <span className="truncate text-neutral-600">{t.kategori}</span>
-                          <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
-                            {t.keparahan}
-                          </span>
-                        </div>
-                      </motion.div>
-                    ))}
+                    <div className="mt-3.5 space-y-2.5">
+                      {kol.tiket.map((t) => (
+                        <motion.div
+                          key={t.id}
+                          whileHover={{ y: -2 }}
+                          transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
+                          className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-all hover:border-[#2D5F3F]/35 hover:bg-white hover:shadow-sm"
+                        >
+                          <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                            <span>{t.id}</span>
+                            <span>{t.lokasi}</span>
+                          </div>
+                          <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
+                            {t.judul}
+                          </p>
+                          <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-neutral-500">
+                            {t.detail}
+                          </p>
+                          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+                            <span className="truncate text-neutral-600">{t.kategori}</span>
+                            <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
+                              {t.keparahan}
+                            </span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                ))}
+              </motion.div>
+            ) : (
+              (() => {
+                const kolomAktif = kolomLaporan.find((k) => k.status === sorotStatus) ?? kolomLaporan[0];
+                return (
+                  <motion.div
+                    key={`board-${kolomAktif.status}`}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
+                    className="p-4 sm:p-6"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-3 text-xs">
+                      <div className="flex items-center gap-2 font-bold text-[#0F3D2E]">
+                        <span className={`h-2.5 w-2.5 rounded-full ${kolomAktif.dot}`} />
+                        <span>Antrean Status: {kolomAktif.status}</span>
+                        <span className="font-mono font-normal text-neutral-500">({kolomAktif.jumlah})</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSorotStatus(null)}
+                        className="font-semibold text-[#1D9E75] hover:text-[#0F3D2E]"
+                      >
+                        Tampilkan semua kolom →
+                      </button>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 md:grid-cols-3">
+                      {kolomAktif.tiket.map((t) => (
+                        <motion.div
+                          key={t.id}
+                          whileHover={{ y: -2 }}
+                          transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
+                          className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#FAFDFB] p-4 transition-all hover:border-[#2D5F3F]/40 hover:bg-white hover:shadow-sm"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                              <span>{t.id}</span>
+                              <span className="font-semibold text-[#0F3D2E]">Kec. {t.lokasi}</span>
+                            </div>
+                            <p className="mt-1.5 text-sm font-bold leading-snug text-[#1A1A1A]">{t.judul}</p>
+                            <p className="mt-1.5 text-xs leading-relaxed text-neutral-600">{t.detail}</p>
+                          </div>
+
+                          <div className="mt-3.5 space-y-2 border-t border-neutral-200/70 pt-3 text-[11px]">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="truncate font-medium text-neutral-600">{t.kategori}</span>
+                              <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]">
+                                {t.keparahan}
+                              </span>
+                            </div>
+                            <p className="font-mono text-[10px] text-neutral-400">{t.infoTambahan}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              })()
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* 4 Langkah Alur */}

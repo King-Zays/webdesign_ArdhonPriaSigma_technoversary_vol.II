@@ -118,51 +118,51 @@ export default function AboutSection3() {
                 href="/media/hero-planting-poster.jpg"
               ></image>
             </svg>
-            <figcaption className="pointer-events-none absolute bottom-3 left-[10%] rounded-full border border-emerald-300/30 bg-[#081C11]/75 px-3 py-1 text-[11px] font-medium text-emerald-50 backdrop-blur-sm">
+            <figcaption className="pointer-events-none absolute bottom-3.5 left-[11%] hidden rounded-full border border-emerald-300/30 bg-[#081C11]/75 px-3 py-1 text-[11px] font-medium text-emerald-50 backdrop-blur-sm sm:inline-block">
               Ilustrasi penghijauan lokal Surabaya · Ekosistem BONI
             </figcaption>
           </TimelineContent>
 
-          {/* Stats */}
-          <div className="flex flex-wrap items-center justify-between py-4 text-sm lg:justify-start">
+          {/* Stats — selaras dengan ruang notch kanan bawah tanpa menabrak gambar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm lg:justify-start">
             <TimelineContent
               as="div"
               animationNum={2}
               timelineRef={heroRef}
               customVariants={revealVariants}
-              className="flex gap-4"
+              className="flex flex-wrap items-center gap-x-4 gap-y-1"
             >
-              <div className="mb-2 flex items-center gap-2 text-xs sm:text-base">
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm">
                 <span className="font-extrabold text-[#1D9E75]">5</span>
                 <span className="text-[#426352]">kategori aksi hijau</span>
-                <span className="text-emerald-900/20">|</span>
               </div>
-              <div className="mb-2 flex items-center gap-2 text-xs sm:text-base">
+              <span className="text-emerald-900/20" aria-hidden="true">|</span>
+              <div className="flex items-center gap-1.5 text-xs sm:text-sm">
                 <span className="font-extrabold text-[#1D9E75]">31</span>
                 <span className="text-[#426352]">kecamatan Surabaya</span>
               </div>
             </TimelineContent>
-            <div className="right-0 bottom-16 flex flex-row-reverse gap-4 lg:absolute lg:flex-col lg:gap-0">
+
+            <div className="flex items-center gap-3 lg:absolute lg:bottom-12 lg:right-0 lg:w-[20.5%] lg:flex-col lg:items-end lg:gap-0.5 lg:text-right">
               <TimelineContent
                 as="div"
                 animationNum={3}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="mb-2 flex items-center gap-2 text-2xl sm:text-3xl xl:text-4xl"
+                className="flex items-baseline gap-1.5 text-lg sm:text-2xl xl:text-[26px] xl:leading-tight"
               >
                 <span className="font-extrabold text-[#0F3D2E]">3</span>
-                <span className="font-semibold uppercase text-[#426352]">peran utama</span>
+                <span className="font-bold uppercase tracking-tight text-[#426352]">Peran</span>
               </TimelineContent>
               <TimelineContent
                 as="div"
                 animationNum={4}
                 timelineRef={heroRef}
                 customVariants={revealVariants}
-                className="mb-2 flex items-center gap-2 text-xs sm:text-base"
+                className="flex items-center gap-1.5 text-xs sm:text-sm"
               >
                 <span className="font-bold text-[#1D9E75]">Surabaya</span>
                 <span className="text-[#426352]">wilayah fokus</span>
-                <span className="block text-emerald-900/20 lg:hidden">|</span>
               </TimelineContent>
             </div>
           </div>
