@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Camera,
-  Check,
-  MapPin,
-  Scale,
-  ShieldAlert,
-  Sparkles,
-  Truck,
-  X,
-} from "lucide-react";
+import { ClipboardList } from "lucide-react";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import { DashboardSidebarPanel } from "@/components/layout/Sidebar";
+import WelcomeSection from "@/components/features/dashboard-main/WelcomeSection";
+import KpiCards from "@/components/features/dashboard-main/KpiCards";
+import TantanganAktifPanel from "@/components/features/dashboard-main/TantanganAktifPanel";
+import VoucherSummaryCard from "@/components/features/dashboard-main/VoucherSummaryCard";
+import GreenActionHistory from "@/components/features/green-action/GreenActionHistory";
+import GreenActionsCarousel from "@/components/features/edukasi/GreenActionsCarousel";
+import MaterialShowcaseStage from "@/components/features/edukasi/MaterialShowcaseStage";
+import PlanningAndRouteStage from "@/components/features/edukasi/PlanningAndRouteStage";
 import SortingReadinessCheck from "@/components/features/edukasi/SortingReadinessCheck";
+import VerificationShowcaseStage from "@/components/features/edukasi/VerificationShowcaseStage";
 import WeighingPhotoIllustration from "@/components/features/edukasi/WeighingPhotoIllustration";
-import { EVIDENCE_RULES, GREEN_ACTION_LIST } from "@/config/green-actions";
 import styles from "./edukasi.module.css";
 
 export const metadata: Metadata = {
@@ -33,166 +32,59 @@ const journeyLinks = [
   { href: "#galeri", step: "06", label: "Galeri Kegiatan" },
 ] as const;
 
-type PartnerLogoVariant =
-  | "orbit"
-  | "triangle"
-  | "cloud"
-  | "grid"
-  | "cube"
-  | "ring"
-  | "arc";
-
-interface PartnerLogoSlot {
-  id: string;
-  name: string;
-  variant: PartnerLogoVariant;
-  /** Isi path file (mis. "/images/partners/nama-mitra.svg") saat logo mitra resmi sudah siap dipasang */
-  logoSrc?: string;
-}
-
-const PARTNER_LOGO_SLOTS: readonly PartnerLogoSlot[] = [
-  { id: "bank-sampah", name: "Bank Sampah", variant: "orbit" },
-  { id: "umkm-mitra", name: "UMKM Mitra", variant: "triangle" },
-  { id: "kampus-hijau", name: "Kampus Hijau", variant: "cloud" },
-  { id: "komunitas-rw", name: "Komunitas RW", variant: "grid" },
-  { id: "aggregator-pet", name: "Aggregator PET", variant: "cube" },
-  { id: "daur-karton", name: "Daur Karton", variant: "ring" },
-  { id: "gerai-lokal", name: "Gerai Lokal", variant: "arc" },
-];
-
-function PartnerSlotGlyph({ variant }: { variant: PartnerLogoVariant }) {
-  switch (variant) {
-    case "orbit":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[18px] w-[18px] shrink-0" fill="none" aria-hidden="true">
-          <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M5.5 13.5C7.2 8.5 12.8 8.5 14.5 13.5" stroke="currentColor" strokeWidth="1.4" />
-          <circle cx="10" cy="6.5" r="1.4" fill="currentColor" />
-        </svg>
-      );
-    case "triangle":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[16px] w-[16px] shrink-0" fill="currentColor" aria-hidden="true">
-          <path d="M10 3.5L17 16H3L10 3.5Z" />
-        </svg>
-      );
-    case "cloud":
-      return (
-        <svg viewBox="0 0 22 20" className="h-[18px] w-[20px] shrink-0" fill="currentColor" aria-hidden="true">
-          <path d="M7.5 15.5h8.2a3.3 3.3 0 0 0 .4-6.58A4.6 4.6 0 0 0 7.4 7.4a3.6 3.6 0 0 0-3.9 3.6c0 2.45 1.8 4.5 4 4.5Z" />
-        </svg>
-      );
-    case "grid":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[16px] w-[16px] shrink-0" fill="currentColor" aria-hidden="true">
-          <circle cx="7" cy="6" r="2.2" />
-          <circle cx="13" cy="6" r="2.2" opacity="0.6" />
-          <circle cx="7" cy="11.5" r="2.2" opacity="0.75" />
-          <circle cx="13" cy="11.5" r="2.2" />
-          <path d="M4.8 16.5a2.2 2.2 0 1 1 4.4 0v.5H4.8v-.5Z" opacity="0.85" />
-        </svg>
-      );
-    case "cube":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[18px] w-[18px] shrink-0" fill="none" aria-hidden="true">
-          <path d="M10 2.5L16.5 6.2V13.8L10 17.5L3.5 13.8V6.2L10 2.5Z" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M10 10L16.5 6.2M10 10L3.5 6.2M10 10V17.5" stroke="currentColor" strokeWidth="1.4" />
-        </svg>
-      );
-    case "ring":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[16px] w-[16px] shrink-0" fill="none" aria-hidden="true">
-          <circle cx="10" cy="10" r="6" stroke="currentColor" strokeWidth="3.2" strokeDasharray="28 10" />
-        </svg>
-      );
-    case "arc":
-      return (
-        <svg viewBox="0 0 20 20" className="h-[16px] w-[16px] shrink-0" fill="none" aria-hidden="true">
-          <path d="M3.5 14.5C9.5 14.5 14 10.5 15.8 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M11.5 14.5H16.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      );
-  }
-}
-
-const materialGuides = [
+const collaborationReferences = [
   {
-    id: "botol-pet",
-    code: "Material 01 · PET (Kode 1)",
-    title: "Botol plastik PET",
-    focus:
-      "Kenali simbol segitiga angka 1, pastikan botol kosong dan kering, lalu pisahkan dari sampah basah sebelum dicek pada checklist di bawah.",
-    accepted: [
-      "Botol air mineral & minuman bening/biru muda kode 1",
-      "Kondisi bersih, sudah ditiriskan, dan tidak lengket",
-      "Terpisah dari plastik lain dan sisa makanan",
-    ],
-    avoided: [
-      "Plastik sachet berlapis foil atau kemasan berminyak",
-      "Botol yang masih berisi cairan atau bercampur sampah dapur",
-    ],
+    name: "Bank Sampah Induk Surabaya",
+    href: "https://surabaya.go.id/id/berita/10222/wali-kota-eri-cahyadi-resmikan-bank-sampah-induk-surabaya-target-penjualan-sampah-kering-150-ton-perbulan",
+    logo: "/images/kolaborasi/bank-sampah-induk-surabaya.webp",
   },
   {
-    id: "kardus",
-    code: "Material 02 · Karton",
-    title: "Kardus dan karton",
-    focus:
-      "Jaga kardus tetap kering dan bersih dari isi non-kertas, lalu lipat rata agar mudah dibawa dan akurat saat ditimbang pengepul.",
-    accepted: [
-      "Kardus paket, boks karton belanja, dan kemasan kering",
-      "Sudah dilipat rata tanpa plastik, styrofoam, atau busa",
-      "Bebas minyak, jamur, dan noda basah",
-    ],
-    avoided: [
-      "Kardus bekas makanan berminyak atau basah kehujanan",
-      "Karton yang masih berisi kemasan plastik atau residu",
-    ],
+    name: "Tunas Hijau ID",
+    href: "https://tunashijau.id/profil/",
+    logo: "/images/kolaborasi/tunas-hijau.webp",
+  },
+  {
+    name: "Green Living Support",
+    href: "https://www.greenlivingsupport.or.id/tentang-kami/",
+    logo: "/images/kolaborasi/green-living-support.webp",
+  },
+  {
+    name: "Green Generation Surabaya",
+    href: "https://www.instagram.com/greengnrsby/",
+    logo: "/images/kolaborasi/green-generation-surabaya.webp",
+  },
+  {
+    name: "Surabaya Next Leader",
+    href: "https://surabaya.go.id/id/berita/9942/wali-kota-eri-cahyadi-resmikan-rumah-surabaya-next-leader-wadah-untuk-tampung-aspirasi-anak-muda",
+    logo: "/images/kolaborasi/surabaya-next-leader.webp",
   },
 ] as const;
 
-const depositOptions = [
+const publicServiceReferences = [
   {
-    id: "setor-langsung",
-    title: "Setor langsung ke titik kumpul",
-    description:
-      "Bawa botol PET atau kardus yang sudah terpilah langsung ke bank sampah, titik setoran, atau pengepul mitra terdekat sesuai jadwal penerimaan.",
-    points: [
-      "Material diterima sesuai standar bersih dan kering",
-      "Ditimbang bersama pengepul di titik kumpul",
-      "Mendukung jadwal operasional bank sampah setempat",
-    ],
-    icon: MapPin,
+    name: "WargaKu Surabaya",
+    href: "https://wargaku.surabaya.go.id/",
+    logo: "/images/kolaborasi/wargaku-surabaya.png",
   },
   {
-    id: "jemput-rumah",
-    title: "Ajukan penjemputan dari rumah",
-    description:
-      "Isi pengajuan jemput dengan jenis material, perkiraan berat (kg), wilayah, dan tanggal usulan agar masuk ke rute pengepul yang sudah berjalan.",
-    points: [
-      "Mencantumkan jenis material dan estimasi berat",
-      "Menentukan wilayah serta tanggal usulan jemput",
-      "Terhubung dengan rute pengangkutan mitra pengepul",
-    ],
-    icon: Truck,
-  },
-] as const;
-
-const aiChecks = [
-  {
-    title: "Membaca jenis material",
-    detail: "Membantu mengenali apakah material di foto sesuai pengajuan botol PET atau kardus.",
+    name: "PPID Kota Surabaya",
+    href: "https://ppid.surabaya.go.id/",
+    logo: "/images/kolaborasi/ppid-surabaya.png",
   },
   {
-    title: "Membaca angka timbangan (OCR)",
-    detail: "Membaca angka berat pada layar timbangan digital untuk dicocokkan dengan catatan transaksi.",
+    name: "e-Peken Surabaya",
+    href: "https://peken.surabaya.go.id/",
+    logo: "/images/kolaborasi/peken-surabaya.webp",
   },
   {
-    title: "Memeriksa kualitas foto",
-    detail: "Mengecek ketajaman, pencahayaan, dan apakah material serta layar timbang berada dalam satu foto.",
+    name: "SIMAKMUR",
+    href: null,
+    logo: "/images/kolaborasi/simakmur.webp",
   },
   {
-    title: "Menandai indikasi duplikasi",
-    detail: "Mendeteksi apabila foto transaksi yang sama berulang kali diajukan kembali.",
+    name: "SIMPELMANIS",
+    href: null,
+    logo: null,
   },
 ] as const;
 
@@ -299,232 +191,89 @@ const galleryItems: GalleryItem[] = [
 ];
 
 export default function EducationPage() {
-  const maxSizeMb = Math.round(EVIDENCE_RULES.maxBytes / (1024 * 1024));
-
   return (
     <LayoutWrapper>
       <div className="bg-[#FAFDFB] text-[#0F3D2E] antialiased">
-        {/* 1. Hero Section — Linear-faithful left-aligned header + app preview panel */}
-        <section className="relative overflow-hidden bg-[radial-gradient(ellipse_at_50%_-15%,rgba(29,158,117,0.09),rgba(250,253,251,0)_65%)] px-6 pb-8 pt-16 md:pt-24">
-          <div className="mx-auto max-w-[1100px] text-left">
-            <h1 className="max-w-[780px] text-[34px] font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-5xl md:text-[56px]">
+        {/* 1. Hero Section — Aligned with Beranda typography & colors */}
+        <section className="relative overflow-hidden border-b border-emerald-900/10 bg-[#F5FAF7] pt-16 md:pt-24">
+          <div className="mx-auto max-w-[1100px] px-6 text-left">
+            <h1 className="max-w-[780px] text-4xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[54px]">
               Dari sampah terpilah menjadi setoran yang tercatat
             </h1>
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="max-w-xl text-[15px] font-normal leading-relaxed text-[#4D6D5B]">
+              <p className="max-w-xl text-base leading-relaxed text-[#2D5542]">
                 Panduan warga memilah PET dan kardus, mengecek kesiapan mandiri, dan menguji verifikasi foto Aksi Hijau.
               </p>
               <a
                 href="#cek-kesiapan"
-                className="inline-flex shrink-0 items-center gap-2 self-start text-sm transition-colors hover:opacity-80 sm:self-auto"
+                className="inline-flex shrink-0 items-center gap-2 self-start text-sm font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75] sm:self-auto"
               >
-                <span className="font-semibold text-[#0F3D2E]">Panduan</span>
-                <span className="text-[#4D6D5B]">Pilah &amp; Setor</span>
+                <span>Panduan</span>
+                <span className="font-medium text-[#426352]">Pilah &amp; Setor</span>
                 <span className="text-[#1D9E75]" aria-hidden="true">
                   →
                 </span>
               </a>
             </div>
+          </div>
 
-            {/* Linear-style Flat App Preview Panel */}
-            <div className={`${styles.heroPerspectiveContainer} mt-12 md:mt-14`}>
+          {/* Full-Bleed Studio Horizon & Lit Floor Backdrop ("standing panel" illusion matching Linear hero) */}
+          <div className={`${styles.heroBackdrop} relative mt-10 px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 md:mt-12 md:pb-24 md:pt-12`}>
+            {/* Soft radial studio spotlight behind standing window */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 bottom-12 top-0 bg-[radial-gradient(62%_56%_at_50%_60%,rgba(255,255,255,0.72),transparent_72%)]"
+            />
+
+            <div className={`${styles.heroPerspectiveContainer} relative mx-auto max-w-[1080px]`}>
+              {/* Grounded double floor contact shadows directly underneath the standing frame */}
               <div
-                className={`${styles.heroPerspectiveCard} overflow-hidden rounded-xl border border-emerald-950/[0.1] bg-white text-left`}
-              >
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-2.5 inset-x-6 h-5 rounded-[100%] bg-[#072219]/40 blur-md"
+              />
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-7 -inset-x-4 h-12 rounded-[100%] bg-[#072219]/22 blur-2xl"
+              />
+
+              <div className="relative z-10 overflow-hidden rounded-xl border border-emerald-950/[0.14] bg-[#F5F5F5] text-left shadow-[0_24px_48px_-12px_rgba(7,34,25,0.28),0_0_0_1px_rgba(15,61,46,0.06)]">
                 <div className="flex flex-col md:flex-row">
-                  {/* Left App Workspace Sidebar */}
+                  {/* Left Authentic Portal Warga Sidebar */}
                   <aside
-                    aria-label="Navigasi panduan edukasi"
-                    className="hidden shrink-0 flex-col justify-between border-r border-emerald-950/[0.08] bg-[#FAFDFB]/80 p-3 md:flex md:w-[228px]"
+                    aria-label="Pratinjau navigasi akun warga"
+                    className="hidden w-[212px] shrink-0 border-r border-[#E5E7EB] bg-white md:block"
                   >
-                    <div>
-                      <div className="flex items-center justify-between px-1.5 py-1">
-                        <div className="flex items-center gap-2 text-xs font-semibold text-[#0F3D2E]">
-                          <span
-                            className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#0F3D2E] text-[9px] font-bold text-white"
-                            aria-hidden="true"
-                          >
-                            B
-                          </span>
-                          <span>BONI Edu</span>
-                          <svg viewBox="0 0 12 12" className="h-3 w-3 text-[#4D6D5B]" fill="none" aria-hidden="true">
-                            <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[#4D6D5B]/75">
-                          <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" aria-hidden="true">
-                            <circle cx="7" cy="7" r="4.5" stroke="currentColor" strokeWidth="1.3" />
-                            <path d="M10.5 10.5L13.5 13.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-                          </svg>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 space-y-0.5 text-[12px] text-[#4D6D5B]">
-                        {journeyLinks.slice(0, 4).map((item, idx) => (
-                          <a
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors ${
-                              idx === 0
-                                ? "bg-[#F0FAF4] font-medium text-[#0F3D2E]"
-                                : "hover:bg-[#FAFDFB] hover:text-[#0F3D2E]"
-                            }`}
-                          >
-                            <span className="truncate">{item.label}</span>
-                            <span className="text-[11px] font-semibold tabular-nums text-[#1D9E75]">
-                              {item.step}
-                            </span>
-                          </a>
-                        ))}
-                      </div>
-
-                      <div className="mt-5 px-2 text-[11px] font-medium text-[#4D6D5B]/70">
-                        Lanjutan
-                      </div>
-                      <div className="mt-1 space-y-0.5 text-[12px] text-[#4D6D5B]">
-                        {journeyLinks.slice(4).map((item) => (
-                          <a
-                            key={item.href}
-                            href={item.href}
-                            className="flex items-center justify-between rounded-lg px-2 py-1.5 transition-colors hover:bg-[#FAFDFB] hover:text-[#0F3D2E]"
-                          >
-                            <span className="truncate">{item.label}</span>
-                            <span className="text-[11px] font-semibold tabular-nums text-[#1D9E75]">
-                              {item.step}
-                            </span>
-                          </a>
-                        ))}
-                      </div>
-                    </div>
+                    <DashboardSidebarPanel activeHref="/dashboard" />
                   </aside>
 
-                  {/* Right Workspace Canvas */}
-                  <div className="min-w-0 flex-1">
-                    {/* Slim Top Breadcrumb Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-950/[0.07] px-5 py-2.5 text-[12px] text-[#4D6D5B]">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="h-2.5 w-2.5 rounded-full border-2 border-[#1D9E75]"
-                          aria-hidden="true"
-                        />
-                        <span className="font-medium tabular-nums text-[#4D6D5B]">BONI-01</span>
-                        <span className="font-medium text-[#0F3D2E]">Panduan Perjalanan Warga</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[11px] tabular-nums text-[#4D6D5B]">
-                        <span>1 / 6</span>
-                        <span className="hidden rounded-md border border-emerald-950/10 bg-[#FAFDFB] px-2 py-0.5 font-medium sm:inline-block">
-                          Setor &amp; Timbang: Rancangan
-                        </span>
-                        <span className="rounded-md bg-[#F0FAF4] px-2 py-0.5 font-semibold text-[#0F3D2E]">
-                          Aksi Hijau: Demo Aktif
-                        </span>
+                  {/* Right Authentic Portal Warga Canvas */}
+                  <div className="min-w-0 flex-1 bg-[#F5F5F5]">
+                    <div className="flex flex-col gap-3.5 p-3.5 sm:p-4">
+                      <WelcomeSection headingTag="h2" compact />
+                      <KpiCards compact />
+                      <div className="grid gap-3.5 lg:grid-cols-[3fr_2fr]">
+                        <div className="flex flex-col gap-3.5">
+                          <GreenActionHistory limit={2} />
+                        </div>
+                        <div className="flex flex-col gap-3.5">
+                          <TantanganAktifPanel />
+                          <VoucherSummaryCard />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Inner 2-Column Content */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12">
-                      <div className="p-6 sm:p-7 lg:col-span-8">
-                        <h2 className="text-lg font-semibold tracking-tight text-[#0F3D2E]">
-                          Standar pilah &amp; penimbangan material
-                        </h2>
-                        <p className="mt-2.5 text-[13px] leading-relaxed text-[#4D6D5B]">
-                          Fokus pemilahan awal mencakup botol{" "}
-                          <span className="rounded bg-[#F0FAF4] px-1.5 py-0.5 text-[12px] font-medium text-[#0F3D2E]">
-                            PET kode 1
-                          </span>{" "}
-                          dan kardus kering agar langsung siap dicek lewat fitur{" "}
-                          <span className="rounded bg-[#F0FAF4] px-1.5 py-0.5 text-[12px] font-medium text-[#0F3D2E]">
-                            cek-kesiapan
-                          </span>{" "}
-                          sebelum ditimbang pengepul.
-                        </p>
-
-                        {/* Quick Material Cards inside Workspace */}
-                        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                          <a
-                            href="#botol-pet"
-                            className="group flex items-center justify-between gap-3 rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-4 transition-colors hover:border-[#1D9E75]/40 hover:bg-[#F0FAF4]/50"
-                          >
-                            <div>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider tabular-nums text-[#1D9E75]">
-                                Material 01 · Kode 1
-                              </p>
-                              <p className="mt-0.5 text-sm font-semibold text-[#0F3D2E]">
-                                Botol Plastik PET
-                              </p>
-                              <p className="mt-0.5 text-xs text-[#4D6D5B]">
-                                Kosong, tiriskan kering, pisah dari residu.
-                              </p>
-                            </div>
-                            <ArrowRight
-                              size={15}
-                              className="shrink-0 text-[#4D6D5B] transition-transform group-hover:translate-x-0.5 group-hover:text-[#0F3D2E]"
-                              aria-hidden="true"
-                            />
-                          </a>
-
-                          <a
-                            href="#kardus"
-                            className="group flex items-center justify-between gap-3 rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-4 transition-colors hover:border-[#1D9E75]/40 hover:bg-[#F0FAF4]/50"
-                          >
-                            <div>
-                              <p className="text-[11px] font-semibold uppercase tracking-wider tabular-nums text-[#1D9E75]">
-                                Material 02 · Karton
-                              </p>
-                              <p className="mt-0.5 text-sm font-semibold text-[#0F3D2E]">
-                                Kardus &amp; Karton
-                              </p>
-                              <p className="mt-0.5 text-xs text-[#4D6D5B]">
-                                Bebas minyak, keluar plastik isi, lipat rata.
-                              </p>
-                            </div>
-                            <ArrowRight
-                              size={15}
-                              className="shrink-0 text-[#4D6D5B] transition-transform group-hover:translate-x-0.5 group-hover:text-[#0F3D2E]"
-                              aria-hidden="true"
-                            />
-                          </a>
-                        </div>
-                      </div>
-
-                      {/* Right Workspace Metadata Strip */}
-                      <div className="flex flex-col justify-between gap-4 border-t border-emerald-950/[0.07] bg-[#FAFDFB]/50 p-5 text-xs lg:col-span-4 lg:border-l lg:border-t-0">
-                        <div className="space-y-3">
-                          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#4D6D5B]/80">
-                            Ringkasan Alur
-                          </div>
-                          <div className="space-y-2 text-[12px] text-[#4D6D5B]">
-                            <div className="flex items-center justify-between">
-                              <span>Material utama</span>
-                              <span className="font-semibold text-[#0F3D2E]">PET &amp; Kardus</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span>Foto bukti</span>
-                              <span className="font-semibold text-[#0F3D2E]">Material + Timbang</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <span>Uji demo Warga</span>
-                              <span className="font-semibold text-[#1D9E75]">Aksi Hijau Aktif</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <a
-                          href="#cek-kesiapan"
-                          className="flex items-center justify-between rounded-lg border border-emerald-950/10 bg-white px-3 py-2 text-xs font-medium text-[#0F3D2E] transition-colors hover:border-[#1D9E75]/40"
-                        >
-                          <span>Mulai Cek Kesiapan</span>
-                          <span aria-hidden="true">→</span>
-                        </a>
-                      </div>
-                    </div>
-
-                    {/* Mobile horizontal jump pills inside preview */}
+                    {/* Mobile quick jump strip inside preview */}
                     <nav
                       aria-label="Pintasan langkah mobile"
-                      className="flex flex-wrap gap-1.5 border-t border-emerald-950/[0.07] p-4 md:hidden"
+                      className="flex flex-wrap gap-1.5 border-t border-emerald-950/[0.07] bg-white p-4 md:hidden"
                     >
+                      <Link
+                        href="/dashboard"
+                        className="rounded-lg bg-[#0F3D2E] px-2.5 py-1 text-[11px] font-semibold text-white"
+                      >
+                        Buka Portal Warga →
+                      </Link>
                       {journeyLinks.map((item) => (
                         <a
                           key={item.href}
@@ -542,49 +291,71 @@ export default function EducationPage() {
           </div>
         </section>
 
-        {/* 2. Partner Logo Slots + Manifesto / Pengantar — max-w-[1100px] */}
-        <section className="px-6 pt-14 pb-24 md:pt-16 md:pb-28">
+        {/* 2. Peluang Kolaborasi + Pengantar — max-w-[1100px] */}
+        <section className="px-6 pb-24 pt-12 md:pb-28 md:pt-14">
           <div className="mx-auto max-w-[1100px]">
-            {/* Partner Logo Strip — disiapkan untuk logo mitra kolaborasi resmi */}
-            <div
-              aria-label="Ruang logo mitra kolaborasi"
-              className="flex flex-wrap items-center justify-center gap-x-7 gap-y-5 sm:justify-between lg:flex-nowrap"
-            >
-              {PARTNER_LOGO_SLOTS.map((partner) => (
-                <div
-                  key={partner.id}
-                  className="inline-flex items-center gap-2 text-[#0F3D2E]/80 transition-opacity hover:text-[#0F3D2E]"
-                >
-                  {partner.logoSrc ? (
-                    <Image
-                      src={partner.logoSrc}
-                      alt={partner.name}
-                      width={120}
-                      height={28}
-                      className="h-6 w-auto object-contain"
-                    />
-                  ) : (
-                    <>
-                      <PartnerSlotGlyph variant={partner.variant} />
-                      <span className="whitespace-nowrap text-[14px] font-semibold tracking-[-0.02em] sm:text-[15px]">
-                        {partner.name}
-                      </span>
-                    </>
-                  )}
-                </div>
+            <div className="mb-16 space-y-8 md:mb-20 md:space-y-10">
+              {[
+                {
+                  id: "peluang-kolaborasi",
+                  label: "Peluang kolaborasi di Surabaya",
+                  references: collaborationReferences,
+                },
+                {
+                  id: "rencana-integrasi",
+                  label: "Rencana integrasi layanan publik",
+                  references: publicServiceReferences,
+                },
+              ].map(({ id, label, references }) => (
+                <section key={id} id={id} className="scroll-mt-28">
+                  <ul
+                    aria-labelledby={id + "-label"}
+                    className="flex flex-wrap items-center justify-start gap-x-7 gap-y-3 lg:justify-between"
+                  >
+                    {references.map(({ name, href, logo }) => {
+                      const LogoItem = href ? "a" : "span";
+
+                      return (
+                        <li key={name}>
+                          <LogoItem
+                            href={href ?? undefined}
+                            className="inline-flex min-h-11 items-center gap-2.5 rounded-sm text-sm font-semibold leading-tight text-[#0F3D2E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1D9E75] [&[href]:hover]:text-[#147F5F]"
+                          >
+                            {logo ? (
+                              <Image
+                                src={logo}
+                                alt=""
+                                width={52}
+                                height={36}
+                                className="h-9 w-auto max-w-[52px] shrink-0 object-contain"
+                              />
+                            ) : (
+                              <ClipboardList size={22} aria-hidden="true" className="shrink-0" />
+                            )}
+                            <span className="max-w-[11rem]">{name}</span>
+                          </LogoItem>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <h2
+                    id={id + "-label"}
+                    className="mt-3 text-[11px] font-medium uppercase tracking-widest text-[#4D6D5B]"
+                  >
+                    {label}
+                  </h2>
+                </section>
               ))}
             </div>
 
-            <p className="mt-6 mb-14 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-[#4D6D5B]/75 sm:text-left">
-              RUANG LOGO MITRA KOLABORASI · EKOSISTEM SURABAYA
-            </p>
-
-            <h2 className="mb-14 max-w-[780px] text-2xl font-normal leading-[1.2] tracking-[-0.025em] text-[#4D6D5B]/85 sm:text-[32px] md:text-[36px]">
-              <span className="font-semibold text-[#0F3D2E]">
+            <h2 className="mb-16 max-w-3xl text-2xl font-bold leading-[1.3] tracking-tight text-[#0F3D2E] sm:text-3xl md:mb-20">
+              <span>
                 Standar pilah jelas sejak dari rumah.
               </span>{" "}
-              Tiga kebiasaan inti menjaga kualitas material saat ditimbang, sementara verifikasi
-              Aksi Hijau sudah aktif diuji pada demo Warga.
+              <span className="font-normal text-[#426352]">
+                Tiga kebiasaan inti menjaga kualitas material saat ditimbang, sementara Aksi Hijau
+                sudah aktif diuji pada demo Warga.
+              </span>
             </h2>
 
             <div className="grid grid-cols-1 divide-y divide-emerald-950/[0.08] border-t border-emerald-950/[0.08] md:grid-cols-3 md:divide-x md:divide-y-0">
@@ -689,219 +460,29 @@ export default function EducationPage() {
           </div>
         </section>
 
-        {/* 3. Section 01: Material PET & Kardus — Linear "Intake and integrations" showcase */}
+        {/* 3. Section 01: Material PET & Kardus — Vercel-style asymmetric editorial showcase */}
         <section id="material-setoran" className="scroll-mt-24 border-t border-emerald-950/[0.06] px-6 py-24 md:py-28">
           <div className="mx-auto max-w-[1100px]">
-            <div className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
-              <div className="md:col-span-5">
-                <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
-                  Material layak setor:<br />PET dan kardus
-                </h2>
-              </div>
-              <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#4D6D5B]">
-                  Dua material utama yang direncanakan pada alur setoran BONI adalah botol plastik PET (kode 1) dan kardus. Tinjau kartu kriteria di bawah sebelum menjalankan checklist kesiapan.
-                </p>
-                <a
-                  href="#cek-kesiapan"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
-                >
-                  <span>Lanjut ke checklist kesiapan</span>
-                  <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Foreground Floating Summary Card overlapping Multi-Column Criterion Board */}
-            <div className="relative flex flex-col gap-6 lg:block">
-              {/* Foreground Card — mirrors Linear Thread #product */}
-              <div className="rounded-2xl border border-emerald-950/[0.1] bg-white p-5 shadow-[0_24px_56px_-16px_rgba(15,61,46,0.16)] lg:absolute lg:left-0 lg:top-6 lg:z-10 lg:w-[310px]">
-                <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-3 text-xs">
-                  <div className="flex items-center gap-2 font-semibold text-[#0F3D2E]">
-                    <span
-                      className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-[#F0FAF4] text-[11px] font-bold text-[#1D9E75]"
-                      aria-hidden="true"
-                    >
-                      #
-                    </span>
-                    <span>Catatan Pilah</span>
-                    <span className="font-normal text-[#4D6D5B]">pet-kardus</span>
-                  </div>
-                  <span className="text-[11px] font-medium tabular-nums text-[#4D6D5B]/75">
-                    01
-                  </span>
-                </div>
-
-                <div className="mt-4 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[10px] font-bold tabular-nums text-[#0F3D2E]">
-                      01
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="font-semibold text-[#0F3D2E]">Botol PET</span>
-                        <span className="text-[11px] text-[#4D6D5B]/80">Kode 1</span>
-                      </div>
-                      <p className="mt-0.5 text-xs leading-relaxed text-[#4D6D5B]">
-                        Kosong, tiriskan sampai kering, dan pisahkan dari botol berlemak atau residu cairan.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F0FAF4] text-[10px] font-bold tabular-nums text-[#0F3D2E]">
-                      02
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="font-semibold text-[#0F3D2E]">Kardus &amp; Karton</span>
-                        <span className="text-[11px] text-[#4D6D5B]/80">Lipat rata</span>
-                      </div>
-                      <p className="mt-0.5 text-xs leading-relaxed text-[#4D6D5B]">
-                        Keluarkan plastik atau styrofoam dari dalam boks, jaga tetap kering sebelum ditimbang.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-50 text-[10px] font-bold tabular-nums text-amber-800">
-                      !
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className="font-semibold text-[#0F3D2E]">Hindari Mencampur</span>
-                        <span className="text-[11px] text-[#4D6D5B]/80">Wadah terpisah</span>
-                      </div>
-                      <p className="mt-0.5 text-xs leading-relaxed text-[#4D6D5B]">
-                        Sachet foil, kardus berminyak, atau sampah dapur dipisah agar nilai timbangan terjaga.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Background Criterion Board Frame — overlapping behind left card on lg */}
-              <div className="overflow-hidden rounded-2xl border border-emerald-950/[0.08] bg-white p-4 shadow-[0_12px_28px_-12px_rgba(15,61,46,0.08)] sm:p-5 lg:ml-[185px] lg:pl-[148px]">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
-                  {materialGuides.map(({ id, code, title, accepted, avoided }, index) => (
-                    <article
-                      id={id}
-                      key={id}
-                      className="scroll-mt-24 flex flex-col gap-2.5 lg:col-span-5"
-                    >
-                      {/* Column Header */}
-                      <div className="flex items-center justify-between px-1 pb-1 text-xs">
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={`h-2.5 w-2.5 rounded-full border-2 ${
-                              index === 0 ? "border-[#1D9E75]" : "border-[#0F3D2E]"
-                            }`}
-                            aria-hidden="true"
-                          />
-                          <h3 className="font-semibold text-[#0F3D2E]">{title}</h3>
-                          <span className="text-[11px] tabular-nums text-[#4D6D5B]/75">
-                            {accepted.length + avoided.length}
-                          </span>
-                        </div>
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#1D9E75]">
-                          {index === 0 ? "PET 01" : "KARDUS"}
-                        </span>
-                      </div>
-
-                      {/* Criterion Issue Cards inside Column */}
-                      <div className="space-y-2.5">
-                        {accepted.map((item, itemIdx) => (
-                          <div
-                            key={item}
-                            className="rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-3.5 transition-colors hover:border-[#1D9E75]/35"
-                          >
-                            <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider tabular-nums text-[#4D6D5B]/80">
-                              <span>
-                                {index === 0 ? `PET-0${itemIdx + 1}` : `KRD-0${itemIdx + 1}`} ·{" "}
-                                {code}
-                              </span>
-                            </div>
-                            <p className="mt-1.5 text-xs font-medium leading-relaxed text-[#0F3D2E]">
-                              {item}
-                            </p>
-                            <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-white px-2 py-0.5 text-[10px] font-semibold text-[#0F3D2E]">
-                              <span
-                                className="h-1.5 w-1.5 rounded-full bg-[#1D9E75]"
-                                aria-hidden="true"
-                              />
-                              <span>Layak disetor</span>
-                            </div>
-                          </div>
-                        ))}
-
-                        {avoided.map((item, itemIdx) => (
-                          <div
-                            key={item}
-                            className="rounded-xl border border-amber-200/80 bg-amber-50/50 p-3.5"
-                          >
-                            <div className="text-[10px] font-semibold uppercase tracking-wider tabular-nums text-amber-800/80">
-                              {index === 0 ? `PET-X${itemIdx + 1}` : `KRD-X${itemIdx + 1}`}
-                            </div>
-                            <p className="mt-1 text-xs font-medium leading-relaxed text-amber-950">
-                              {item}
-                            </p>
-                            <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-amber-900">
-                              <span
-                                className="h-1.5 w-1.5 rounded-full bg-amber-600"
-                                aria-hidden="true"
-                              />
-                              <span>Hindari mencampur</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
-
-                  {/* Subtle receding right-edge preview column matching Linear board */}
-                  <div
-                    aria-hidden="true"
-                    className="hidden select-none flex-col gap-2.5 opacity-40 lg:col-span-2 lg:flex [mask-image:linear-gradient(to_right,black_10%,transparent_95%)]"
-                  >
-                    <div className="flex items-center gap-2 px-1 pb-1 text-xs">
-                      <span className="h-2.5 w-2.5 rounded-full border-2 border-[#1D9E75]" />
-                      <span className="truncate font-semibold text-[#0F3D2E]">Checklist</span>
-                    </div>
-                    <div className="rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-3">
-                      <div className="text-[10px] font-semibold text-[#4D6D5B]">CHK-01</div>
-                      <p className="mt-1 truncate text-xs text-[#0F3D2E]">Botol kering</p>
-                    </div>
-                    <div className="rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-3">
-                      <div className="text-[10px] font-semibold text-[#4D6D5B]">CHK-02</div>
-                      <p className="mt-1 truncate text-xs text-[#0F3D2E]">Kardus rata</p>
-                    </div>
-                    <div className="rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-3">
-                      <div className="text-[10px] font-semibold text-[#4D6D5B]">CHK-03</div>
-                      <p className="mt-1 truncate text-xs text-[#0F3D2E]">Siap foto AI</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <MaterialShowcaseStage />
           </div>
         </section>
 
-        {/* 4. Section 02: Cek Kesiapan Mandiri Interaktif — Linear "Planning and monitoring" overlap */}
-        <section className="border-t border-emerald-950/[0.06] px-6 py-24 md:py-28">
+        {/* 4. Section 02: Cek Kesiapan Mandiri Interaktif */}
+        <section className="border-t border-emerald-900/10 bg-[#FAFDFB] px-6 py-24 md:py-28">
           <div className="mx-auto max-w-[1100px]">
             <div className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
               <div className="md:col-span-5">
-                <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
+                <h2 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px]">
                   Cek kesiapan<br />sebelum setor
                 </h2>
               </div>
               <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#4D6D5B]">
+                <p className="max-w-lg text-[15px] leading-relaxed text-[#2D5542]">
                   Pilih jenis material di panel interaktif berikut untuk memastikan botol PET maupun kardus telah memenuhi tiga syarat pemilahan mandiri.
                 </p>
                 <a
                   href="#setor-atau-jemput"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
                 >
                   <span>Lanjut ke opsi setor</span>
                   <span aria-hidden="true">→</span>
@@ -913,198 +494,29 @@ export default function EducationPage() {
           </div>
         </section>
 
-        {/* 5. Section 03: Setor atau Jemput — Linear "AI and automations" 4-window showcase */}
-        <section id="setor-atau-jemput" className="scroll-mt-24 border-t border-emerald-950/[0.06] py-24 md:py-28">
-          <div className="mx-auto max-w-[1100px] px-6">
-            <div className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
-              <div className="md:col-span-5">
-                <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
-                  Setor langsung atau<br />penjemputan rutin
-                </h2>
-              </div>
-              <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#4D6D5B]">
-                  BONI terhubung dengan rute pengepul dan bank sampah yang sudah berjalan. Alur setor, jemput, dan penimbangan bersama pengepul saat ini masih dalam tahap rancangan pengembangan.
-                </p>
-                <a
-                  href="#setelah-ditimbang"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
-                >
-                  <span>Lihat syarat bukti timbang</span>
-                  <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* 4-Window Horizontal Showcase matching Linear's AI & automations fanned cards */}
-          <div className="mx-auto max-w-[1380px] overflow-hidden px-6 lg:px-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-[0.42fr_1fr_1fr_0.42fr]">
-              {/* Far-left receding peek card */}
-              <div
-                aria-hidden="true"
-                className="hidden select-none flex-col justify-between rounded-2xl border border-emerald-950/[0.08] bg-white/80 p-5 opacity-45 lg:flex [mask-image:linear-gradient(to_right,transparent_5%,black_90%)]"
-              >
-                <div>
-                  <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-3 text-xs text-[#4D6D5B]">
-                    <span className="truncate font-semibold text-[#0F3D2E]">Bank Sampah</span>
-                    <span className="tracking-widest text-[10px]">— ×</span>
-                  </div>
-                  <div className="mt-4 rounded-xl border border-emerald-950/[0.07] bg-[#FAFDFB] p-3 text-xs text-[#4D6D5B]">
-                    Jadwal penerimaan rutin titik kumpul warga sekitar
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2 border-t border-emerald-950/[0.06] pt-3 text-[11px] text-[#4D6D5B]">
-                  <div className="truncate rounded-lg bg-[#FAFDFB] px-2.5 py-1.5">Titik kumpul RT/RW</div>
-                  <div className="truncate rounded-lg bg-[#FAFDFB] px-2.5 py-1.5">Timbang awal</div>
-                </div>
-              </div>
-
-              {/* Center pair: Setor langsung & Ajukan penjemputan */}
-              {depositOptions.map(({ id, title, description, points, icon: Icon }, index) => (
-                <article
-                  key={id}
-                  className="flex h-full flex-col justify-between rounded-2xl border border-emerald-950/[0.1] bg-white p-5 shadow-[0_18px_40px_-16px_rgba(15,61,46,0.1)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:p-6"
-                >
-                  <div>
-                    {/* Minimal Linear-style window top chrome */}
-                    <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-3 text-xs">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <Icon size={15} className="shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                        <h3 className="truncate text-sm font-semibold text-[#0F3D2E]">
-                          {title}
-                        </h3>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <span className="rounded-md bg-[#F0FAF4] px-2 py-0.5 text-[10px] font-semibold text-[#0F3D2E]">
-                          {index === 0 ? "Titik Kumpul" : "Rute Jemput"}
-                        </span>
-                        <span aria-hidden="true" className="hidden text-[10px] tracking-widest text-[#4D6D5B]/60 sm:inline">
-                          — ×
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Recessed description/prompt card inside window */}
-                    <div className="mt-4 rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-4">
-                      <p className="text-xs leading-relaxed text-[#4D6D5B] sm:text-[13px]">
-                        {description}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 flex items-center gap-2 text-[11px] font-medium text-[#4D6D5B]">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#1D9E75]" aria-hidden="true" />
-                      <span>
-                        {index === 0 ? "Alur Setor Langsung" : "Alur Jemput Rumah"} · {points.length} poin
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Action issue-style rows */}
-                  <ul className="mt-3 space-y-2 border-t border-emerald-950/[0.07] pt-3.5 text-xs text-[#3B5B49]">
-                    {points.map((point, pointIdx) => (
-                      <li
-                        key={point}
-                        className="flex items-center justify-between gap-2.5 rounded-lg border border-emerald-950/[0.05] bg-[#FAFDFB]/70 px-3 py-2"
-                      >
-                        <div className="flex min-w-0 items-center gap-2">
-                          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-[#4D6D5B]/75">
-                            {index === 0 ? `STR-0${pointIdx + 1}` : `JPT-0${pointIdx + 1}`}
-                          </span>
-                          <span className="truncate font-medium text-[#0F3D2E]">{point}</span>
-                        </div>
-                        <Check size={13} className="shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-
-              {/* Far-right receding peek card */}
-              <div
-                aria-hidden="true"
-                className="hidden select-none flex-col justify-between rounded-2xl border border-emerald-950/[0.08] bg-white/80 p-5 opacity-45 lg:flex [mask-image:linear-gradient(to_left,transparent_5%,black_90%)]"
-              >
-                <div>
-                  <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-3 text-xs text-[#4D6D5B]">
-                    <span className="truncate font-semibold text-[#0F3D2E]">Timbang Digital</span>
-                    <span className="tracking-widest text-[10px]">— ×</span>
-                  </div>
-                  <div className="mt-4 rounded-xl border border-emerald-950/[0.07] bg-[#FAFDFB] p-3 text-xs text-[#4D6D5B]">
-                    Pencatatan berat aktual material bersih bersama pengepul
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2 border-t border-emerald-950/[0.06] pt-3 text-[11px] text-[#4D6D5B]">
-                  <div className="truncate rounded-lg bg-[#FAFDFB] px-2.5 py-1.5">Cek fisik material</div>
-                  <div className="truncate rounded-lg bg-[#FAFDFB] px-2.5 py-1.5">Foto + angka layar</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Collector Role Summary Card */}
-          <div className="mx-auto mt-6 max-w-[1100px] px-6">
-            <div className="rounded-2xl border border-emerald-950/[0.08] bg-white p-6 shadow-[0_12px_28px_-10px_rgba(15,61,46,0.06)]">
-              <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
-                <div className="lg:col-span-7">
-                  <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                    <Scale size={14} aria-hidden="true" />
-                    <span>Peran Pengepul di Lapangan</span>
-                  </div>
-                  <h3 className="mt-2 text-lg font-bold text-[#0F3D2E] sm:text-xl">
-                    Pengepul memeriksa material dan mencatat berat aktual
-                  </h3>
-                  <ul className="mt-3 space-y-2 text-xs leading-relaxed text-[#3B5B49] sm:text-sm">
-                    <li className="flex items-start gap-2">
-                      <Check size={15} className="mt-0.5 shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                      <span>
-                        <strong className="font-semibold text-[#0F3D2E]">Pemeriksaan fisik material:</strong>{" "}
-                        memastikan botol PET atau kardus sesuai pengajuan serta bebas kontaminasi basah atau minyak.
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check size={15} className="mt-0.5 shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                      <span>
-                        <strong className="font-semibold text-[#0F3D2E]">Pencatatan berat aktual:</strong>{" "}
-                        menimbang menggunakan timbangan digital agar berat akhir tercatat objektif.
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="rounded-xl border border-emerald-950/[0.06] bg-[#FAFDFB] p-5 lg:col-span-5">
-                  <p className="text-xs leading-relaxed text-[#4D6D5B]">
-                    Formulir setoran dan Portal Pengepul masih dalam rancangan. Untuk menguji unggah foto dan pemeriksaan AI yang sudah berjalan, gunakan menu Aksi Hijau di demo Warga.
-                  </p>
-                  <Link
-                    href="/dashboard/eco-action"
-                    className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-[#18533F]"
-                  >
-                    <span>Coba Aksi Hijau</span>
-                    <ArrowRight size={14} aria-hidden="true" />
-                  </Link>
-                </div>
-              </div>
-            </div>
+        {/* 5. Section 03: Setor atau Jemput — Vercel/Mintlify asymmetric showcase */}
+        <section id="setor-atau-jemput" className="scroll-mt-24 border-t border-emerald-900/10 bg-[#F5FAF7] px-6 py-24 md:py-28">
+          <div className="mx-auto max-w-[1100px]">
+            <PlanningAndRouteStage />
           </div>
         </section>
 
-        {/* 6. Section 04: Setelah Ditimbang — Linear "Build, review, and ship" overlapping showcase */}
-        <section id="setelah-ditimbang" className="scroll-mt-24 border-t border-emerald-950/[0.06] px-6 py-24 md:py-28">
+        {/* 6. Section 04: Setelah Ditimbang — Linear `/plan` style specification showcase */}
+        <section id="setelah-ditimbang" className="scroll-mt-24 border-t border-emerald-900/10 bg-[#FAFDFB] px-6 py-24 md:py-28">
           <div className="mx-auto max-w-[1100px]">
             <div className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
               <div className="md:col-span-5">
-                <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
+                <h2 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px]">
                   Setelah ditimbang:<br />satu foto hingga verifikasi
                 </h2>
               </div>
               <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#4D6D5B]">
+                <p className="max-w-lg text-[15px] leading-relaxed text-[#2D5542]">
                   Saat penimbangan berlangsung, warga mengambil satu foto bukti yang memuat material terpilah sekaligus angka layar timbangan digital dalam satu bingkai.
                 </p>
                 <Link
                   href="/dashboard/eco-action"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
                 >
                   <span>Coba verifikasi Aksi Hijau</span>
                   <span aria-hidden="true">→</span>
@@ -1112,221 +524,26 @@ export default function EducationPage() {
               </div>
             </div>
 
-            {/* Overlapping Queue + Camera Inspector Showcase matching Linear's Build/Review */}
-            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
-              {/* Left/Background Verification Queue Panel */}
-              <div className="order-2 rounded-2xl border border-emerald-950/[0.08] bg-white p-5 shadow-[0_12px_28px_-12px_rgba(15,61,46,0.06)] sm:p-6 lg:order-1 lg:col-start-1 lg:col-end-7 lg:row-start-1">
-                <div className="space-y-5">
-                  <div>
-                    <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-2.5 text-xs">
-                      <span className="font-semibold text-[#0F3D2E]">
-                        Pemeriksaan AI (Rancangan)
-                      </span>
-                      <span className="tabular-nums text-[11px] text-[#4D6D5B]">
-                        {aiChecks.length}
-                      </span>
-                    </div>
-                    <ul className="mt-2.5 space-y-2">
-                      {aiChecks.map((check, idx) => (
-                        <li
-                          key={check.title}
-                          className="flex items-center gap-2.5 rounded-lg border border-emerald-950/[0.05] bg-[#FAFDFB] px-3 py-2 text-xs"
-                        >
-                          <span className="shrink-0 text-[10px] font-semibold tabular-nums text-[#4D6D5B]/75">
-                            AI-0{idx + 1}
-                          </span>
-                          <span
-                            className="h-2 w-2 shrink-0 rounded-full border-2 border-[#1D9E75]"
-                            aria-hidden="true"
-                          />
-                          <span className="truncate font-medium text-[#0F3D2E]">{check.title}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center justify-between border-b border-emerald-950/[0.07] pb-2.5 text-xs">
-                      <span className="font-semibold text-[#0F3D2E]">Status Jalur Uji</span>
-                      <span className="tabular-nums text-[11px] text-[#4D6D5B]">2</span>
-                    </div>
-                    <ul className="mt-2.5 space-y-2 text-xs">
-                      <li className="flex items-center justify-between rounded-lg border border-emerald-950/[0.05] bg-[#FAFDFB] px-3 py-2">
-                        <span className="font-medium text-[#0F3D2E]">OCR Timbangan &amp; Setor</span>
-                        <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-[#4D6D5B]">
-                          Rancangan
-                        </span>
-                      </li>
-                      <li className="flex items-center justify-between rounded-lg border border-emerald-950/[0.05] bg-[#F0FAF4]/70 px-3 py-2">
-                        <span className="font-medium text-[#0F3D2E]">Verifikasi Aksi Hijau</span>
-                        <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-semibold text-[#1D9E75]">
-                          Demo Aktif
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right/Foreground Elevated Camera Illustration Window */}
-              <div className="order-1 relative z-10 overflow-hidden rounded-2xl border border-emerald-950/[0.1] bg-white shadow-[0_24px_56px_-16px_rgba(15,61,46,0.16)] lg:order-2 lg:col-start-5 lg:col-end-13 lg:row-start-1 lg:mt-10">
-                <div className="flex items-center justify-between border-b border-emerald-950/[0.07] bg-[#FAFDFB] px-4 py-2.5 text-xs">
-                  <div className="flex min-w-0 items-center gap-2 text-[#4D6D5B]">
-                    <Camera size={14} className="shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                    <span className="truncate font-medium text-[#0F3D2E]">
-                      kamera-bukti-boni / foto-timbangan-v1.jpg
-                    </span>
-                  </div>
-                  <span className="shrink-0 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-900">
-                    Ilustrasi
-                  </span>
-                </div>
-
-                <div className="border-b border-emerald-950/[0.07]">
-                  <WeighingPhotoIllustration compact />
-                </div>
-
-                <div className="grid grid-cols-1 divide-y divide-emerald-950/[0.07] bg-[#FAFDFB]/60 text-xs sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-                  <div className="p-4">
-                    <p className="font-semibold text-[#0F3D2E]">
-                      1. Material terpilah terlihat jelas
-                    </p>
-                    <p className="mt-1 leading-relaxed text-[#4D6D5B]">
-                      Botol PET atau kardus terlipat utuh tampak di atas platform timbangan.
-                    </p>
-                  </div>
-                  <div className="p-4">
-                    <p className="font-semibold text-[#0F3D2E]">
-                      2. Angka timbang terbaca tajam
-                    </p>
-                    <p className="mt-1 leading-relaxed text-[#4D6D5B]">
-                      Angka berat pada layar timbangan berada di frame yang sama tanpa bayangan.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Dual Comparison Cards aligned via #team pattern */}
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Left Card: Deposit Verification Design (Planned) */}
-              <article className="flex h-full flex-col justify-between rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] sm:p-8">
-                <div>
-                  <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                    Rancangan Verifikasi Setoran
-                  </span>
-                  <h3 className="mt-2 text-xl font-extrabold text-[#0F3D2E]">
-                    Rancangan Verifikasi BONI &amp; pemeriksaan manual
-                  </h3>
-                  <p className="mt-2.5 text-xs leading-relaxed text-[#4D6D5B] sm:text-sm">
-                    Pada alur setoran yang sedang dirancang, AI membantu menyaring foto transaksi sebelum diverifikasi tim lapangan.
-                  </p>
-
-                  <dl className="mt-5 grid gap-3 border-t border-gray-100 pt-4 sm:grid-cols-2">
-                    {aiChecks.map((check) => (
-                      <div
-                        key={check.title}
-                        className="rounded-2xl border border-emerald-950/[0.06] bg-[#FAFDFB] p-3.5"
-                      >
-                        <dt className="text-xs font-bold text-[#0F3D2E]">{check.title}</dt>
-                        <dd className="mt-1 text-xs leading-relaxed text-[#4D6D5B]">{check.detail}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-
-                {/* Inset Box matching #tantangan */}
-                <div className="mt-5 rounded-2xl border border-amber-200/80 bg-amber-50/70 p-4">
-                  <div className="flex items-start gap-2.5">
-                    <ShieldAlert size={16} className="mt-0.5 shrink-0 text-amber-800" aria-hidden="true" />
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-amber-950">
-                        Jika bukti meragukan
-                      </p>
-                      <p className="mt-1 text-xs leading-relaxed text-amber-900">
-                        Transaksi tetap mengandalkan pemeriksaan fisik oleh pengepul dan peninjauan manual admin.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </article>
-
-              {/* Right Card: Current Demo Status (Active Green Action AI) */}
-              <article className="flex h-full flex-col justify-between rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] sm:p-8">
-                <div>
-                  <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                    <Sparkles size={13} aria-hidden="true" />
-                    <span>Status Demo Saat Ini</span>
-                  </div>
-                  <h3 className="mt-2 text-xl font-extrabold text-[#0F3D2E]">
-                    Verifikasi Aksi Hijau sudah dapat dicoba di demo Warga
-                  </h3>
-                  <p className="mt-2.5 text-xs leading-relaxed text-[#4D6D5B] sm:text-sm">
-                    Berbeda dari pengajuan setoran dan OCR timbangan yang masih dirancang, pemeriksaan foto lima kebiasaan hijau sudah berjalan di Portal Warga.
-                  </p>
-
-                  <ul className="mt-5 space-y-2 border-t border-gray-100 pt-4 text-xs leading-relaxed text-[#3B5B49]">
-                    <li className="flex items-start gap-2.5">
-                      <Check size={14} className="mt-0.5 shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                      <span>
-                        Alur setor, jemput, penimbangan, dan OCR timbangan tersimpan sebagai rancangan tahap lanjut.
-                      </span>
-                    </li>
-                    <li className="flex items-start gap-2.5">
-                      <Check size={14} className="mt-0.5 shrink-0 text-[#1D9E75]" aria-hidden="true" />
-                      <span>
-                        Pemeriksaan foto berbantuan AI sudah aktif untuk diuji pada menu Aksi Hijau di demo Warga.
-                      </span>
-                    </li>
-                  </ul>
-
-                  {/* Inset Box matching #tantangan */}
-                  <div className="mt-5 rounded-2xl border border-emerald-200/70 bg-[#FAFDFB] p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#0F3D2E]">
-                      Rencana EcoPoints setoran
-                    </p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#4D6D5B]">
-                      Transaksi setoran PET atau kardus yang valid direncanakan menghasilkan EcoPoints untuk voucher UMKM, dengan konversi per kilogram ditetapkan bersama mitra.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-gray-100 pt-4">
-                  <Link
-                    href="/dashboard/eco-action"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#18533F]"
-                  >
-                    <span>Coba Verifikasi Aksi Hijau</span>
-                    <ArrowRight size={14} aria-hidden="true" />
-                  </Link>
-                  <Link
-                    href="/tentang#rencana-setoran"
-                    className="text-xs font-bold text-[#0F3D2E] underline underline-offset-4 hover:text-[#1D9E75]"
-                  >
-                    Baca ringkasan rancangan
-                  </Link>
-                </div>
-              </article>
-            </div>
+            <VerificationShowcaseStage />
           </div>
         </section>
 
-        {/* 7. Section 05: Lima Kategori Aksi Hijau — #how-it-works light cards + full-width Evidence Rules */}
-        <section id="aksi-hijau" className="scroll-mt-24 border-t border-emerald-950/[0.06] px-6 py-24 md:py-28">
+        {/* 7. Section 05: Lima Kategori Aksi Hijau — Linear horizontal card showcase + 3-col footer rules */}
+        <section id="aksi-hijau" className="scroll-mt-24 border-t border-emerald-900/10 bg-[#FAFDFB] px-6 py-24 md:py-28">
           <div className="mx-auto max-w-[1100px]">
-            <div className="mb-12 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
+            <div className="mb-10 grid grid-cols-1 items-start gap-6 md:grid-cols-12 md:gap-8">
               <div className="md:col-span-5">
-                <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
+                <h2 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px]">
                   Lima kategori<br />Aksi Hijau
                 </h2>
               </div>
               <div className="space-y-4 md:col-span-6 md:col-start-7">
-                <p className="max-w-lg text-[15px] leading-relaxed text-[#4D6D5B]">
+                <p className="max-w-lg text-[15px] leading-relaxed text-[#2D5542]">
                   Di luar rancangan setoran PET dan kardus, warga sudah bisa menguji pencatatan dan verifikasi foto lima kebiasaan hijau di Portal Warga.
                 </p>
                 <Link
                   href="/dashboard/eco-action"
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
+                  className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
                 >
                   <span>Coba verifikasi Aksi Hijau</span>
                   <span aria-hidden="true">→</span>
@@ -1334,61 +551,14 @@ export default function EducationPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {GREEN_ACTION_LIST.map((action) => (
-                <article
-                  key={action.type}
-                  className="group flex h-full flex-col justify-between rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span
-                        className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: action.color }}
-                        aria-hidden="true"
-                      />
-                      <span className="rounded-full bg-[#F0FAF4] px-3 py-0.5 text-[11px] font-bold tabular-nums text-[#0F3D2E]">
-                        +{action.ecoPoints} EcoPoints
-                      </span>
-                    </div>
-                    <h3 className="mt-4 text-xl font-extrabold leading-snug text-[#0F3D2E]">
-                      {action.labelId}
-                    </h3>
-                    <p className="mt-2.5 text-xs leading-relaxed text-[#4D6D5B] sm:text-sm">
-                      {action.evidenceRequirement}
-                    </p>
-                  </div>
-
-                  <div className="mt-6 space-y-1 border-t border-gray-100 pt-4 text-xs text-[#3B5B49]">
-                    <p>
-                      <span className="font-semibold text-[#0F3D2E]">Batas demo:</span> maks.{" "}
-                      {action.dailyLimit}×/hari
-                    </p>
-                    <p>
-                      <span className="font-semibold text-[#0F3D2E]">SDGs:</span>{" "}
-                      {action.sdgs.map((g) => `SDG ${g}`).join(", ")}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {/* Full-grid-width concise summary panel for shared Evidence Rules */}
-            <div className="mt-5 rounded-3xl border border-emerald-950/[0.08] bg-white p-6 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] sm:p-7">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-700">
-                Syarat Bukti Foto Aksi Hijau (Berlaku untuk Kelima Kategori)
-              </p>
-              <p className="mt-1.5 text-xs leading-relaxed text-[#4D6D5B] sm:text-sm">
-                Format JPEG/PNG/WebP maksimal {maxSizeMb} MB, resolusi minimal {EVIDENCE_RULES.minDimension}px, usia foto maksimal {EVIDENCE_RULES.maxEvidenceAgeHours} jam, jeda antar pengajuan {EVIDENCE_RULES.minIntervalSeconds} detik, serta pemeriksaan duplikasi hash SHA-256.
-              </p>
-            </div>
+            <GreenActionsCarousel />
           </div>
         </section>
 
-        {/* 8. Section 06: Galeri Kegiatan — Linear "Changelog" horizontal dot-line timeline + 6 visual cards */}
-        <section id="galeri" className="scroll-mt-24 border-t border-emerald-950/[0.06] px-6 py-24 md:py-28">
+        {/* 8. Section 06: Galeri Kegiatan — Linear "Changelog" horizontal dot-line timeline + 2/2/2 alternating 1/3 & 2/3 Beranda-themed bento */}
+        <section id="galeri" className="scroll-mt-24 border-t border-emerald-900/10 bg-[#FAFDFB] px-6 py-24 md:py-28">
           <div className="mx-auto max-w-[1100px]">
-            <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl md:text-[44px]">
+            <h2 className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px]">
               Alur dokumentasi
             </h2>
 
@@ -1396,7 +566,7 @@ export default function EducationPage() {
             <div className="relative mt-12">
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute left-2 right-4 top-2 hidden h-px bg-emerald-950/[0.1] md:block"
+                className="pointer-events-none absolute left-2 right-4 top-2 hidden h-px bg-emerald-900/12 md:block"
               />
               <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
                 {galleryItems.slice(0, 4).map((item, idx) => (
@@ -1406,26 +576,26 @@ export default function EducationPage() {
                         className={`relative z-10 inline-flex h-4 w-4 items-center justify-center rounded-full ${
                           idx === 0
                             ? "bg-[#1D9E75]/20 ring-4 ring-[#FAFDFB]"
-                            : "bg-emerald-950/[0.08] ring-4 ring-[#FAFDFB]"
+                            : "bg-emerald-900/10 ring-4 ring-[#FAFDFB]"
                         }`}
                         aria-hidden="true"
                       >
                         <span
                           className={`h-1.5 w-1.5 rounded-full ${
-                            idx === 0 ? "bg-[#1D9E75]" : "bg-[#4D6D5B]/70"
+                            idx === 0 ? "bg-[#1D9E75]" : "bg-[#426352]/70"
                           }`}
                         />
                       </span>
-                      <div className="h-px flex-1 bg-emerald-950/[0.08] md:hidden" />
+                      <div className="h-px flex-1 bg-emerald-900/10 md:hidden" />
                     </div>
 
-                    <h3 className="text-[14px] font-semibold leading-snug text-[#0F3D2E]">
+                    <h3 className="text-[14px] font-bold leading-snug text-[#0F3D2E]">
                       {item.title}
                     </h3>
-                    <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#4D6D5B]">
+                    <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#426352]">
                       {item.caption}
                     </p>
-                    <p className="mt-4 text-[11px] font-medium uppercase tracking-[0.1em] tabular-nums text-[#4D6D5B]/75">
+                    <p className="mt-4 text-[11px] font-bold uppercase tracking-wider tabular-nums text-[#1D9E75]">
                       {item.stage}
                     </p>
                   </div>
@@ -1436,98 +606,196 @@ export default function EducationPage() {
             <div className="mt-10">
               <a
                 href="#galeri-kartu"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#4D6D5B] transition-colors hover:text-[#0F3D2E]"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
               >
                 <span>Lihat 6 slot dokumentasi &amp; ilustrasi</span>
                 <span aria-hidden="true">→</span>
               </a>
             </div>
 
-            {/* Detailed 6-Card Illustration Grid below */}
+            {/* Alternating 2-2-2 Bento Grid: Row 1 (1/3 + 2/3), Row 2 (2/3 + 1/3), Row 3 (1/3 + 2/3) */}
             <div
               id="galeri-kartu"
-              className="mt-16 grid scroll-mt-24 grid-cols-1 gap-5 border-t border-emerald-950/[0.06] pt-14 sm:grid-cols-2 lg:grid-cols-3"
+              className="mt-16 grid scroll-mt-24 grid-cols-1 gap-5 border-t border-emerald-900/10 pt-14 md:grid-cols-3"
             >
-              {galleryItems.map((item) => (
-                <figure
-                  key={item.title}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-emerald-950/[0.08] bg-white shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div
-                    className={`relative aspect-video w-full overflow-hidden border-b border-gray-100 ${
-                      item.visual.kind === "image" && item.visual.fit === "contain"
-                        ? "bg-white"
-                        : "bg-[#FAFDFB]"
-                    }`}
-                  >
-                    {item.visual.kind === "weighing-illustration" ? (
-                      <WeighingPhotoIllustration compact />
-                    ) : (
+              {galleryItems.map((item, idx) => {
+                // Row 1: 1/3 (0) + 2/3 (1)
+                // Row 2: 2/3 (2) + 1/3 (3)
+                // Row 3: 1/3 (4) + 2/3 (5)
+                const isWide = idx === 1 || idx === 2 || idx === 5;
+                const isPhotoHero = idx === 3;
+                const isMintAccent = idx === 0 || idx === 4;
+
+                const surfaceClasses = isWide
+                  ? "md:col-span-2 bg-gradient-to-br from-[#F5FAF7] via-white to-[#EDF7F1] text-[#0F3D2E] border-emerald-900/12"
+                  : isPhotoHero
+                    ? "md:col-span-1 bg-[#0B2516] text-white border-emerald-950/20"
+                    : isMintAccent
+                      ? "md:col-span-1 bg-[#E8F5EE] text-[#0F3D2E] border-emerald-900/15"
+                      : "md:col-span-1 bg-white text-[#0F3D2E] border-emerald-900/12";
+
+                if (isPhotoHero && item.visual.kind === "image") {
+                  return (
+                    <figure
+                      key={item.title}
+                      className={`group relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-2xl border p-6 shadow-[0_14px_34px_-12px_rgba(15,61,46,0.18)] sm:p-7 ${surfaceClasses}`}
+                    >
                       <Image
                         src={item.visual.src}
                         alt={item.visual.alt}
                         fill
-                        sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 360px"
-                        className={
-                          item.visual.fit === "contain" ? "object-contain p-3" : "object-cover"
-                        }
+                        sizes="(max-width: 767px) 100vw, 360px"
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    )}
-                  </div>
+                      <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0B2516]/90 via-[#0F3320]/75 to-[#0B2516]/92"
+                      />
 
-                  <figcaption className="flex flex-1 flex-col justify-between p-7">
+                      <div className="relative z-10">
+                        <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+                          {item.stage}
+                        </span>
+                        <h3 className="mt-2 text-lg font-extrabold leading-snug tracking-tight text-white sm:text-xl">
+                          “{item.title}”
+                        </h3>
+                        <p className="mt-2.5 text-xs leading-relaxed text-emerald-100/90 sm:text-[13px]">
+                          {item.caption}
+                        </p>
+                      </div>
+
+                      <figcaption className="relative z-10 mt-6 border-t border-white/15 pt-3.5 text-xs">
+                        <p className="font-bold text-white">{item.slotStatus}</p>
+                        <p className="mt-0.5 text-[11px] text-emerald-100/80">
+                          {item.dateSlot} · {item.locationSlot}
+                        </p>
+                      </figcaption>
+                    </figure>
+                  );
+                }
+
+                if (isWide) {
+                  return (
+                    <figure
+                      key={item.title}
+                      className={`group relative flex min-h-[290px] flex-col justify-between overflow-hidden rounded-2xl border p-6 shadow-[0_14px_34px_-12px_rgba(15,61,46,0.08)] sm:p-7 ${surfaceClasses}`}
+                    >
+                      <div className="grid flex-1 grid-cols-1 items-center gap-6 sm:grid-cols-12">
+                        <div className="sm:col-span-7">
+                          <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#1D9E75]">
+                            {item.stage}
+                          </span>
+                          <h3 className="mt-2 text-xl font-extrabold leading-snug tracking-tight text-[#0F3D2E] sm:text-2xl">
+                            {item.title}
+                          </h3>
+                          <p className="mt-2.5 max-w-md text-[13px] leading-relaxed text-[#426352] sm:text-sm">
+                            {item.caption}
+                          </p>
+                        </div>
+
+                        <div className="sm:col-span-5">
+                          {item.visual.kind === "weighing-illustration" ? (
+                            <div className="overflow-hidden rounded-xl border border-emerald-900/12 shadow-sm">
+                              <WeighingPhotoIllustration compact />
+                            </div>
+                          ) : (
+                            <div className="relative mx-auto aspect-square w-full max-w-[200px]">
+                              <Image
+                                src={item.visual.src}
+                                alt={item.visual.alt}
+                                fill
+                                sizes="220px"
+                                className="object-contain mix-blend-multiply"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <figcaption className="mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-emerald-900/10 pt-3.5 text-xs">
+                        <span className="font-bold text-[#0F3D2E]">{item.slotStatus}</span>
+                        <span className="text-[11px] text-[#426352]">
+                          {item.dateSlot} · {item.locationSlot}
+                        </span>
+                      </figcaption>
+                    </figure>
+                  );
+                }
+
+                return (
+                  <figure
+                    key={item.title}
+                    className={`group relative flex min-h-[290px] flex-col justify-between overflow-hidden rounded-2xl border p-6 shadow-[0_14px_34px_-12px_rgba(15,61,46,0.08)] sm:p-7 ${surfaceClasses}`}
+                  >
                     <div>
-                      <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                      <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#1D9E75]">
                         {item.stage}
                       </span>
-                      <h3 className="mt-2 text-lg font-extrabold leading-snug text-[#0F3D2E]">
+                      <h3 className="mt-2 text-lg font-extrabold leading-snug tracking-tight text-[#0F3D2E] sm:text-xl">
                         {item.title}
                       </h3>
-                      <p className="mt-2 text-xs leading-relaxed text-[#4D6D5B] sm:text-sm">
+                      <p className="mt-2 text-xs leading-relaxed text-[#2D5542] sm:text-[13px]">
                         {item.caption}
                       </p>
                     </div>
 
-                    <div className="mt-5 rounded-2xl border border-emerald-950/[0.06] bg-[#FAFDFB] p-4 text-xs leading-relaxed text-[#3B5B49]">
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-amber-800">
-                        {item.slotStatus}
+                    {item.visual.kind === "image" && (
+                      <div className="relative my-3 ml-auto h-28 w-28 shrink-0">
+                        <Image
+                          src={item.visual.src}
+                          alt={item.visual.alt}
+                          fill
+                          sizes="120px"
+                          className="object-contain mix-blend-multiply"
+                        />
+                      </div>
+                    )}
+
+                    <figcaption className="border-t border-emerald-900/10 pt-3.5 text-xs">
+                      <p className="font-bold text-[#0F3D2E]">{item.slotStatus}</p>
+                      <p className="mt-0.5 text-[11px] text-[#426352]">
+                        {item.dateSlot} · {item.locationSlot}
                       </p>
-                      <dl className="mt-2 space-y-1 border-t border-gray-200/70 pt-2">
-                        <div className="flex flex-wrap gap-x-1">
-                          <dt className="font-semibold text-[#0F3D2E]">Tanggal:</dt>
-                          <dd>{item.dateSlot}</dd>
-                        </div>
-                        <div className="flex flex-wrap gap-x-1">
-                          <dt className="font-semibold text-[#0F3D2E]">Lokasi:</dt>
-                          <dd>{item.locationSlot}</dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </figcaption>
-                </figure>
-              ))}
+                    </figcaption>
+                  </figure>
+                );
+              })}
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center justify-between gap-4 text-xs text-[#426352]">
+              <p>
+                Keenam slot dokumentasi di atas masih berupa ilustrasi rancangan hingga uji coba lapangan bersama pengepul berjalan.
+              </p>
+              <Link
+                href="/dashboard/eco-action"
+                className="inline-flex items-center gap-1.5 font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
+              >
+                <span>Coba Portal Warga</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* 9. Final CTA — max-w-[700px] centered, 2 buttons */}
-        <section className="relative overflow-hidden border-t border-emerald-950/[0.06] px-6 py-28 text-center md:py-40">
+        {/* 9. Final CTA — Aligned with Beranda buttons & weights */}
+        <section className="relative overflow-hidden border-t border-emerald-900/10 bg-[#F5FAF7] px-6 py-28 text-center md:py-36">
           <div className="mx-auto max-w-[700px] space-y-8">
-            <h2 className="text-4xl font-semibold leading-tight tracking-tight text-[#0F3D2E] sm:text-6xl">
+            <h2 className="text-4xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-6xl">
               Pilah dari rumah.<br />Uji demo hari ini.
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
               <Link
                 href="/dashboard/eco-action"
-                className="rounded-lg bg-[#0F3D2E] px-5 py-2.5 text-xs font-medium text-white shadow-lg shadow-[#0F3D2E]/15 transition-all hover:bg-[#18533F]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-colors hover:bg-[#18533F]"
               >
-                Coba verifikasi aksi
+                <span>Coba verifikasi aksi</span>
+                <span aria-hidden="true">→</span>
               </Link>
               <Link
                 href="/#gateway"
-                className="rounded-lg border border-emerald-950/15 bg-white px-5 py-2.5 text-xs font-medium text-[#0F3D2E] transition-all hover:bg-emerald-50/70"
+                className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/25 bg-white px-6 py-3 text-sm font-bold text-[#0F3D2E] transition-colors hover:bg-emerald-50/70"
               >
-                Pilih portal demo
+                <span>Pilih portal demo</span>
               </Link>
             </div>
           </div>

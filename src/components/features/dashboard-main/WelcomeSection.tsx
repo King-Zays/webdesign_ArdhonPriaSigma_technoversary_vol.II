@@ -6,7 +6,13 @@ import { useAuthStore } from "@/store/auth.store";
 import { useGreenActionStore } from "@/store/greenAction.store";
 import { useHydrated } from "@/hooks/useHydrated";
 
-export default function WelcomeSection() {
+export default function WelcomeSection({
+  headingTag = "h1",
+  compact = false,
+}: {
+  headingTag?: "h1" | "h2";
+  compact?: boolean;
+}) {
   const hydrated = useHydrated();
   const user = useAuthStore((s) => s.user);
   const actions = useGreenActionStore((s) => s.actions);
@@ -18,6 +24,8 @@ export default function WelcomeSection() {
   const displayName = user?.name && user.name !== "Demo" && user.name !== "Demo Resident"
     ? user.name
     : "Rendra Pratama";
+
+  const GreetingTag = headingTag;
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-gray-200/90 bg-white p-5 shadow-xs sm:p-6">
@@ -40,11 +48,15 @@ export default function WelcomeSection() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-1">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0F3D2E] tracking-tight">
+      <div className={`flex flex-wrap items-center justify-between gap-4 pt-1 ${compact ? "lg:flex-nowrap" : ""}`}>
+        <div className="min-w-0">
+          <GreetingTag
+            className={`font-extrabold tracking-tight text-[#0F3D2E] ${
+              compact ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"
+            }`}
+          >
             Halo, {hydrated ? displayName : "Rendra Pratama"}
-          </h1>
+          </GreetingTag>
           <p className="mt-1 text-xs sm:text-sm text-[#4D6D5B] leading-relaxed">
             {verified > 0 ? (
               <>

@@ -15,8 +15,19 @@ import { DASHBOARD_NAV } from "@/config/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 /* ── Shared nav content ── */
-function SidebarContent({ onLinkClick, onClose }: { onLinkClick?: () => void; onClose?: () => void }) {
+function SidebarContent({
+  onLinkClick,
+  onClose,
+  activeHref,
+  isPreview = false,
+}: {
+  onLinkClick?: () => void;
+  onClose?: () => void;
+  activeHref?: string;
+  isPreview?: boolean;
+}) {
   const pathname = usePathname();
+  const effectivePath = activeHref ?? pathname;
   const isLiveTracking = useStepTrackerStore((s) => s.isTracking);
   const hydrated = useHydrated();
   const balance = useEcoPointsStore((s) => s.balance);
@@ -63,7 +74,7 @@ function SidebarContent({ onLinkClick, onClose }: { onLinkClick?: () => void; on
           <ul className="flex flex-col gap-1">
             {DASHBOARD_NAV.map(({ label, icon: Icon, href, exact, group }, idx) => {
               // live removed
-              const isActive = exact ? pathname === href : pathname.startsWith(href);
+              const isActive = exact ? effectivePath === href : effectivePath.startsWith(href);
               const firstMore = group === "more" && DASHBOARD_NAV[idx - 1]?.group === "primary";
               return (
                 <li key={href}>
@@ -94,18 +105,27 @@ function SidebarContent({ onLinkClick, onClose }: { onLinkClick?: () => void; on
 
       {/* Footer Navigasi Bawah (Hanya 1 Tombol Keluar Akun) */}
       <div className="border-t border-[#E5E7EB] p-4 flex flex-col gap-2.5">
-        <button
-          type="button"
-          onClick={() => {
-            if (onLinkClick) onLinkClick();
-            logoutMutation.mutate();
-          }}
-          disabled={logoutMutation.isPending}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-semibold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
-        >
-          <LogOut size={15} />
-          <span>Keluar Akun</span>
-        </button>
+        {isPreview ? (
+          <Link
+            href="/dashboard"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-950/15 bg-[#F0FAF4] py-2.5 text-xs font-semibold text-[#0F3D2E] hover:bg-[#E1F5E9] transition-colors"
+          >
+            <span>Buka Portal Warga</span>
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (onLinkClick) onLinkClick();
+              logoutMutation.mutate();
+            }}
+            disabled={logoutMutation.isPending}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white py-2.5 text-xs font-semibold text-gray-600 hover:border-red-200 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            <LogOut size={15} />
+            <span>Keluar Akun</span>
+          </button>
+        )}
 
         <div className="pt-0.5 text-center">
           <p className="text-[11px] text-gray-500 font-medium">© 2026 BONI · {teamConfig.teamName}</p>
@@ -169,6 +189,10 @@ function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void })
       )}
     </AnimatePresence>
   );
+}
+
+export function DashboardSidebarPanel({ activeHref = "/dashboard" }: { activeHref?: string }) {
+  return <SidebarContent activeHref={activeHref} isPreview />;
 }
 
 export default function Sidebar({

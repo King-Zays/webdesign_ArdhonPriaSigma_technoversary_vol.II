@@ -1,10 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
-import ContactForm, { type ContactTopic } from "./ContactForm";
-import styles from "./contact.module.css";
+import { HelpCircle } from "lucide-react";
+import ContactForm from "./ContactForm";
 
 export interface FaqLink {
   label: string;
@@ -17,234 +16,180 @@ export interface FaqItem {
   links?: FaqLink[];
 }
 
-type ActiveModal = { kind: "form"; topic: ContactTopic } | null;
+const ECOSYSTEM_REFERENCES = [
+  {
+    name: "Bank Sampah Induk Surabaya",
+    logo: "/images/kolaborasi/bank-sampah-induk-surabaya.webp",
+  },
+  {
+    name: "Tunas Hijau ID",
+    logo: "/images/kolaborasi/tunas-hijau.webp",
+  },
+  {
+    name: "Green Living Support",
+    logo: "/images/kolaborasi/green-living-support.webp",
+  },
+  {
+    name: "Green Generation Surabaya",
+    logo: "/images/kolaborasi/green-generation-surabaya.webp",
+  },
+] as const;
 
 export default function ContactPageClient({ questions }: { questions: FaqItem[] }) {
-  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
-
-  const otherBtnRef = useRef<HTMLButtonElement>(null);
-  const lastTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const firstInputRef = useRef<HTMLInputElement>(null);
-
-  const closeModal = useCallback((restoreFocus = true) => {
-    setActiveModal(null);
-    if (restoreFocus && lastTriggerRef.current) {
-      const target = lastTriggerRef.current;
-      requestAnimationFrame(() => {
-        target.focus();
-      });
-    }
-  }, []);
-
-  const openFormModal = (topic: ContactTopic, trigger: HTMLButtonElement | null) => {
-    lastTriggerRef.current = trigger;
-    setActiveModal({ kind: "form", topic });
-  };
-
-  useEffect(() => {
-    if (!activeModal) return;
-
-    const frame = requestAnimationFrame(() => {
-      firstInputRef.current?.focus();
-    });
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeModal(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [activeModal, closeModal]);
-
   return (
     <div className="bg-[#FAFDFB] text-[#0F3D2E] antialiased">
-      <div className="mx-auto w-full max-w-[1240px] px-6 pb-28 pt-16 md:pt-24">
-        {/* Page Title */}
-        <section aria-labelledby="contact-title" className="mb-12">
-          <h1
-            id="contact-title"
-            className="text-4xl font-semibold tracking-[-0.03em] text-[#0F3D2E] sm:text-[46px] sm:leading-[1.12]"
-          >
-            Apa yang bisa kami bantu?
-          </h1>
-        </section>
+      {/* 1. Split Hero + Direct Contact Form (Vercel Enterprise layout 1) */}
+      <section
+        aria-labelledby="contact-title"
+        className="bg-[#FAFDFB] px-6 pb-20 pt-16 md:pb-24 md:pt-24"
+      >
+        <div className="mx-auto grid w-full max-w-[1100px] grid-cols-1 gap-12 md:grid-cols-12 md:items-start lg:gap-16">
+          {/* Left Column: Bold Heading, Intro, Surabaya Ecosystem Reference Grid */}
+          <div className="md:col-span-5 md:pt-2">
+            <h1
+              id="contact-title"
+              className="text-4xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[50px]"
+            >
+              Mulai kolaborasi<br />bersama tim BONI
+            </h1>
 
-        {/* 3 Core Contact Cards — proporsi & ritme 1:1 linear.app/contact */}
-        <section
-          aria-label="Kanal kontak dan bantuan"
-          className="mb-16 grid grid-cols-1 gap-5 md:mb-20 md:grid-cols-3"
-        >
-          {/* Card 1: Kolaborasi */}
-          <div className="group flex min-h-[228px] flex-col justify-between rounded-xl border border-emerald-950/10 bg-white p-7 transition-colors duration-200 hover:border-[#1D9E75]/45">
-            <h2 className="text-[17px] font-semibold tracking-tight text-[#0F3D2E]">Kolaborasi</h2>
-            <div className="mt-10">
-              <p className="text-[13.5px] leading-[1.6] text-[#4D6D5B]">
-                Bahas kemitraan bank sampah, kolaborasi UMKM, atau program komunitas.
+            <p className="mt-4 max-w-md text-base leading-relaxed text-[#2D5542]">
+              Bahas kemitraan bank sampah, kolaborasi UMKM, pelaporan kendala demo, atau sampaikan masukan dari warga.
+            </p>
+
+            {/* 2x2 Reference Partner Marks (mirrors Vercel's 2x2 logo block cleanly) */}
+            <div className="mt-10 border-t border-emerald-900/10 pt-7">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#1D9E75]">
+                Referensi Ekosistem Surabaya
               </p>
+              <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4">
+                {ECOSYSTEM_REFERENCES.map(({ name, logo }) => (
+                  <div key={name} className="flex items-center gap-2.5">
+                    <Image
+                      src={logo}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="h-7 w-7 shrink-0 object-contain"
+                    />
+                    <span className="text-xs font-bold leading-snug text-[#0F3D2E]">
+                      {name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Subtle Secondary Channel Links */}
+            <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-[#426352]">
               <Link
                 href="/kontak/kolaborasi"
-                className="mt-4 inline-flex items-center gap-1.5 rounded text-[13px] font-medium text-[#3B5B49] transition-colors group-hover:text-[#0F3D2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
+                className="transition-colors hover:text-[#0F3D2E]"
               >
-                <span>Diskusikan kolaborasi</span>
-                <span
-                  className="transition-transform duration-150 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
+                Panduan kolaborasi →
               </Link>
-            </div>
-          </div>
-
-          {/* Card 2: Bantuan */}
-          <div className="group flex min-h-[228px] flex-col justify-between rounded-xl border border-emerald-950/10 bg-white p-7 transition-colors duration-200 hover:border-[#1D9E75]/45">
-            <h2 className="text-[17px] font-semibold tracking-tight text-[#0F3D2E]">Bantuan</h2>
-            <div className="mt-10">
-              <p className="text-[13.5px] leading-[1.6] text-[#4D6D5B]">
-                Kami siap membantu. Tanya fitur BONI, laporkan kendala, atau beri masukan.
-              </p>
               <Link
                 href="/kontak/bantuan"
-                className="mt-4 inline-flex items-center gap-1.5 rounded text-[13px] font-medium text-[#3B5B49] transition-colors group-hover:text-[#0F3D2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
+                className="transition-colors hover:text-[#0F3D2E]"
               >
-                <span>Buka pusat bantuan</span>
-                <span
-                  className="transition-transform duration-150 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
+                Pusat bantuan →
               </Link>
             </div>
           </div>
 
-          {/* Card 3: Pertanyaan Lain */}
-          <div className="group flex min-h-[228px] flex-col justify-between rounded-xl border border-emerald-950/10 bg-white p-7 transition-colors duration-200 hover:border-[#1D9E75]/45">
-            <h2 className="text-[17px] font-semibold tracking-tight text-[#0F3D2E]">Pertanyaan Lain</h2>
-            <div className="mt-10">
-              <p className="text-[13.5px] leading-[1.6] text-[#4D6D5B]">
-                Hubungi tim BONI untuk masukan fitur, liputan media, atau pertanyaan umum.
-              </p>
-              <button
-                ref={otherBtnRef}
-                id="open-other-modal"
-                type="button"
-                onClick={() => openFormModal("other", otherBtnRef.current)}
-                className="mt-4 inline-flex items-center gap-1.5 rounded text-[13px] font-medium text-[#3B5B49] transition-colors group-hover:text-[#0F3D2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
-              >
-                <span>Kirim pertanyaan lainnya</span>
-                <span
-                  className="transition-transform duration-150 group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Pertanyaan Umum (Merged Sumber Daya links + FAQ Accordion right below cards) */}
-        <section
-          id="faq"
-          aria-labelledby="faq-title"
-          className="grid scroll-mt-24 grid-cols-1 gap-8 border-t border-emerald-950/[0.08] pt-14 md:grid-cols-12 md:gap-8"
-        >
-          <div className="md:col-span-4">
-            <h2 id="faq-title" className="text-xl font-semibold tracking-tight text-[#0F3D2E]">
-              Pertanyaan Umum
-            </h2>
-            <p className="mt-2 max-w-[260px] text-[13.5px] leading-[1.6] text-[#4D6D5B]">
-              Jawaban singkat seputar demo BONI, panduan pilah, verifikasi foto, dan EcoPoints.
-            </p>
-          </div>
-
-          <div className="md:col-span-8">
-            <div className="border-t border-emerald-950/[0.08]">
-              {questions.map(({ question, answer, links }) => (
-                <details
-                  key={question}
-                  className="group border-b border-emerald-950/[0.08]"
-                >
-                  <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-4 py-3.5 text-[14px] font-medium text-[#0F3D2E] transition-colors hover:text-[#1D9E75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]">
-                    <span>{question}</span>
-                    <ChevronDown
-                      size={17}
-                      className="shrink-0 text-[#4D6D5B] transition-transform duration-200 group-open:rotate-180 group-open:text-[#1D9E75]"
-                      aria-hidden="true"
-                    />
-                  </summary>
-                  <div className="pb-5 pr-6">
-                    <p className="text-[13.5px] leading-[1.65] text-[#4D6D5B]">{answer}</p>
-                    {links && links.length > 0 && (
-                      <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
-                        {links.map((item) => (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            className="inline-flex items-center gap-1.5 rounded text-[13px] font-medium text-[#0F3D2E] transition-colors hover:text-[#1D9E75] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
-                          >
-                            <span>{item.label}</span>
-                            <span aria-hidden="true">→</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Modal: Contact Form (Pertanyaan Lain) */}
-      {activeModal?.kind === "form" && (
-        <div
-          id="contact-form-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="contact-form-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4 backdrop-blur-[2px]"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) closeModal(true);
-          }}
-        >
-          <div
-            className={`relative w-full max-w-lg rounded-2xl border border-emerald-950/[0.12] bg-white p-6 shadow-2xl ${styles.modalEnter}`}
-          >
-            <div className="flex items-center justify-between border-b border-emerald-950/[0.08] pb-4">
-              <div>
-                <h3 id="contact-form-modal-title" className="text-lg font-medium text-[#0F3D2E]">
-                  Sampaikan kebutuhanmu
-                </h3>
-                <p className="text-xs text-[#4D6D5B]">
-                  Kirim pertanyaan umum atau masukan untuk tim BONI.
-                </p>
-              </div>
-              <button
-                type="button"
-                aria-label="Tutup dialog formulir"
-                onClick={() => closeModal(true)}
-                className="rounded-md p-1 text-xl leading-none text-[#4D6D5B] transition-colors hover:text-[#0F3D2E] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
-              >
-                ×
-              </button>
-            </div>
-            <ContactForm
-              key={activeModal.topic}
-              initialTopic={activeModal.topic}
-              onCancel={() => closeModal(true)}
-              firstInputRef={firstInputRef}
-            />
+          {/* Right Column: Clean 2-Column Inline Form */}
+          <div className="md:col-span-7">
+            <ContactForm initialTopic="collaboration" />
           </div>
         </div>
-      )}
+      </section>
+
+      {/* 2. Pertanyaan Umum — 4-Column Horizontal Layout (Vercel Enterprise layout 2) */}
+      <section
+        id="faq"
+        aria-labelledby="faq-title"
+        className="scroll-mt-24 border-t border-emerald-900/10 bg-white px-6 py-20 md:py-24"
+      >
+        <div className="mx-auto w-full max-w-[1100px]">
+          <div className="max-w-2xl">
+            <p className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1D9E75]">
+              <HelpCircle size={14} aria-hidden="true" />
+              <span>Pertanyaan Umum</span>
+            </p>
+            <h2
+              id="faq-title"
+              className="mt-3 text-3xl font-extrabold leading-[1.14] tracking-tight text-[#0F3D2E] sm:text-5xl"
+            >
+              Jawaban singkat seputar<br />demo dan pemilahan
+            </h2>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 gap-8 border-t border-emerald-900/10 pt-10 sm:grid-cols-2 lg:grid-cols-4">
+            {questions.map(({ question, answer, links }) => (
+              <article key={question} className="flex flex-col justify-between gap-4">
+                <div>
+                  <h3 className="text-[15px] font-bold leading-snug text-[#0F3D2E]">
+                    {question}
+                  </h3>
+                  <p className="mt-2.5 text-[13.5px] leading-relaxed text-[#426352]">
+                    {answer}
+                  </p>
+                </div>
+
+                {links && links.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1">
+                    {links.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
+                      >
+                        <span>{item.label}</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Centered Community Encouragement Quote (Vercel Enterprise layout 3) */}
+      <section
+        aria-label="Semangat gerakan pilah dari rumah"
+        className="border-t border-emerald-900/10 bg-[#F5FAF7] px-6 py-24 text-center md:py-32"
+      >
+        <div className="mx-auto max-w-3xl">
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#1D9E75]">
+            BERSAMA WARGA SURABAYA
+          </p>
+          <blockquote className="mt-6 text-2xl font-extrabold leading-[1.3] tracking-tight text-[#0F3D2E] sm:text-4xl">
+            “Perubahan kota yang bersih tidak menunggu langkah besar dari jauh—ia tumbuh dari satu botol terpilah dan satu aksi hijau yang kita mulai dari rumah hari ini.”
+          </blockquote>
+          <p className="mt-7 text-xs text-[#426352]">
+            <strong className="font-bold text-[#0F3D2E]">Tim BONI</strong>{" "}
+            — Gerakan Pilah Sampah &amp; Aksi Hijau Warga Surabaya
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/dashboard/eco-action"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-colors hover:bg-[#18533F]"
+            >
+              <span>Mulai aksi hijau hari ini</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              href="/edukasi"
+              className="inline-flex items-center gap-2 rounded-full border border-[#0F3D2E]/25 bg-white px-6 py-3 text-sm font-bold text-[#0F3D2E] transition-colors hover:bg-emerald-50/70"
+            >
+              <span>Baca panduan pilah</span>
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

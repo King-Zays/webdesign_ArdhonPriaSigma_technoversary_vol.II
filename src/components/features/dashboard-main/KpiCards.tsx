@@ -8,25 +8,52 @@ import { useGreenActionStore } from "@/store/greenAction.store";
 import { useEcoActionStore } from "@/store/ecoAction.store";
 import { useHydrated } from "@/hooks/useHydrated";
 
-function Card({ href, Icon, color, label, value, sub }: { href: string; Icon: LucideIcon; color: string; label: string; value: string; sub: string }) {
+function Card({
+  href,
+  Icon,
+  color,
+  label,
+  value,
+  sub,
+  compact = false,
+}: {
+  href: string;
+  Icon: LucideIcon;
+  color: string;
+  label: string;
+  value: string;
+  sub: string;
+  compact?: boolean;
+}) {
   return (
     <Link
       href={href}
       className="flex gap-3 rounded-2xl border border-gray-200/90 bg-white p-4 shadow-xs transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-[#1D9E75]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] sm:p-5"
     >
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: `${color}18` }}>
-        <Icon size={20} style={{ color }} aria-hidden="true" />
+      <span
+        className={`flex shrink-0 items-center justify-center rounded-xl ${
+          compact ? "h-10 w-10" : "h-11 w-11"
+        }`}
+        style={{ backgroundColor: `${color}18` }}
+      >
+        <Icon size={compact ? 18 : 20} style={{ color }} aria-hidden="true" />
       </span>
       <span className="min-w-0">
         <span className="block text-xs font-semibold text-gray-500">{label}</span>
-        <span className="block truncate text-xl font-extrabold text-[#0F3D2E] sm:text-2xl">{value}</span>
+        <span
+          className={`block font-extrabold text-[#0F3D2E] ${
+            compact ? "text-base sm:text-lg whitespace-nowrap" : "truncate text-xl sm:text-2xl"
+          }`}
+        >
+          {value}
+        </span>
         <span className="block text-[11px] font-medium text-gray-500 mt-0.5">{sub}</span>
       </span>
     </Link>
   );
 }
 
-export default function KpiCards() {
+export default function KpiCards({ compact = false }: { compact?: boolean }) {
   const hydrated = useHydrated();
   const balance = useEcoPointsStore((s) => s.balance);
   const { level, pointsToNextLevel } = useEcoPointsLevel();
@@ -51,6 +78,7 @@ export default function KpiCards() {
         label="Saldo EcoPoints"
         value={v(balance.toLocaleString("id-ID"))}
         sub={hydrated ? `Level ${level} (kurang ${pointsToNextLevel} poin)` : " "}
+        compact={compact}
       />
       <Card
         href="/dashboard/eco-action"
@@ -59,6 +87,7 @@ export default function KpiCards() {
         label="Aksi Hijau Terverifikasi"
         value={v(String(verified.length))}
         sub={hydrated ? (pending > 0 ? `${pending} menunggu verifikasi` : "Semua bukti valid") : " "}
+        compact={compact}
       />
       <Card
         href="/dashboard/map"
@@ -67,6 +96,7 @@ export default function KpiCards() {
         label="Estimasi Reduksi Emisi"
         value={v(`${co2.toFixed(1)} kg CO₂e`)}
         sub={hydrated ? `${kgSorted.toFixed(1)} kg sampah terpilah` : " "}
+        compact={compact}
       />
       <Card
         href="/dashboard/marketplace?tab=challenges"
@@ -75,6 +105,7 @@ export default function KpiCards() {
         label="Tantangan Berjalan"
         value={v(String(active))}
         sub={hydrated ? `${joined - active} selesai dari ${joined} misi` : " "}
+        compact={compact}
       />
     </div>
   );

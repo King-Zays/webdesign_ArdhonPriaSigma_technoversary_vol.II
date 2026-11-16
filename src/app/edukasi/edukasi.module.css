@@ -1,3 +1,16 @@
+.heroBackdrop {
+  background-image: linear-gradient(
+    to bottom,
+    rgb(250 253 251 / 0) 0%,
+    rgb(220 234 226 / 0.2) 12%,
+    #dceae2 32%,
+    #b8d2c4 58%,
+    #dcebe2 76%,
+    #edf5f0 90%,
+    #fafdfb 100%
+  );
+}
+
 .heroPerspectiveContainer {
   position: relative;
 }
