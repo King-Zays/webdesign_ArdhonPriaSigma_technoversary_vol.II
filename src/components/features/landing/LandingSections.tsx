@@ -2,13 +2,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check } from "lucide-react";
 import { competitionConfig, sdgAlignment, teamConfig } from "@/config/site";
+import HeroConsole from "./HeroConsole";
+import PlatformShowcase from "./PlatformShowcase";
+export { PlatformShowcase };
 
 /* ── 1. Hero Section (Video Latar Belakang & Panggung Kaca Kristal) ── */
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#FAFDFB]">
-      {/* Video Latar Belakang Jelas & Elegan */}
-      <div className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+    <section className="relative isolate overflow-hidden border-b border-emerald-900/10 bg-[#F5FAF7]">
+      {/* Video latar merawat tanaman & lingkungan agar suasana hijau langsung terasa */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
         <video
           src="/media/hero-planting.mp4"
           poster="/media/hero-planting-poster.jpg"
@@ -18,136 +21,40 @@ export function Hero() {
           playsInline
           className="h-full w-full object-cover opacity-35"
         />
-        {/* Lapisan Gradien Lembut Penjaga Keterbacaan Tanpa Kotak */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAFDFB]/90 via-[#FAFDFB]/75 to-[#FAFDFB]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_450px_at_50%_15%,rgba(29,158,117,0.06)_0%,transparent_80%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#F5FAF7]/90 via-[#F5FAF7]/80 to-[#F5FAF7]" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pb-18 pt-16 sm:px-6 sm:pb-24 sm:pt-20">
-        {/* Tajuk Utama Terbuka & Bersih (Tanpa Kotak Pembungkus) */}
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="mx-auto max-w-3xl text-3xl font-black tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[54px] leading-snug sm:leading-tight lg:leading-[1.22]">
-            Ubah Kebiasaan Baik di Rumah <br className="hidden sm:inline" />
-            Menjadi{" "}
-            <span className="relative inline-block text-[#1D9E75]">
-              Manfaat Nyata.
-              <svg
-                className="absolute -bottom-2 left-0 w-full text-[#1D9E75]/45 pointer-events-none"
-                viewBox="0 0 255 14"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  d="M3 10C50 3 95 3 135 8.5C175 14 218 11 252 6.5"
-                  stroke="currentColor"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
+        <div className="max-w-3xl">
+          <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl lg:text-[54px]">
+            Jaga kebersihan dari rumah, <span className="text-[#1D9E75]">hidupkan lingkungan Surabaya.</span>
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-[#2D5542] sm:text-base font-medium">
-            Pilah sampah dapur, kumpulkan jelantah, dan rawat lingkungan. <br className="hidden sm:inline" />
-            Coba pemeriksaan bukti foto berbantuan AI dan jelajahi contoh insentif UMKM.
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-[#2D5542] sm:text-lg">
+            Pilah botol plastik dan kardus, simpan minyak jelantah, serta rawat tanaman pekarangan. Setiap kebiasaan
+            baik warga dicatat transparan dan kembali menjadi voucher belanja UMKM kampung.
           </p>
 
-          {/* Tombol Aksi Utama - Ukuran Lebih Besar & Nyaman */}
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center gap-5">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2.5 rounded-full bg-[#0F3D2E] px-8 py-4 text-sm sm:text-base font-bold text-white shadow-lg shadow-[#0F3D2E]/20 transition-all hover:bg-[#18533F] hover:shadow-xl hover:-translate-y-0.5 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-colors hover:bg-[#18533F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2"
             >
-              <span>Mulai Eksplorasi Demo</span>
-              <ArrowRight size={17} aria-hidden="true" />
+              <span>Mulai eksplorasi demo</span>
             </Link>
             <Link
               href="/#gateway"
-              className="inline-flex items-center gap-2 rounded-full border-2 border-[#0F3D2E]/20 bg-white/95 px-8 py-4 text-sm sm:text-base font-bold text-[#0F3D2E] shadow-sm backdrop-blur-sm transition-all hover:bg-emerald-50/60 hover:border-[#0F3D2E]/40 hover:-translate-y-0.5 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
             >
-              <span>Pilih Portal Peran</span>
+              <span>Pilih portal peran</span>
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
 
-        {/* 3 Kartu Pilar Utama — Desain Murni & Elegan */}
-        <div id="features" className="scroll-mt-24 mt-12 grid gap-5 sm:grid-cols-3">
-          <div id="how-it-works" className="scroll-mt-24 contents">
-            {/* Kartu 1: Verifikasi AI */}
-            <div className="group rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <h3 className="text-xl font-extrabold text-[#0F3D2E]">Verifikasi Citra Cerdas</h3>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#4D6D5B]">
-                Coba unggah bukti pemilahan atau perawatan tanaman untuk melihat hasil pemeriksaan.
-              </p>
-              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-[#3B5B49] font-medium">Pemeriksaan foto</span>
-              </div>
-            </div>
-
-            {/* Kartu 2: Pasar Hijau */}
-            <div className="group rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <h3 className="text-xl font-extrabold text-[#0F3D2E]">Ekonomi Sirkular Lokal</h3>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#4D6D5B]">
-                Jelajahi cara kerja EcoPoints dan simulasi penukaran poin dengan voucher UMKM.
-              </p>
-              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-[#3B5B49] font-medium">Voucher demo</span>
-              </div>
-            </div>
-
-            {/* Kartu 3: Peta Kota */}
-            <div className="group rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <h3 className="text-xl font-extrabold text-[#0F3D2E]">Peta Dampak Geospasial</h3>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#4D6D5B]">
-                Visualisasi agregat partisipasi aksi hijau di 31 kecamatan Surabaya dengan perlindungan privasi alamat.
-              </p>
-              <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-[#3B5B49] font-medium">Data demo</span>
-                <span className="font-extrabold text-[#0F3D2E]">31 Kecamatan</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Metrik Kunci Dampak Kota — Tipografi Tegas & Bersih Tanpa Ikon Menumpuk */}
-        <div className="mt-10 rounded-[2rem] border border-emerald-950/[0.08] bg-white/80 p-3 sm:p-4 backdrop-blur-xl shadow-[0_12px_32px_-8px_rgba(15,61,46,0.08)]">
-          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-            {/* Metrik 1: 31 Kecamatan */}
-            <div className="rounded-2xl border border-emerald-950/[0.05] bg-gradient-to-br from-white to-emerald-50/40 p-4 transition-all hover:bg-white hover:shadow-sm">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0F3D2E]">31</span>
-                <span className="text-[11px] font-mono font-bold text-emerald-700 uppercase">Wilayah</span>
-              </div>
-              <p className="mt-1 text-xs font-semibold text-[#2D5542]">Kecamatan di Surabaya</p>
-            </div>
-
-            {/* Metrik 2: 5 Kategori AI */}
-            <div className="rounded-2xl border border-emerald-950/[0.05] bg-gradient-to-br from-white to-emerald-50/40 p-4 transition-all hover:bg-white hover:shadow-sm">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0F3D2E]">5</span>
-                <span className="text-[11px] font-mono font-bold text-teal-700 uppercase">Kategori</span>
-              </div>
-              <p className="mt-1 text-xs font-semibold text-[#2D5542]">Validasi Citra Otomatis</p>
-            </div>
-
-            {/* Metrik 3: 100% Non-Kripto */}
-            <div className="rounded-2xl border border-emerald-950/[0.05] bg-gradient-to-br from-white to-emerald-50/40 p-4 transition-all hover:bg-white hover:shadow-sm">
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#0F3D2E]">100%</span>
-                <span className="text-[11px] font-mono font-bold text-amber-700 uppercase">Non-Kripto</span>
-              </div>
-              <p className="mt-1 text-xs font-semibold text-[#2D5542]">Skema poin EcoPoints</p>
-            </div>
-
-            {/* Metrik 4: Real-Time Akses */}
-            <div className="rounded-2xl border border-emerald-950/[0.05] bg-gradient-to-br from-white to-emerald-50/40 p-4 transition-all hover:bg-white hover:shadow-sm">
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0F3D2E]">Demo</span>
-              </div>
-              <p className="mt-1 text-xs font-semibold text-[#2D5542]">Ringkasan dampak per wilayah</p>
-            </div>
-          </div>
+        {/* Jendela Aplikasi Jurnal Aksi Lingkungan */}
+        <div className="mt-12 sm:mt-14">
+          <HeroConsole />
         </div>
       </div>
     </section>
@@ -159,100 +66,101 @@ export function Problem() {
   const tantangan = [
     {
       nomor: "01",
-      kategori: "Hulu Rumah Tangga",
-      judul: "Sampah Dapur Tercampur Sejak dari Rumah",
-      info: "Sisa makanan dan kemasan plastik dibuang langsung ke satu tempat sampah yang sama. Tanpa pemilahan mandiri di dapur keluarga, seluruh timbulan masuk menjadi beban residu kota.",
-      akibat: "Material yang tercampur sisa makanan lebih sulit disiapkan untuk pengumpulan dan daur ulang.",
+      kategori: "Dapur Rumah Tangga",
+      judul: "Sampah dapur tercampur sejak dari rumah",
+      info: "Sisa makanan basah dan kemasan plastik dibuang ke satu tempat sampah yang sama sehingga material daur ulang ikut kotor.",
+      akibat: "1.800 ton sampah masuk setiap hari ke TPA Benowo tanpa terpilah.",
     },
     {
       nomor: "02",
-      kategori: "Saluran Drainase Kota",
-      judul: "Minyak Jelantah Dibuang ke Selokan",
-      info: "Minyak sisa penggorengan dibuang ke wastafel dan got perumahan. Minyak membeku dan memadat menjadi kerak yang menyumbat saluran air permukiman.",
-      akibat: "Saluran drainase menyempit dan memicu genangan air saat curah hujan tinggi di berbagai wilayah Surabaya.",
+      kategori: "Saluran Air Kampung",
+      judul: "Minyak jelantah dibuang ke selokan",
+      info: "Minyak sisa penggorengan dibuang ke wastafel dan membeku menjadi kerak yang menyumbat aliran got warga.",
+      akibat: "Saluran drainase menyempit dan memicu genangan saat hujan tinggi.",
     },
     {
       nomor: "03",
-      kategori: "Retensi Partisipasi Warga",
-      judul: "Semangat Warga Cepat Padam",
-      info: "Sosialisasi atau perlombaan lingkungan kerap ramai hanya sesaat. Tanpa apresiasi dan manfaat ekonomi yang dirasakan langsung di kehidupan sehari-hari, kebiasaan baik warga sulit bertahan lama.",
-      akibat: "Partisipasi warga terhenti begitu masa kampanye usai, aksi tidak terbangun menjadi kebiasaan rutin mandiri.",
+      kategori: "Kebiasaan Harian Warga",
+      judul: "Semangat warga cepat padam",
+      info: "Kerja bakti atau lomba kebersihan sering ramai sesaat tanpa manfaat ekonomi yang dirasakan langsung oleh keluarga.",
+      akibat: "Partisipasi berhenti begitu acara usai, belum menjadi kebiasaan mandiri.",
     },
     {
       nomor: "04",
-      kategori: "Monitoring Armada DLH",
-      judul: "Titik Tumpukan Sampah Tersebar Liar",
-      info: "Dinas kebersihan sulit mendeteksi titik tumpukan sampah liar di sudut-sudut permukiman tanpa adanya laporan berkoordinat lokasi yang akurat langsung dari warga sekitar.",
-      akibat: "Alokasi rute armada truk pengangkut sampah menjadi lambat dan penanganan timbulan liar terhambat.",
+      kategori: "Kebersihan Sudut Kota",
+      judul: "Titik tumpukan sampah tersebar liar",
+      info: "Tumpukan liar di sudut jalan sulit terpantau cepat oleh petugas tanpa laporan lokasi langsung dari warga sekitar.",
+      akibat: "Pengangkutan armada kebersihan menjadi lambat dan lingkungan tercemar.",
+    },
+  ];
+
+  const ringkasanKota = [
+    {
+      label: "Timbulan Harian Kota",
+      angka: "1.800 ton / hari",
+      judul: "Dimulai dari dapur keluarga",
+      deskripsi: "Volume sampah harian Surabaya yang bisa dikurangi drastis bila plastik dan kardus dipilah sejak dari rumah.",
+    },
+    {
+      label: "Beban Lahan Akhir",
+      angka: "37,5 Hektar",
+      judul: "Menjaga usia TPA Benowo",
+      deskripsi: "Fasilitas pengolahan akhir kota tetap membutuhkan pemilahan warga agar tidak kelebihan residu basah.",
+    },
+    {
+      label: "Gotong Royong Wilayah",
+      angka: "31 Kecamatan",
+      judul: "Lingkungan bersih merata",
+      deskripsi: "Partisipasi kebersihan dipetakan di seluruh kecamatan Surabaya dengan tetap menjaga privasi rumah warga.",
     },
   ];
 
   return (
-    <section
-      id="tantangan"
-      className="scroll-mt-16 bg-gradient-to-br from-[#0B2516] via-[#0F3320] to-[#081B10] px-4 py-18 text-white sm:px-6 sm:py-24"
-    >
+    <section id="tantangan" className="scroll-mt-16 border-b border-emerald-900/10 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        {/* Tajuk Bagian Tengah */}
-        <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
-          <h2 className="text-2xl font-black text-white sm:text-4xl leading-snug sm:leading-[1.35]">
-            Tantangan Nyata di Kota Surabaya
-          </h2>
-          <p className="mt-4 text-xs sm:text-sm leading-relaxed text-emerald-100/80">
-            Masalah lingkungan perkotaan yang bermula dari rumah tangga dan berdampak langsung ke kebersihan kota.
-          </p>
-        </div>
+        <h2 className="max-w-3xl text-2xl font-bold leading-[1.3] tracking-tight text-[#0F3D2E] sm:text-3xl">
+          <span>Kebersihan kota berawal dari kebiasaan kecil di rumah.</span>{" "}
+          <span className="font-normal text-[#426352]">
+            Ketika botol plastik, kardus, dan minyak jelantah dipisahkan dari sampah basah, beban lingkungan Surabaya
+            berkurang dan berubah menjadi manfaat bagi warga.
+          </span>
+        </h2>
 
-        {/* Panel Pemilahan dari Rumah */}
-        <div className="mt-12 rounded-3xl border border-white/20 bg-gradient-to-b from-white/[0.12] to-white/[0.04] p-7 backdrop-blur-md shadow-[0_8px_32px_-4px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.22)]">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-300">
-                Pemilahan dari rumah
-              </span>
-              <p className="mt-1 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                Mulai dari PET dan kardus
+        {/* 3 Pilar Angka Lingkungan */}
+        <div className="mt-12 grid border-y border-emerald-900/12 sm:grid-cols-3 sm:divide-x sm:divide-emerald-900/12">
+          {ringkasanKota.map(({ label, angka, judul, deskripsi }) => (
+            <div key={label} className="border-b border-emerald-900/10 py-7 last:border-b-0 sm:border-b-0 sm:px-7 sm:first:pl-0 sm:last:pr-0">
+              <span className="text-xs font-semibold text-[#1D9E75]">{label}</span>
+              <p className="mt-3 text-2xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-3xl">
+                {angka}
               </p>
+              <h3 className="mt-2 text-base font-bold text-[#0F3D2E]">{judul}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-[#426352]">{deskripsi}</p>
             </div>
-            <p className="max-w-md text-xs sm:text-sm text-emerald-100/80 leading-relaxed border-t md:border-t-0 md:border-l border-white/15 pt-4 md:pt-0 md:pl-6">
-              Botol PET dan kardus dapat disimpan terpisah dari sampah basah sampai siap disetor.
-            </p>
-          </div>
+          ))}
         </div>
 
-        {/* 4 Kartu Masalah — Mengikuti gaya kartu referensi 1:1 */}
-        <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 4 Tantangan Lingkungan */}
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
           {tantangan.map(({ nomor, kategori, judul, info, akibat }) => (
             <div
               key={nomor}
-              className="group flex flex-col justify-between rounded-3xl border border-white/20 bg-gradient-to-b from-white/[0.12] to-white/[0.04] p-7 backdrop-blur-md shadow-[0_8px_32px_-4px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.22)] transition-all duration-300 hover:border-white/35 hover:bg-white/[0.16] hover:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:-translate-y-1.5"
+              className="flex flex-col justify-between rounded-2xl border border-emerald-900/12 bg-white p-6 shadow-2xs"
             >
               <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 px-2.5 py-1 font-mono text-xs font-black tracking-wider text-emerald-200">
-                    {nomor}
-                  </span>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/80 text-right">
-                    {kategori}
-                  </span>
+                <div className="flex items-center justify-between text-xs font-semibold text-[#1D9E75]">
+                  <span>{nomor}</span>
+                  <span className="text-[#527362]">{kategori}</span>
                 </div>
-
-                <h3 className="mt-4 text-lg font-bold tracking-tight text-white leading-snug">
-                  {judul}
-                </h3>
-                <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-emerald-100/80">
-                  {info}
-                </p>
+                <h3 className="mt-3 text-lg font-bold text-[#0F3D2E]">{judul}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-[#426352]">{info}</p>
               </div>
 
-              {/* Kotak Dampak Lapangan - Selaras dengan gaya kartu referensi */}
-              <div className="mt-5 rounded-2xl border border-white/15 bg-black/25 p-3.5 sm:p-4">
-                <div className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+              <div className="mt-5 rounded-xl border border-emerald-950/20 bg-gradient-to-br from-[#0B2516] to-[#0F3320] px-4 py-3.5">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                   Dampak Lapangan
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-emerald-100/90 font-medium">
-                  {akibat}
                 </p>
+                <p className="mt-1 text-xs font-medium leading-relaxed text-emerald-100/95 sm:text-[13px]">{akibat}</p>
               </div>
             </div>
           ))}
@@ -264,77 +172,210 @@ export function Problem() {
 
 /* ── 2b. Cara Kerja Demo BONI (Alur Pilah → Setor/Jemput → Timbang → Verifikasi) ── */
 export function CaraKerjaDemo() {
+  const kolomLaporan = [
+    {
+      status: "Menunggu",
+      jumlah: "3 laporan",
+      dot: "bg-blue-600",
+      tiket: [
+        {
+          id: "wr-demo-02",
+          judul: "Sampah plastik tersangkut di bantaran sungai",
+          lokasi: "Semampir",
+          kategori: "Sampah sungai",
+          keparahan: "Kritis",
+        },
+        {
+          id: "wr-demo-05",
+          judul: "Lahan terbuka berubah menjadi pembuangan liar",
+          lokasi: "Gayungan",
+          kategori: "TPS/TPA liar",
+          keparahan: "Berat",
+        },
+      ],
+    },
+    {
+      status: "Ditindaklanjuti",
+      jumlah: "3 laporan",
+      dot: "bg-amber-600",
+      tiket: [
+        {
+          id: "wr-demo-01",
+          judul: "Tumpukan sampah meluber di pinggir jalan",
+          lokasi: "Wonokromo",
+          kategori: "Tim Truk Pengangkut Sampah DLH",
+          keparahan: "Berat",
+        },
+        {
+          id: "wr-demo-10",
+          judul: "Sampah jajanan berserakan di gerbang sekolah",
+          lokasi: "Sukolilo",
+          kategori: "Kelompok Relawan Lingkungan Warga",
+          keparahan: "Ringan",
+        },
+      ],
+    },
+    {
+      status: "Selesai",
+      jumlah: "3 laporan",
+      dot: "bg-[#15803D]",
+      tiket: [
+        {
+          id: "wr-demo-07",
+          judul: "Saluran drainase tersumbat tumpukan sampah",
+          lokasi: "Tambaksari",
+          kategori: "Satuan Saluran & Drainase Dinas SDA",
+          keparahan: "Selesai dikeruk",
+        },
+        {
+          id: "wr-demo-08",
+          judul: "Bak sampah meluber di pintu pasar tradisional",
+          lokasi: "Bubutan",
+          kategori: "Tim Truk Pengangkut Sampah DLH",
+          keparahan: "Ritase ditambah",
+        },
+      ],
+    },
+  ];
+
   const langkah = [
     {
+      nomor: "Langkah 1",
       judul: "Pilah dari rumah",
-      deskripsi: "Pisahkan botol PET dan kardus yang bersih dan kering.",
+      deskripsi: "Pisahkan botol PET dan kardus bersih dari sampah dapur basah.",
+      status: "Panduan di Edukasi",
+      href: "/edukasi",
     },
     {
-      judul: "Setor atau jadwalkan jemput",
+      nomor: "Langkah 2",
+      judul: "Setor atau jemput",
       deskripsi: "Warga memilih cara menyerahkan sampah yang sudah dipilah.",
+      status: "Dalam rancangan",
+      href: "/tentang#rencana-setoran",
     },
     {
-      judul: "Timbang dan cek material",
-      deskripsi: "Pengepul memeriksa jenis material dan mencatat beratnya.",
+      nomor: "Langkah 3",
+      judul: "Timbang & cek material",
+      deskripsi: "Pengepul memeriksa kebersihan material dan mencatat beratnya.",
+      status: "Dalam rancangan",
+      href: "/tentang#rencana-setoran",
     },
     {
-      judul: "Verifikasi dan insentif",
-      deskripsi: "Di demo Warga, coba verifikasi foto dan jelajahi EcoPoints.",
+      nomor: "Langkah 4",
+      judul: "Verifikasi & EcoPoints",
+      deskripsi: "Coba verifikasi foto dan tukarkan poin di katalog UMKM.",
+      status: "Bisa dicoba di demo",
+      href: "/login?role=warga",
     },
   ];
 
   return (
-    <section
-      id="cara-kerja"
-      className="relative isolate scroll-mt-24 overflow-hidden border-t border-emerald-950/[0.06] bg-[#FAFDFB]"
-    >
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(1000px_450px_at_50%_15%,rgba(29,158,117,0.06)_0%,transparent_80%)]" />
-
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="mx-auto max-w-4xl text-center">
-          <h2 className="mx-auto max-w-3xl text-3xl font-black tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[44px] leading-snug sm:leading-tight lg:leading-[1.22]">
-            Cara kerja{" "}
-            <span className="text-[#1D9E75]">ekosistem BONI</span>
+    <section id="cara-kerja" className="scroll-mt-24 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 sm:px-6 sm:py-28">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12">
+          <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-[#0F3D2E] sm:text-5xl">
+            Pelaporan warga <br />
+            dan tindak lanjut kota
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-medium leading-relaxed text-[#2D5542] sm:text-base">
-            Setor, jemput, dan timbang masih dalam rancangan. Verifikasi foto dan EcoPoints bisa dicoba di demo Warga.
-          </p>
+
+          <div className="max-w-lg md:pt-1">
+            <p className="text-base leading-relaxed text-[#2D5542] sm:text-[17px]">
+              Laporan titik sampah berkoordinat di portal Warga langsung terhubung dengan antrean tindak lanjut petugas
+              di portal Pemkot Surabaya.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-5">
+              <Link
+                href="/gov/login"
+                className="inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
+              >
+                <span>Buka pratinjau portal Pemkot</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
         </div>
 
-        <ol className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {langkah.map(({ judul, deskripsi }) => (
+        {/* Pratinjau Papan Tiket Laporan Sampah Asli (/dashboard/laporan-sampah & /gov/dashboard) */}
+        <div className="mt-12 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.14)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 bg-[#F8FAF9] px-4 py-2.5 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+              <span className="ml-2 rounded-md border border-neutral-200/80 bg-white px-2.5 py-0.5 font-mono text-[11px] text-neutral-500">
+                boni.app/gov/dashboard · Tiket Laporan Sampah
+              </span>
+            </div>
+            <span className="font-mono text-[11px] text-neutral-500">31 Kecamatan Surabaya</span>
+          </div>
+
+          <div className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {kolomLaporan.map((kol) => (
+              <div key={kol.status} className="p-4 sm:p-5">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
+                    <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
+                    <span>{kol.status}</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
+                </div>
+
+                <div className="mt-3.5 space-y-2.5">
+                  {kol.tiket.map((t) => (
+                    <div
+                      key={t.id}
+                      className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-colors hover:border-[#2D5F3F]/30"
+                    >
+                      <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                        <span>{t.id}</span>
+                        <span>{t.lokasi}</span>
+                      </div>
+                      <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
+                        {t.judul}
+                      </p>
+                      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+                        <span className="truncate text-neutral-600">{t.kategori}</span>
+                        <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
+                          {t.keparahan}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 4 Langkah Alur */}
+        <ol className="mt-10 grid border-t border-emerald-900/15 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-emerald-900/15">
+          {langkah.map(({ nomor, judul, deskripsi, status, href }) => (
             <li
-              key={judul}
-              className="group rounded-3xl border border-emerald-950/[0.08] bg-white p-7 shadow-[0_12px_28px_-6px_rgba(15,61,46,0.06)] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+              key={nomor}
+              className="flex flex-col justify-between border-b border-emerald-900/10 py-6 last:border-b-0 sm:px-5 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
             >
-              <h3 className="text-xl font-extrabold text-[#0F3D2E]">{judul}</h3>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-[#4D6D5B]">
-                {deskripsi}
-              </p>
+              <div>
+                <div className="flex items-center justify-between text-xs font-semibold text-[#1D9E75]">
+                  <span>{nomor}</span>
+                  <span className="text-[#527362]">{status}</span>
+                </div>
+                <h3 className="mt-3 text-base font-bold text-[#0F3D2E]">{judul}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-[#426352]">{deskripsi}</p>
+              </div>
+              <Link
+                href={href}
+                className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-[#0F3D2E] hover:text-[#1D9E75]"
+              >
+                <span>Buka halaman</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </li>
           ))}
         </ol>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/tentang#rencana-setoran"
-            className="inline-flex items-center justify-center rounded-full border-2 border-[#0F3D2E]/20 bg-white/95 px-6 py-3 text-sm font-bold text-[#0F3D2E] shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-[#0F3D2E]/40 hover:bg-emerald-50/60 active:scale-[0.98]"
-          >
-            Rancangan alur setoran
-          </Link>
-          <Link
-            href="/#gateway"
-            className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-[#0F3D2E]/20 transition-all hover:-translate-y-0.5 hover:bg-[#18533F] hover:shadow-xl active:scale-[0.98]"
-          >
-            <span>Pilih portal demo</span>
-            <ArrowRight size={15} aria-hidden="true" />
-          </Link>
-        </div>
       </div>
     </section>
   );
 }
-
 /* ── 3. Flagship Interactive Showcase — 3 Panggung Solusi Nyata Berbasis UI Mockup ── */
 export function FlagshipShowcase() {
   return (
@@ -595,44 +636,51 @@ export const Features = FlagshipShowcase;
 export function BuiltForSurabaya() {
   const pilar = [
     {
+      kode: "01",
       judul: "Warga Berdaya",
       info: "Dokumentasikan aksi peduli lingkungan langsung dari ponsel tanpa birokrasi rumit.",
     },
     {
+      kode: "02",
       judul: "Respon Sampah Presisi",
-      info: "Coba catat lokasi timbulan sampah dan lihat cara laporan dikelola di portal demo.",
+      info: "Catat lokasi timbulan sampah dan lihat cara laporan dikelola di portal demo.",
     },
     {
+      kode: "03",
       judul: "Ekonomi Kampung Berputar",
-      info: "Gunakan EcoPoints dalam simulasi katalog voucher UMKM.",
+      info: "Gunakan EcoPoints dalam simulasi katalog voucher UMKM lokal.",
     },
     {
+      kode: "04",
       judul: "Peta Demo 31 Kecamatan",
-      info: "Lihat contoh ringkasan wilayah dan partisipasi warga dalam peta dampak.",
+      info: "Lihat contoh ringkasan wilayah dan partisipasi warga dengan privasi terjaga.",
     },
   ];
 
   return (
-    <section id="surabaya" className="scroll-mt-16 bg-gradient-to-br from-[#0B2516] via-[#0F3320] to-[#081B10] px-4 py-18 text-white sm:px-6 sm:py-24">
+    <section id="surabaya" className="scroll-mt-16 border-b border-white/10 bg-gradient-to-br from-[#0B2618] via-[#0F3623] to-[#092014] px-4 py-20 text-white sm:px-6 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <div className="text-center max-w-2xl mx-auto flex flex-col items-center">
-          <h2 className="text-2xl font-black text-white sm:text-4xl leading-snug sm:leading-[1.35]">
-            Melengkapi Semangat Bank Sampah <br className="hidden sm:inline" />
-            & Tradisi Gotong Royong
+        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12">
+          <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-white sm:text-5xl">
+            Melengkapi semangat <br />
+            bank sampah & gotong royong
           </h2>
-          <p className="mt-4 text-xs sm:text-sm leading-relaxed text-emerald-100/80">
-            Warga Surabaya sudah lama mandiri menjaga lingkungannya. BONI hadir memperkuat tradisi ini agar setiap kebaikan terdata transparan dan berbuah manfaat timbal balik.
+
+          <p className="max-w-lg text-base leading-relaxed text-emerald-100/85 sm:text-[17px] md:pt-1">
+            Warga Surabaya sudah lama mandiri menjaga kebersihan kampungnya. BONI hadir memperkuat tradisi ini agar
+            setiap kebaikan tercatat rapi dan memberi manfaat timbal balik bagi keluarga.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {pilar.map(({ judul, info }) => (
+        <div className="mt-14 grid border-y border-white/15 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-white/15">
+          {pilar.map(({ kode, judul, info }) => (
             <div
               key={judul}
-              className="group rounded-3xl border border-white/20 bg-gradient-to-b from-white/[0.12] to-white/[0.04] p-7 backdrop-blur-md shadow-[0_8px_32px_-4px_rgba(0,0,0,0.3),inset_0_1px_1px_rgba(255,255,255,0.22)] transition-all duration-300 hover:border-white/35 hover:bg-white/[0.16] hover:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.4)] hover:-translate-y-1.5"
+              className="border-b border-white/15 py-7 last:border-b-0 sm:px-6 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
             >
-              <h3 className="text-lg font-bold tracking-tight text-white">{judul}</h3>
-              <p className="mt-2.5 text-xs sm:text-sm leading-relaxed text-emerald-100/80">{info}</p>
+              <span className="text-xs font-bold text-[#7AC74F]">{kode}</span>
+              <h3 className="mt-3 text-base font-bold text-white">{judul}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-emerald-100/80">{info}</p>
             </div>
           ))}
         </div>
@@ -767,105 +815,82 @@ export function Team() {
 
 /* ── 9. Call to Action Eksekutif — Dua Gerbang Eksplorasi Interaktif ── */
 export function FinalCta() {
+  const gerbang = [
+    {
+      kode: "Peran Warga & UMKM",
+      judul: "Simulasi Aksi Warga & UMKM",
+      deskripsi: "Coba unggah bukti aksi kebersihan, kumpulkan EcoPoints, dan simulasikan penukaran voucher UMKM.",
+      butir: [
+        "Pemeriksaan contoh foto berbantuan AI",
+        "Katalog voucher diskon belanja warung & UMKM Surabaya",
+        "Pelaporan titik timbulan sampah berkoordinat GPS",
+      ],
+      href: "/login?role=warga",
+      tombol: "Mulai demo Warga",
+      utama: true,
+    },
+    {
+      kode: "Peran Pemerintah Kota",
+      judul: "Simulasi Portal Pemkot",
+      deskripsi: "Jelajahi contoh pemantauan aksi lingkungan dan penanganan laporan kebersihan per wilayah.",
+      butir: [
+        "Peta agregasi spasial terbuka 31 kecamatan",
+        "Contoh tiket laporan timbulan sampah",
+        "Ringkasan partisipasi kebersihan warga",
+      ],
+      href: "/gov/login",
+      tombol: "Buka portal Pemkot",
+      utama: false,
+    },
+  ];
+
   return (
-    <section id="gateway" className="scroll-mt-16 relative bg-[#FAFDFB] px-4 py-16 sm:px-6 sm:py-24 border-t border-gray-100">
+    <section id="gateway" className="scroll-mt-16 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28">
       <div id="team" className="scroll-mt-20 mx-auto max-w-6xl">
-        {/* Kontainer Utama Bergaya Glass Command Center */}
-        <div className="relative isolate overflow-hidden rounded-[2.5rem] border border-white/20 bg-gradient-to-b from-[#092617] via-[#0E3522] to-[#06180E] p-8 sm:p-12 lg:p-16 text-white shadow-2xl shadow-emerald-950/20">
-          {/* Garis Aksen Pendar Cahaya di Sisi Atas */}
-          <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#7AC74F] to-transparent" />
+        <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-end md:gap-12">
+          <h2 className="text-3xl font-extrabold leading-[1.14] tracking-tight text-[#0F3D2E] sm:text-5xl">
+            Mulai jelajahi <br />
+            ekosistem BONI
+          </h2>
+          <p className="max-w-md text-base leading-relaxed text-[#2D5542]">
+            Uji coba sistem interaktif warga atau akses portal pemerintah kota langsung di peramban tanpa instalasi
+            aplikasi.
+          </p>
+        </div>
 
-          {/* Latar Belakang Pendar Cahaya Radial & Vektor Geometris */}
-          <div className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-80 w-80 rounded-full bg-emerald-500/15 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-32 right-10 h-72 w-72 rounded-full bg-[#7AC74F]/10 blur-3xl" />
-
-          {/* Tajuk Utama Banner */}
-          <div className="relative z-10 text-center max-w-2xl mx-auto">
-            <h2 className="text-2xl font-black tracking-tight text-white sm:text-4xl leading-tight">
-              Mulai Jelajahi Ekosistem BONI
-            </h2>
-
-            <p className="mx-auto mt-3 max-w-xl text-xs sm:text-sm leading-relaxed text-emerald-100/80 font-medium">
-              Uji coba sistem interaktif warga atau akses portal pemerintah kota langsung di peramban tanpa instalasi aplikasi.
-            </p>
-          </div>
-
-          {/* Dua Kartu Pilihan Gerbang Masuk (Bento Dual-Gateway) */}
-          <div className="relative z-10 mt-10 grid gap-6 md:grid-cols-2">
-            {/* Gerbang 1: Warga & UMKM */}
-            <div className="group relative flex flex-col justify-between rounded-3xl border border-white/15 bg-gradient-to-b from-white/[0.10] to-white/[0.04] p-7 sm:p-8 backdrop-blur-md transition-all duration-300 hover:border-emerald-400/50 hover:bg-white/[0.14] hover:-translate-y-1 hover:shadow-xl">
+        <div className="mt-12 grid overflow-hidden rounded-2xl border border-emerald-900/15 bg-white shadow-sm md:grid-cols-2 md:divide-x md:divide-emerald-900/12">
+          {gerbang.map(({ kode, judul, deskripsi, butir, href, tombol, utama }) => (
+            <div
+              key={judul}
+              className="flex flex-col justify-between gap-8 border-b border-emerald-900/10 p-7 last:border-b-0 sm:p-9 md:border-b-0"
+            >
               <div>
-                <h3 className="text-xl font-bold tracking-tight text-white">
-                  Simulasi Aksi Warga & UMKM
-                </h3>
-                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-emerald-100/75">
-                  Coba unggah bukti aksi, kumpulkan EcoPoints, dan simulasikan penukaran voucher UMKM.
-                </p>
+                <span className="text-xs font-bold text-[#1D9E75]">{kode}</span>
+                <h3 className="mt-2 text-xl font-bold tracking-tight text-[#0F3D2E]">{judul}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#426352]">{deskripsi}</p>
 
-                <ul className="mt-5 space-y-2 border-t border-white/10 pt-4 text-xs text-white/80">
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Pemeriksaan contoh foto berbantuan AI</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Katalog voucher diskon belanja UMKM Surabaya</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Pelaporan titik timbulan sampah berkoordinat GPS</span>
-                  </li>
+                <ul className="mt-6 divide-y divide-emerald-900/10 border-y border-emerald-900/10 text-sm text-[#1F3F2F]">
+                  {butir.map((item) => (
+                    <li key={item} className="py-2.5">
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
 
-              <div className="mt-8">
-                <Link
-                  href="/login?role=warga"
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#1D9E75] to-[#15803D] px-6 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-950/30 transition-all hover:brightness-110 hover:shadow-xl active:scale-[0.98]"
-                >
-                  <span>Mulai Demo Interaktif Warga</span>
-                  <ArrowRight size={16} className="text-white" />
-                </Link>
-              </div>
+              <Link
+                href={href}
+                className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2 ${
+                  utama
+                    ? "bg-[#0F3D2E] text-white hover:bg-[#18533F]"
+                    : "border border-[#0F3D2E]/25 text-[#0F3D2E] hover:bg-emerald-50/70"
+                }`}
+              >
+                <span>{tombol}</span>
+                <span aria-hidden="true">→</span>
+              </Link>
             </div>
-
-            {/* Gerbang 2: Pemerintah Kota & Dinas */}
-            <div className="group relative flex flex-col justify-between rounded-3xl border border-white/15 bg-gradient-to-b from-white/[0.10] to-white/[0.04] p-7 sm:p-8 backdrop-blur-md transition-all duration-300 hover:border-emerald-400/50 hover:bg-white/[0.14] hover:-translate-y-1 hover:shadow-xl">
-              <div>
-                <h3 className="text-xl font-bold tracking-tight text-white">
-                  Simulasi Portal Pemkot
-                </h3>
-                <p className="mt-2 text-xs sm:text-sm leading-relaxed text-emerald-100/75">
-                  Jelajahi contoh pemantauan aksi lingkungan dan penanganan laporan per wilayah.
-                </p>
-
-                <ul className="mt-5 space-y-2 border-t border-white/10 pt-4 text-xs text-white/80">
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Peta agregasi spasial terbuka 31 kecamatan</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Contoh tiket laporan timbulan sampah</span>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Check size={14} className="text-[#7AC74F] shrink-0" />
-                    <span>Ringkasan partisipasi warga</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-8">
-                <Link
-                  href="/gov/login"
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#1D9E75] to-[#15803D] px-6 py-4 text-sm font-bold text-white shadow-lg shadow-emerald-950/30 transition-all hover:brightness-110 hover:shadow-xl active:scale-[0.98]"
-                >
-                  <span>Buka Portal Pemkot (Demo)</span>
-                  <ArrowRight size={16} className="text-white" />
-                </Link>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

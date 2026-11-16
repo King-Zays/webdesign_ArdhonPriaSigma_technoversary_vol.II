@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 import {
   Hero,
+  PlatformShowcase,
   Problem,
   CaraKerjaDemo,
   BuiltForSurabaya,
@@ -19,6 +20,7 @@ export default function HomePage() {
     <LayoutWrapper>
       <Hero />
       <Problem />
+      <PlatformShowcase />
       <CaraKerjaDemo />
       <BuiltForSurabaya />
       {/* DepositImpact dan nav pratinjau /pengepul + /admin dinonaktifkan sementara untuk fokus jalur demo Warga & Pemkot */}
