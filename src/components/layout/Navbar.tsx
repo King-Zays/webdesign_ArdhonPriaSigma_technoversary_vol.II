@@ -46,7 +46,7 @@ export default function Navbar() {
           <NavbarLogo />
           <NavItems items={RESIZABLE_NAV_ITEMS} />
 
-          <div className="relative z-20 flex items-center gap-2.5">
+          <div className="relative z-20 flex shrink-0 items-center gap-2 whitespace-nowrap">
             {signedIn ? (
               <>
                 <NavbarButton

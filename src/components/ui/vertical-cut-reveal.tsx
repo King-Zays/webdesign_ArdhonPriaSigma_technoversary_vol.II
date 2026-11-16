@@ -138,7 +138,7 @@ const VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(
     }, [autoStart, startAnimation])
 
     const variants = {
-      hidden: { y: reverse ? "-100%" : "100%" },
+      hidden: { y: reverse ? "-115%" : "115%" },
       visible: (i: number) => ({
         y: 0,
         transition: {

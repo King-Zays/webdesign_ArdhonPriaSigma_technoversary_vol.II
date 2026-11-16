@@ -18,25 +18,71 @@ import {
 } from "lucide-react";
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+function ScrambleCode({ code, active }: { code: string; active: boolean }) {
+  const [display, setDisplay] = useState(() =>
+    code.replace(/[A-Z0-9]/g, "•")
+  );
+
+  useEffect(() => {
+    if (!active) {
+      setDisplay(code.replace(/[A-Z0-9]/g, "•"));
+      return;
+    }
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplay(code);
+      return;
+    }
+
+    let frame = 0;
+    const totalFrames = 18;
+    const id = setInterval(() => {
+      frame += 1;
+      const lockedCount = Math.floor((frame / totalFrames) * code.length);
+      const next = code
+        .split("")
+        .map((ch, idx) => {
+          if (ch === "-") return "-";
+          if (idx < lockedCount) return ch;
+          return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+        })
+        .join("");
+      setDisplay(next);
+      if (frame >= totalFrames) {
+        clearInterval(id);
+        setDisplay(code);
+      }
+    }, 45);
+
+    return () => clearInterval(id);
+  }, [active, code]);
+
+  return (
+    <span className="font-mono tracking-tight text-[#0F3D2E]" aria-label={code}>
+      {display}
+    </span>
+  );
+}
 
 const materialStandards = [
   {
     id: "pet",
     nama: "Botol Plastik PET (Kode 1)",
-    syarat: "Kosongkan sisa cairan, bilas singkat bila lengket, dan remukkan agar hemat ruang simpan.",
-    tujuan: "Disetorkan ke bank sampah / pengepul atau dicatat di Aksi Hijau (+40 pts).",
+    unit: "+40 EcoPoints",
+    syarat: "Kosongkan sisa cairan, bilas singkat jika lengket, lalu remukkan sebelum disetor ke pengepul atau diunggah di Aksi Hijau.",
   },
   {
     id: "kardus",
     nama: "Kardus & Karton Lipat",
-    syarat: "Lipat rata, lepaskan lakban berlebih, dan pastikan kering bebas noda minyak atau sisa makanan.",
-    tujuan: "Ditimbang per kilogram pada jadwal setor langsung atau penjemputan.",
+    unit: "Timbang per kg",
+    syarat: "Lipat rata dan lepaskan lakban berlebih. Pastikan tetap kering serta bebas dari noda minyak maupun sisa makanan.",
   },
   {
     id: "jelantah",
     nama: "Minyak Jelantah Rumah Tangga",
-    syarat: "Saring ampas penggorengan dan simpan di jeriken atau botol tertutup rapat, jangan dituang ke selokan.",
-    tujuan: "Disetor ke titik pengumpulan warga untuk diolah kembali (+50 pts).",
+    unit: "+50 EcoPoints",
+    syarat: "Saring ampas penggorengan dan simpan di jeriken atau botol tertutup rapat untuk disetor ke titik pengumpulan warga.",
   },
 ] as const;
 
@@ -147,18 +193,45 @@ const collaborationTracks = [
 
 export default function AboutSections() {
   const [aktifTahap, setAktifTahap] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [showMaterialUnit, setShowMaterialUnit] = useState(false);
+  const [stageStep, setStageStep] = useState(0);
 
   useEffect(() => {
-    if (paused) return;
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setStageStep(3);
+      return;
+    }
+    setStageStep(0);
+    const t1 = setTimeout(() => setStageStep(1), 650);
+    const t2 = setTimeout(() => setStageStep(2), 1550);
+    const t3 = setTimeout(() => setStageStep(3), 2450);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [aktifTahap]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setShowMaterialUnit(true);
       return;
     }
     const id = setInterval(() => {
-      setAktifTahap((i) => (i + 1) % depositStages.length);
-    }, 5200);
+      setShowMaterialUnit((prev) => !prev);
+    }, 2800);
     return () => clearInterval(id);
-  }, [paused]);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+    const id = setTimeout(() => {
+      setAktifTahap((i) => (i + 1) % depositStages.length);
+    }, 4000);
+    return () => clearTimeout(id);
+  }, [aktifTahap]);
 
   const tahap = depositStages[aktifTahap];
 
@@ -166,8 +239,9 @@ export default function AboutSections() {
     <>
       {/* 1. Masalah di Rumah & Standar Material Awal */}
       <section
+        id="standar-material"
         aria-labelledby="mulai-dari-rumah-title"
-        className="border-b border-emerald-900/10 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28"
+        className="scroll-mt-20 border-b border-emerald-900/10 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -203,36 +277,73 @@ export default function AboutSections() {
               </div>
             </div>
 
-            {/* Tabel Standar Material Bersih & Kering */}
-            <div className="overflow-hidden rounded-2xl border border-emerald-900/15 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.12)]">
-              <div className="flex items-center justify-between border-b border-emerald-900/10 bg-[#F4F9F6] px-5 py-3 text-xs">
-                <span className="font-bold text-[#0F3D2E]">Standar Material Rumah Tangga</span>
-                <span className="font-mono text-[11px] text-[#426352]">Bersih · Kering · Terpisah</span>
+            {/* Tabel Standar Kondisi Material */}
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.985 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.8, ease: EASE_OUT_EXPO }}
+              className="overflow-hidden rounded-2xl border border-emerald-900/15 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.12)]"
+            >
+              <div className="flex items-center justify-between border-b border-emerald-900/10 bg-[#F4F9F6] px-5 py-3.5 text-xs">
+                <span className="font-bold text-[#0F3D2E]">Standar Kondisi Material</span>
+                <span className="text-[#527362]">3 kategori awal rumah tangga</span>
               </div>
               <div className="divide-y divide-emerald-900/10">
-                {materialStandards.map((m) => (
-                  <div key={m.id} className="p-5">
-                    <div className="flex items-start justify-between gap-3">
+                {materialStandards.map((m, idx) => (
+                  <motion.div
+                    key={m.id}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.6, delay: 0.12 + idx * 0.1, ease: EASE_OUT_EXPO }}
+                    className="p-5"
+                  >
+                    <div className="flex items-baseline justify-between gap-4">
                       <h3 className="text-sm font-bold text-[#0F3D2E] sm:text-base">{m.nama}</h3>
-                      <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#1D9E75]">
-                        <Check size={14} aria-hidden="true" />
-                        <span>Diterima</span>
-                      </span>
+                      <div className="relative flex h-5 min-w-[116px] shrink-0 items-center justify-end overflow-hidden">
+                        <AnimatePresence mode="wait" initial={false}>
+                          {showMaterialUnit ? (
+                            <motion.span
+                              key="unit"
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -8 }}
+                              transition={{ duration: 0.32, delay: idx * 0.08, ease: EASE_OUT_EXPO }}
+                              className="inline-flex items-center text-xs font-semibold text-[#1D9E75]"
+                            >
+                              {m.unit}
+                            </motion.span>
+                          ) : (
+                            <motion.span
+                              key="accepted"
+                              initial={{ opacity: 0, y: 8 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -8 }}
+                              transition={{ duration: 0.32, delay: idx * 0.08, ease: EASE_OUT_EXPO }}
+                              className="inline-flex items-center gap-1 text-xs font-semibold text-[#1D9E75]"
+                            >
+                              <Check size={13} aria-hidden="true" />
+                              <span>Diterima</span>
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
                     </div>
                     <p className="mt-1.5 text-sm leading-relaxed text-[#426352]">{m.syarat}</p>
-                    <p className="mt-2 font-mono text-xs text-[#527362]">{m.tujuan}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* 2. Tiga Peran Ekosistem (Baris Hairline Editorial) */}
       <section
+        id="peran-ekosistem"
         aria-labelledby="peran-ekosistem-title"
-        className="border-b border-emerald-900/10 bg-white px-4 py-20 sm:px-6 sm:py-28"
+        className="scroll-mt-20 border-b border-emerald-900/10 bg-white px-4 py-20 sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -303,7 +414,7 @@ export default function AboutSections() {
       <section
         id="rencana-setoran"
         aria-labelledby="rencana-setoran-title"
-        className="scroll-mt-24 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 text-[#0F3D2E] sm:px-6 sm:py-28"
+        className="scroll-mt-20 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 text-[#0F3D2E] sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -356,8 +467,6 @@ export default function AboutSections() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: false, amount: 0.18 }}
             transition={{ duration: 1.1, delay: 0.12, ease: EASE_OUT_EXPO }}
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
             className="mt-12 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-[0_28px_70px_-24px_rgba(15,61,46,0.18)]"
           >
             {/* Window Chrome Titlebar */}
@@ -471,9 +580,19 @@ export default function AboutSections() {
                             Checklist Kesiapan Material Rumah Tangga
                           </h3>
                         </div>
-                        <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-[#15803D]">
-                          3/3 Syarat Terpenuhi
-                        </span>
+                        <motion.span
+                          key={stageStep}
+                          initial={{ scale: 0.92, opacity: 0.7 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                          className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold transition-colors duration-300 ${
+                            stageStep >= 3
+                              ? "bg-emerald-50 text-[#15803D]"
+                              : "bg-neutral-100 text-neutral-500"
+                          }`}
+                        >
+                          {stageStep}/3 Syarat Terpenuhi
+                        </motion.span>
                       </div>
 
                       <div className="grid gap-2.5 sm:grid-cols-3">
@@ -481,34 +600,91 @@ export default function AboutSections() {
                           { label: "Botol Plastik PET (Kode 1)", berat: "1.2 kg", status: "Bersih & Diremukkan" },
                           { label: "Kardus & Karton Lipat", berat: "1.3 kg", status: "Dilipat Rata & Kering" },
                           { label: "Minyak Jelantah Saring", berat: "1.0 L", status: "Botol Tertutup Rapat" },
-                        ].map((item) => (
-                          <div
-                            key={item.label}
-                            className="rounded-xl border border-neutral-200/80 bg-white p-3.5"
-                          >
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="font-mono text-[11px] font-bold text-[#1D9E75]">{item.berat}</span>
-                              <CheckCircle2 size={14} className="text-[#15803D]" />
-                            </div>
-                            <p className="mt-1.5 text-xs font-bold text-[#1A1A1A]">{item.label}</p>
-                            <p className="mt-1 text-[11px] text-neutral-500">{item.status}</p>
-                          </div>
-                        ))}
+                        ].map((item, idx) => {
+                          const checked = stageStep > idx;
+                          return (
+                            <motion.div
+                              key={item.label}
+                              initial={{ opacity: 0, y: 14 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.55, delay: idx * 0.16, ease: EASE_OUT_EXPO }}
+                              className={`rounded-xl border p-3.5 transition-colors duration-500 ${
+                                checked
+                                  ? "border-emerald-900/15 bg-white"
+                                  : "border-neutral-200/70 bg-neutral-50/60"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="font-mono text-[11px] font-bold text-[#1D9E75]">{item.berat}</span>
+                                <motion.span
+                                  initial={false}
+                                  animate={{
+                                    scale: checked ? 1 : 0.72,
+                                    opacity: checked ? 1 : 0.22,
+                                  }}
+                                  transition={{ type: "spring", stiffness: 260, damping: 22 }}
+                                >
+                                  <CheckCircle2
+                                    size={14}
+                                    className={checked ? "text-[#15803D]" : "text-neutral-300"}
+                                  />
+                                </motion.span>
+                              </div>
+                              <p className="mt-1.5 text-xs font-bold text-[#1A1A1A]">{item.label}</p>
+                              <p className="mt-1 text-[11px] text-neutral-500">{item.status}</p>
+                            </motion.div>
+                          );
+                        })}
                       </div>
 
                       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200/80 bg-white text-xs">
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                        <motion.div
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: stageStep >= 1 ? 1 : 0.45, x: 0 }}
+                          transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Bebas sisa makanan basah &amp; minyak dapur</span>
-                          <span className="font-mono font-semibold text-[#15803D]">✓ Lolos</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                          <motion.span
+                            animate={{ scale: stageStep >= 1 ? 1 : 0.9, opacity: stageStep >= 1 ? 1 : 0.35 }}
+                            transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                            className="font-mono font-semibold text-[#15803D]"
+                          >
+                            ✓ Lolos
+                          </motion.span>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: stageStep >= 2 ? 1 : 0.45, x: 0 }}
+                          transition={{ duration: 0.35, delay: 0.08, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Tutup botol &amp; lakban tebal sudah dilepas</span>
-                          <span className="font-mono font-semibold text-[#15803D]">✓ Lolos</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                          <motion.span
+                            animate={{ scale: stageStep >= 2 ? 1 : 0.9, opacity: stageStep >= 2 ? 1 : 0.35 }}
+                            transition={{ type: "spring", stiffness: 380, damping: 24 }}
+                            className="font-mono font-semibold text-[#15803D]"
+                          >
+                            ✓ Lolos
+                          </motion.span>
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: stageStep >= 3 ? 1 : 0.55, x: 0 }}
+                          transition={{ duration: 0.35, delay: 0.14, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Status kesiapan pengajuan setoran warga</span>
-                          <span className="font-mono font-bold text-[#0F3D2E]">Siap Disetor (2.5 kg)</span>
-                        </div>
+                          <motion.span
+                            animate={{ scale: stageStep >= 3 ? [1, 1.04, 1] : 1 }}
+                            transition={{ duration: 0.35 }}
+                            className={`font-mono font-bold transition-colors duration-300 ${
+                              stageStep >= 3 ? "text-[#0F3D2E]" : "text-neutral-400"
+                            }`}
+                          >
+                            {stageStep >= 3 ? "Siap Disetor (2.5 kg)" : "Memeriksa..."}
+                          </motion.span>
+                        </motion.div>
                       </div>
                     </motion.div>
                   )}
@@ -536,7 +712,12 @@ export default function AboutSections() {
                       </div>
 
                       <div className="grid gap-3 sm:grid-cols-[1.15fr_1fr]">
-                        <div className="rounded-xl border border-neutral-200/80 bg-white p-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                          className="rounded-xl border border-neutral-200/80 bg-white p-4"
+                        >
                           <div className="flex items-center justify-between text-xs text-neutral-500">
                             <span className="inline-flex items-center gap-1.5 font-semibold text-[#0F3D2E]">
                               <Truck size={13} className="text-[#1D9E75]" />
@@ -551,38 +732,82 @@ export default function AboutSections() {
                             Penjemputan Rute RW 04 · Botol PET &amp; Kardus
                           </p>
                           <div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
-                            <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]">
+                            <motion.span
+                              animate={{ opacity: stageStep >= 1 ? 1 : 0.3, scale: stageStep >= 1 ? 1 : 0.94 }}
+                              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                              className="rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]"
+                            >
                               ✓ Material Kering
-                            </span>
-                            <span className="rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]">
+                            </motion.span>
+                            <motion.span
+                              animate={{ opacity: stageStep >= 2 ? 1 : 0.3, scale: stageStep >= 2 ? 1 : 0.94 }}
+                              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                              className="rounded-md bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]"
+                            >
                               ✓ Bebas Kontaminasi
-                            </span>
+                            </motion.span>
                           </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#F0FAF4] p-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, delay: 0.12, ease: EASE_OUT_EXPO }}
+                          className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#F0FAF4] p-4"
+                        >
                           <div className="flex items-center justify-between text-[11px] text-[#426352]">
                             <span>Layar Timbangan Digital</span>
-                            <span className="font-mono font-semibold text-[#15803D]">Stabil</span>
+                            <motion.span
+                              key={stageStep >= 3 ? "stabil" : "menimbang"}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.25 }}
+                              className={`font-mono font-semibold ${
+                                stageStep >= 3 ? "text-[#15803D]" : "text-amber-700"
+                              }`}
+                            >
+                              {stageStep >= 3 ? "Stabil" : "Menimbang..."}
+                            </motion.span>
                           </div>
-                          <p className="my-1 font-mono text-2xl font-extrabold tracking-tight text-[#0F3D2E]">
-                            2.45 <span className="text-sm font-normal text-[#426352]">kg</span>
-                          </p>
+                          <motion.p
+                            key={stageStep >= 2 ? "2.45" : stageStep >= 1 ? "1.15" : "0.00"}
+                            initial={{ opacity: 0.5, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                            className="my-1 font-mono text-2xl font-extrabold tracking-tight text-[#0F3D2E]"
+                          >
+                            {stageStep >= 2 ? "2.45" : stageStep >= 1 ? "1.15" : "0.00"}{" "}
+                            <span className="text-sm font-normal text-[#426352]">kg</span>
+                          </motion.p>
                           <p className="text-[11px] text-[#426352]">
                             1 foto memuat material + angka layar timbangan
                           </p>
-                        </div>
+                        </motion.div>
                       </div>
 
                       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200/80 bg-white text-xs">
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                        <motion.div
+                          animate={{ opacity: stageStep >= 1 ? 1 : 0.4, x: 0 }}
+                          initial={{ opacity: 0.4, x: -6 }}
+                          transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Botol PET Bening · Berat Aktual</span>
-                          <span className="font-mono font-bold text-[#0F3D2E]">1.15 kg</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                          <span className="font-mono font-bold text-[#0F3D2E]">
+                            {stageStep >= 1 ? "1.15 kg" : "—"}
+                          </span>
+                        </motion.div>
+                        <motion.div
+                          animate={{ opacity: stageStep >= 2 ? 1 : 0.4, x: 0 }}
+                          initial={{ opacity: 0.4, x: -6 }}
+                          transition={{ duration: 0.35, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Kardus Lipat Kering · Berat Aktual</span>
-                          <span className="font-mono font-bold text-[#0F3D2E]">1.30 kg</span>
-                        </div>
+                          <span className="font-mono font-bold text-[#0F3D2E]">
+                            {stageStep >= 2 ? "1.30 kg" : "—"}
+                          </span>
+                        </motion.div>
                       </div>
                     </motion.div>
                   )}
@@ -604,13 +829,28 @@ export default function AboutSections() {
                             Verifikasi Aksi Hijau Berbasis AI &amp; Privasi EXIF
                           </h3>
                         </div>
-                        <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-[11px] font-semibold text-[#15803D]">
-                          ✓ Terverifikasi · Skor 92%
-                        </span>
+                        <motion.span
+                          key={stageStep >= 3 ? "verified" : "checking"}
+                          initial={{ scale: 0.92, opacity: 0.7 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: "spring", stiffness: 320, damping: 24 }}
+                          className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold transition-colors duration-300 ${
+                            stageStep >= 3
+                              ? "bg-emerald-50 text-[#15803D]"
+                              : "bg-neutral-100 text-neutral-500"
+                          }`}
+                        >
+                          {stageStep >= 3 ? "✓ Terverifikasi · Skor 92%" : "Memeriksa EXIF & AI..."}
+                        </motion.span>
                       </div>
 
                       <div className="grid gap-3 sm:grid-cols-[1.1fr_1fr]">
-                        <div className="rounded-xl border border-neutral-200/80 bg-white p-4">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                          className="rounded-xl border border-neutral-200/80 bg-white p-4"
+                        >
                           <div className="flex items-center justify-between text-xs">
                             <span className="inline-flex items-center gap-1.5 font-bold text-[#1A1A1A]">
                               <Camera size={13} className="text-[#2D5F3F]" />
@@ -619,39 +859,74 @@ export default function AboutSections() {
                             <span className="font-mono text-[11px] font-semibold text-[#1D9E75]">1.5 kg</span>
                           </div>
                           <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[11px]">
-                            <span className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[#0F3D2E]">
+                            <motion.span
+                              animate={{ opacity: stageStep >= 1 ? 1 : 0.25, scale: stageStep >= 1 ? 1 : 0.94 }}
+                              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                              className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[#0F3D2E]"
+                            >
                               plastic bottle · 0.94
-                            </span>
-                            <span className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[#0F3D2E]">
+                            </motion.span>
+                            <motion.span
+                              animate={{ opacity: stageStep >= 2 ? 1 : 0.25, scale: stageStep >= 2 ? 1 : 0.94 }}
+                              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+                              className="rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[#0F3D2E]"
+                            >
                               cardboard · 0.91
-                            </span>
+                            </motion.span>
                           </div>
-                          <p className="mt-3 text-[11px] text-neutral-500">
+                          <motion.p
+                            animate={{ opacity: stageStep >= 1 ? 1 : 0.45 }}
+                            transition={{ duration: 0.35 }}
+                            className="mt-3 text-[11px] text-neutral-500"
+                          >
                             Koordinat GPS rumah warga telah dihapus otomatis sebelum unggah.
-                          </p>
-                        </div>
+                          </motion.p>
+                        </motion.div>
 
-                        <div className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#F0FAF4] p-4 text-xs">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, delay: 0.12, ease: EASE_OUT_EXPO }}
+                          className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#F0FAF4] p-4 text-xs"
+                        >
                           <span className="text-[#426352]">Hasil Pemeriksaan Sistem</span>
-                          <p className="my-1 text-base font-bold text-[#0F3D2E]">
-                            Kategori: Pilah Sampah Rumah Tangga
-                          </p>
+                          <motion.p
+                            animate={{ opacity: stageStep >= 2 ? 1 : 0.45 }}
+                            transition={{ duration: 0.35 }}
+                            className="my-1 text-base font-bold text-[#0F3D2E]"
+                          >
+                            {stageStep >= 2 ? "Kategori: Pilah Sampah Rumah Tangga" : "Mencocokkan kategori..."}
+                          </motion.p>
                           <div className="flex items-center justify-between border-t border-emerald-900/10 pt-2.5">
                             <span className="text-[#426352]">Poin Diterbitkan</span>
-                            <span className="font-mono font-extrabold text-[#15803D]">+40 EcoPoints</span>
+                            <motion.span
+                              animate={{ scale: stageStep >= 3 ? [1, 1.06, 1] : 1, opacity: stageStep >= 3 ? 1 : 0.4 }}
+                              transition={{ duration: 0.35 }}
+                              className="font-mono font-extrabold text-[#15803D]"
+                            >
+                              {stageStep >= 3 ? "+40 EcoPoints" : "Menghitung..."}
+                            </motion.span>
                           </div>
-                        </div>
+                        </motion.div>
                       </div>
 
                       <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200/80 bg-white text-xs">
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                        <motion.div
+                          animate={{ opacity: stageStep >= 1 ? 1 : 0.4 }}
+                          transition={{ duration: 0.35 }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Pilah Sampah · 1.5 kg · Kec. Wonokromo</span>
                           <span className="font-mono font-bold text-[#15803D]">+40 pts</span>
-                        </div>
-                        <div className="flex items-center justify-between px-4 py-2.5">
+                        </motion.div>
+                        <motion.div
+                          animate={{ opacity: stageStep >= 2 ? 1 : 0.4 }}
+                          transition={{ duration: 0.35 }}
+                          className="flex items-center justify-between px-4 py-2.5"
+                        >
                           <span className="text-neutral-700">Transportasi Rendah Emisi · 4 km</span>
                           <span className="font-mono font-bold text-[#15803D]">+30 pts</span>
-                        </div>
+                        </motion.div>
                       </div>
                     </motion.div>
                   )}
@@ -679,19 +954,43 @@ export default function AboutSections() {
                       </div>
 
                       <div className="grid gap-2.5 sm:grid-cols-2">
-                        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#2D5F3F] bg-[#F0FAF4] p-3.5 text-xs">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                          className={`flex items-center justify-between gap-3 rounded-xl border p-3.5 text-xs transition-colors duration-500 ${
+                            stageStep >= 1
+                              ? "border-[#2D5F3F] bg-[#F0FAF4]"
+                              : "border-neutral-200/80 bg-white"
+                          }`}
+                        >
                           <div className="min-w-0">
                             <p className="truncate font-bold text-[#0F3D2E]">Gratis Kopi Susu (Bawa Tumbler)</p>
                             <p className="mt-0.5 truncate text-[11px] text-[#426352]">
                               Kopi Kampung Genteng · 150 pts
                             </p>
                           </div>
-                          <span className="shrink-0 rounded-lg bg-emerald-100 px-2.5 py-1 font-mono text-[10px] font-bold text-[#15803D]">
-                            ✓ Ditukar
-                          </span>
-                        </div>
+                          <motion.span
+                            key={stageStep >= 1 ? "ditukar" : "tukar"}
+                            initial={{ scale: 0.9, opacity: 0.7 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 320, damping: 24 }}
+                            className={`shrink-0 rounded-lg px-2.5 py-1 font-mono text-[10px] font-bold transition-colors duration-300 ${
+                              stageStep >= 1
+                                ? "bg-emerald-100 text-[#15803D]"
+                                : "bg-[#0F3D2E] text-white"
+                            }`}
+                          >
+                            {stageStep >= 1 ? "✓ Ditukar" : "Tukar"}
+                          </motion.span>
+                        </motion.div>
 
-                        <div className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-white p-3.5 text-xs">
+                        <motion.div
+                          initial={{ opacity: 0, y: 12 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.45, delay: 0.14, ease: EASE_OUT_EXPO }}
+                          className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-white p-3.5 text-xs"
+                        >
                           <div className="min-w-0">
                             <p className="truncate font-bold text-[#1A1A1A]">Paket Sayur Segar Lokal, Diskon 15%</p>
                             <p className="mt-0.5 truncate text-[11px] text-neutral-500">
@@ -701,14 +1000,29 @@ export default function AboutSections() {
                           <span className="shrink-0 rounded-lg bg-[#0F3D2E] px-2.5 py-1 text-[10px] font-bold text-white">
                             Tukar
                           </span>
-                        </div>
+                        </motion.div>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-white px-4 py-3 text-xs">
+                      <motion.div
+                        animate={{
+                          opacity: stageStep >= 2 ? 1 : 0.35,
+                          y: stageStep >= 2 ? 0 : 8,
+                          borderColor: stageStep >= 3 ? "rgba(29, 158, 117, 0.35)" : "rgba(229, 229, 229, 0.8)",
+                        }}
+                        transition={{ duration: 0.45, ease: EASE_OUT_EXPO }}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-white px-4 py-3 text-xs"
+                      >
                         <div className="flex items-center gap-2.5">
-                          <QrCode size={16} className="text-[#2D5F3F]" />
+                          <motion.span
+                            animate={{ scale: stageStep >= 2 ? 1 : 0.8 }}
+                            transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                          >
+                            <QrCode size={16} className="text-[#2D5F3F]" />
+                          </motion.span>
                           <div>
-                            <p className="font-bold text-[#1A1A1A]">Kupon Aktif: BONI-KPG-842</p>
+                            <p className="font-bold text-[#1A1A1A]">
+                              Kupon Aktif: <ScrambleCode code="BONI-KPG-842" active={stageStep >= 2} />
+                            </p>
                             <p className="text-[11px] text-neutral-500">
                               Tunjukkan QR Code di kasir mitra UMKM tanpa kripto atau dompet rumit
                             </p>
@@ -721,7 +1035,7 @@ export default function AboutSections() {
                           <Ticket size={13} />
                           <span>Lihat QR →</span>
                         </Link>
-                      </div>
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -755,7 +1069,7 @@ export default function AboutSections() {
       </section>
 
       {/* 4. Peluang Kolaborasi & Kontak (#kolaborasi) */}
-      <section id="kolaborasi" aria-labelledby="kolaborasi-title" className="scroll-mt-24 bg-[#FAFDFB] px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28">
+      <section id="kolaborasi" aria-labelledby="kolaborasi-title" className="scroll-mt-20 bg-[#FAFDFB] px-4 pb-12 pt-20 sm:px-6 sm:pb-16 sm:pt-28">
         <div className="mx-auto max-w-6xl">
           <motion.div
             initial={{ opacity: 0, y: 34, filter: "blur(5px)" }}
@@ -811,6 +1125,33 @@ export default function AboutSections() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* 5. Kutipan Gerakan Warga Surabaya (paling bawah sebelum footer) */}
+      <section
+        aria-label="Semangat gerakan pilah dari rumah"
+        className="border-t border-emerald-900/10 bg-[#FAFDFB] px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
+          className="mx-auto max-w-[920px]"
+        >
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#1D9E75]">
+            BERSAMA WARGA SURABAYA
+          </p>
+          <blockquote className="mt-6 text-2xl font-semibold leading-[1.22] tracking-[-0.03em] text-[#0F3D2E] sm:text-[32px] lg:text-[36px]">
+            “Perubahan kota yang bersih tidak menunggu dari langkah yang besar, ia tumbuh dari satu botol terpilah dan satu aksi hijau yang kita mulai dari rumah.”
+          </blockquote>
+          <p className="mt-8 text-[13px] tracking-[-0.01em] text-[#527362]">
+            <strong className="font-semibold text-[#0F3D2E]">Tim BONI</strong>
+            <span className="ml-2.5">
+              Gerakan Pilah Sampah &amp; Aksi Hijau Warga Surabaya
+            </span>
+          </p>
+        </motion.div>
       </section>
     </>
   );

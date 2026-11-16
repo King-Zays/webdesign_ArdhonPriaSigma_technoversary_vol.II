@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
@@ -30,8 +30,8 @@ export function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-[#F5FAF7]/90 via-[#F5FAF7]/80 to-[#F5FAF7]" />
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20">
-        <div className="max-w-3xl">
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20 2xl:max-w-7xl">
+        <div className="max-w-3xl 2xl:max-w-4xl">
           <motion.h1
             initial={{ opacity: 0, y: 34, filter: "blur(6px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -365,6 +365,18 @@ export function CaraKerjaDemo() {
   ];
 
   const [sorotStatus, setSorotStatus] = useState<string | null>(null);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [boardHeight, setBoardHeight] = useState<number | "auto">("auto");
+
+  useEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    const measure = () => setBoardHeight(el.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [sorotStatus]);
 
   return (
     <section id="cara-kerja" className="scroll-mt-24 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 sm:px-6 sm:py-28">
@@ -427,130 +439,144 @@ export function CaraKerjaDemo() {
                     type="button"
                     aria-pressed={aktif}
                     onClick={() => setSorotStatus(st === "Semua" ? null : st)}
-                    className={`cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all active:scale-95 ${
-                      aktif
-                        ? "bg-[#0F3D2E] text-white shadow-xs"
-                        : "bg-white text-neutral-600 hover:bg-emerald-50 hover:text-[#0F3D2E]"
+                    className={`relative cursor-pointer rounded-md px-2.5 py-1 text-[11px] font-semibold transition-colors active:scale-95 ${
+                      aktif ? "text-white" : "text-neutral-600 hover:bg-emerald-50 hover:text-[#0F3D2E]"
                     }`}
                   >
-                    {st}
+                    {aktif && (
+                      <motion.span
+                        layoutId="filter-tiket-pill"
+                        transition={{ type: "spring", stiffness: 360, damping: 32 }}
+                        className="absolute inset-0 rounded-md bg-[#0F3D2E] shadow-xs"
+                      />
+                    )}
+                    <span className="relative z-10">{st}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            {sorotStatus === null ? (
-              <motion.div
-                key="board-all"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
-                className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0"
-              >
-                {kolomLaporan.map((kol) => (
-                  <div key={kol.status} className="p-4 sm:p-5">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
-                        <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
-                        <span>{kol.status}</span>
-                      </div>
-                      <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
-                    </div>
-
-                    <div className="mt-3.5 space-y-2.5">
-                      {kol.tiket.map((t) => (
-                        <motion.div
-                          key={t.id}
-                          whileHover={{ y: -2 }}
-                          transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
-                          className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-all hover:border-[#2D5F3F]/35 hover:bg-white hover:shadow-sm"
-                        >
-                          <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
-                            <span>{t.id}</span>
-                            <span>{t.lokasi}</span>
-                          </div>
-                          <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
-                            {t.judul}
-                          </p>
-                          <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-neutral-500">
-                            {t.detail}
-                          </p>
-                          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
-                            <span className="truncate text-neutral-600">{t.kategori}</span>
-                            <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
-                              {t.keparahan}
-                            </span>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            ) : (
-              (() => {
-                const kolomAktif = kolomLaporan.find((k) => k.status === sorotStatus) ?? kolomLaporan[0];
-                return (
+          <motion.div
+            initial={false}
+            animate={{ height: boardHeight }}
+            transition={{ type: "spring", stiffness: 220, damping: 30, mass: 0.9 }}
+            className="overflow-hidden"
+          >
+            <div ref={boardRef}>
+              <AnimatePresence mode="wait" initial={false}>
+                {sorotStatus === null ? (
                   <motion.div
-                    key={`board-${kolomAktif.status}`}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.22, ease: EASE_OUT_EXPO }}
-                    className="p-4 sm:p-6"
+                    key="board-all"
+                    initial={{ opacity: 0, y: 8, filter: "blur(3px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -8, filter: "blur(3px)" }}
+                    transition={{ duration: 0.28, ease: EASE_OUT_EXPO }}
+                    className="grid divide-y divide-neutral-200/80 md:grid-cols-3 md:divide-x md:divide-y-0"
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-3 text-xs">
-                      <div className="flex items-center gap-2 font-bold text-[#0F3D2E]">
-                        <span className={`h-2.5 w-2.5 rounded-full ${kolomAktif.dot}`} />
-                        <span>Antrean Status: {kolomAktif.status}</span>
-                        <span className="font-mono font-normal text-neutral-500">({kolomAktif.jumlah})</span>
+                    {kolomLaporan.map((kol) => (
+                      <div key={kol.status} className="p-4 sm:p-5">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2 font-bold text-[#1A1A1A]">
+                            <span className={`h-2 w-2 rounded-full ${kol.dot}`} />
+                            <span>{kol.status}</span>
+                          </div>
+                          <span className="font-mono text-[11px] text-neutral-500">{kol.jumlah}</span>
+                        </div>
+
+                        <div className="mt-3.5 space-y-2.5">
+                          {kol.tiket.map((t) => (
+                            <motion.div
+                              key={t.id}
+                              whileHover={{ y: -2 }}
+                              transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
+                              className="rounded-xl border border-neutral-200/80 bg-[#FAFDFB] p-3.5 transition-all hover:border-[#2D5F3F]/35 hover:bg-white hover:shadow-sm"
+                            >
+                              <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                                <span>{t.id}</span>
+                                <span>{t.lokasi}</span>
+                              </div>
+                              <p className="mt-1 text-xs font-bold leading-snug text-[#1A1A1A] sm:text-[13px]">
+                                {t.judul}
+                              </p>
+                              <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-neutral-500">
+                                {t.detail}
+                              </p>
+                              <div className="mt-2.5 flex flex-wrap items-center justify-between gap-1.5 text-[11px]">
+                                <span className="truncate text-neutral-600">{t.kategori}</span>
+                                <span className="rounded border border-neutral-200 bg-white px-1.5 py-0.5 font-medium text-[#2D5F3F]">
+                                  {t.keparahan}
+                                </span>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setSorotStatus(null)}
-                        className="font-semibold text-[#1D9E75] hover:text-[#0F3D2E]"
-                      >
-                        Tampilkan semua kolom →
-                      </button>
-                    </div>
-
-                    <div className="mt-4 grid gap-3 md:grid-cols-3">
-                      {kolomAktif.tiket.map((t) => (
-                        <motion.div
-                          key={t.id}
-                          whileHover={{ y: -2 }}
-                          transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
-                          className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#FAFDFB] p-4 transition-all hover:border-[#2D5F3F]/40 hover:bg-white hover:shadow-sm"
-                        >
-                          <div>
-                            <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
-                              <span>{t.id}</span>
-                              <span className="font-semibold text-[#0F3D2E]">Kec. {t.lokasi}</span>
-                            </div>
-                            <p className="mt-1.5 text-sm font-bold leading-snug text-[#1A1A1A]">{t.judul}</p>
-                            <p className="mt-1.5 text-xs leading-relaxed text-neutral-600">{t.detail}</p>
-                          </div>
-
-                          <div className="mt-3.5 space-y-2 border-t border-neutral-200/70 pt-3 text-[11px]">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="truncate font-medium text-neutral-600">{t.kategori}</span>
-                              <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]">
-                                {t.keparahan}
-                              </span>
-                            </div>
-                            <p className="font-mono text-[10px] text-neutral-400">{t.infoTambahan}</p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
+                    ))}
                   </motion.div>
-                );
-              })()
-            )}
-          </AnimatePresence>
+                ) : (
+                  (() => {
+                    const kolomAktif = kolomLaporan.find((k) => k.status === sorotStatus) ?? kolomLaporan[0];
+                    return (
+                      <motion.div
+                        key={`board-${kolomAktif.status}`}
+                        initial={{ opacity: 0, y: 8, filter: "blur(3px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -8, filter: "blur(3px)" }}
+                        transition={{ duration: 0.28, ease: EASE_OUT_EXPO }}
+                        className="p-4 sm:p-6"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 pb-3 text-xs">
+                          <div className="flex items-center gap-2 font-bold text-[#0F3D2E]">
+                            <span className={`h-2.5 w-2.5 rounded-full ${kolomAktif.dot}`} />
+                            <span>Antrean Status: {kolomAktif.status}</span>
+                            <span className="font-mono font-normal text-neutral-500">({kolomAktif.jumlah})</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setSorotStatus(null)}
+                            className="font-semibold text-[#1D9E75] hover:text-[#0F3D2E]"
+                          >
+                            Tampilkan semua kolom →
+                          </button>
+                        </div>
+
+                        <div className="mt-4 grid gap-3 md:grid-cols-3">
+                          {kolomAktif.tiket.map((t) => (
+                            <motion.div
+                              key={t.id}
+                              whileHover={{ y: -2 }}
+                              transition={{ duration: 0.18, ease: EASE_OUT_EXPO }}
+                              className="flex flex-col justify-between rounded-xl border border-emerald-900/15 bg-[#FAFDFB] p-4 transition-all hover:border-[#2D5F3F]/40 hover:bg-white hover:shadow-sm"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between font-mono text-[11px] text-neutral-500">
+                                  <span>{t.id}</span>
+                                  <span className="font-semibold text-[#0F3D2E]">Kec. {t.lokasi}</span>
+                                </div>
+                                <p className="mt-1.5 text-sm font-bold leading-snug text-[#1A1A1A]">{t.judul}</p>
+                                <p className="mt-1.5 text-xs leading-relaxed text-neutral-600">{t.detail}</p>
+                              </div>
+
+                              <div className="mt-3.5 space-y-2 border-t border-neutral-200/70 pt-3 text-[11px]">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="truncate font-medium text-neutral-600">{t.kategori}</span>
+                                  <span className="shrink-0 rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-[#15803D]">
+                                    {t.keparahan}
+                                  </span>
+                                </div>
+                                <p className="font-mono text-[10px] text-neutral-400">{t.infoTambahan}</p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    );
+                  })()
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* 4 Langkah Alur */}

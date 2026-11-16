@@ -1,16 +1,85 @@
 "use client";
 
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import { useRef } from "react";
+import { useRef, type MouseEvent } from "react";
 import { TimelineContent } from "@/components/ui/timeline-animation";
 import { VerticalCutReveal } from "@/components/ui/vertical-cut-reveal";
 
+const TENS_DIGITS = ["0", "1", "2", "3"] as const;
+const ONES_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "1"] as const;
+
+function DigitReel({
+  digits,
+  delay,
+  duration,
+  active,
+}: {
+  digits: readonly string[];
+  delay: number;
+  duration: number;
+  active: boolean;
+}) {
+  const targetY = `-${((digits.length - 1) / digits.length) * 100}%`;
+
+  return (
+    <span className="relative inline-block h-[1.15em] overflow-hidden align-top leading-none">
+      <motion.span
+        className="flex h-fit flex-col will-change-transform"
+        initial={{ y: "0%" }}
+        animate={{ y: active ? targetY : "0%" }}
+        transition={{
+          duration,
+          delay,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+      >
+        {digits.map((digit, index) => (
+          <span key={`${digit}-${index}`} className="flex h-[1.15em] shrink-0 items-center justify-center leading-none">
+            {digit}
+          </span>
+        ))}
+      </motion.span>
+    </span>
+  );
+}
+
+function Odometer31({ className }: { className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.4 });
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return (
+      <span ref={ref} className={className} aria-label="31">
+        31
+      </span>
+    );
+  }
+
+  return (
+    <span ref={ref} className={`inline-flex items-center tabular-nums ${className ?? ""}`} aria-label="31">
+      <span className="inline-flex items-center" aria-hidden="true">
+        <DigitReel digits={TENS_DIGITS} delay={0.22} duration={1.45} active={isInView} />
+        <DigitReel digits={ONES_DIGITS} delay={0.18} duration={1.75} active={isInView} />
+      </span>
+    </span>
+  );
+}
+
+const sectionLinks = [
+  { label: "Standar Material", href: "#standar-material" },
+  { label: "Peran", href: "#peran-ekosistem" },
+  { label: "Alur Sistem", href: "#rencana-setoran" },
+  { label: "Kolaborasi", href: "#kolaborasi" },
+] as const;
+
 const socialChannels = [
-  { name: "Facebook BONI (segera dilengkapi)", icon: "/media/tentang-fb.svg", animationNum: 0 },
-  { name: "Instagram BONI (segera dilengkapi)", icon: "/media/tentang-insta.svg", animationNum: 1 },
-  { name: "LinkedIn BONI (segera dilengkapi)", icon: "/media/tentang-linkedin.svg", animationNum: 2 },
-  { name: "YouTube BONI (segera dilengkapi)", icon: "/media/tentang-youtube.svg", animationNum: 3 },
+  { name: "Facebook BONI", icon: "/media/tentang-fb.svg" },
+  { name: "Instagram BONI", icon: "/media/tentang-insta.svg" },
+  { name: "LinkedIn BONI", icon: "/media/tentang-linkedin.svg" },
+  { name: "YouTube BONI", icon: "/media/tentang-youtube.svg" },
 ] as const;
 
 export default function AboutSection3() {
@@ -49,47 +118,60 @@ export default function AboutSection3() {
       opacity: 0,
     },
   };
+
+  const handleAnchorClick = (e: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith("#")) return;
+    const target = document.getElementById(href.slice(1));
+    if (!target) return;
+    e.preventDefault();
+    const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - 72);
+    window.scrollTo({ top, behavior: "smooth" });
+    window.history.replaceState(null, "", href);
+  };
+
   return (
-    <section className="border-b border-emerald-900/10 bg-[#F5FAF7] px-4 py-10 sm:px-6 sm:py-14" ref={heroRef}>
+    <section className="border-b border-emerald-900/10 bg-[#F5FAF7] px-4 py-10 sm:px-6 sm:py-16" ref={heroRef}>
       <div className="mx-auto max-w-6xl">
         <div className="relative">
-          {/* Header dengan label ekosistem & tautan kanal */}
-          <div className="absolute -top-3 z-10 mb-8 flex w-[85%] items-center justify-between sm:-top-2 md:top-0 lg:top-4">
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#1D9E75]" aria-hidden="true" />
-              <TimelineContent
-                as="span"
-                animationNum={0}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="font-mono text-xs font-bold uppercase tracking-wider text-[#0F3D2E]"
-              >
-                TENTANG BONI
-              </TimelineContent>
-            </div>
-            <div className="flex gap-3">
-              {socialChannels.map((channel) => (
+          {/* Baris atas di dalam ruang cutout atas (0% - 84%): Judul halaman & navigasi bagian */}
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3 sm:absolute sm:top-1 sm:left-0 sm:z-10 sm:mb-0 sm:w-[83%] md:top-2 lg:top-3.5">
+            <TimelineContent
+              as="span"
+              animationNum={0}
+              timelineRef={heroRef}
+              customVariants={revealVariants}
+              className="text-xs font-bold tracking-tight text-[#0F3D2E] sm:text-sm"
+            >
+              Tentang Ekosistem BONI
+            </TimelineContent>
+
+            <nav aria-label="Bagian halaman Tentang" className="hidden items-center gap-5 sm:flex">
+              {sectionLinks.map((item, idx) => (
                 <TimelineContent
-                  key={channel.icon}
-                  as="a"
-                  animationNum={channel.animationNum}
+                  key={item.href}
+                  as="div"
+                  animationNum={idx + 1}
                   timelineRef={heroRef}
                   customVariants={revealVariants}
-                  href="#kolaborasi"
-                  className="flex h-6 w-6 cursor-pointer items-center justify-center rounded-lg border border-emerald-900/15 bg-white/90 transition-colors hover:border-[#1D9E75] hover:bg-emerald-50 md:h-8 md:w-8"
                 >
-                  <Image src={channel.icon} alt={channel.name} width={20} height={20} />
+                  <a
+                    href={item.href}
+                    onClick={(e) => handleAnchorClick(e, item.href)}
+                    className="text-xs font-medium text-[#426352] transition-colors hover:text-[#0F3D2E]"
+                  >
+                    {item.label}
+                  </a>
                 </TimelineContent>
               ))}
-            </div>
+            </nav>
           </div>
 
           <TimelineContent
             as="figure"
-            animationNum={4}
+            animationNum={2}
             timelineRef={heroRef}
             customVariants={scaleVariants}
-            className="relative group"
+            className="relative"
           >
             <svg
               className="w-full"
@@ -97,7 +179,7 @@ export default function AboutSection3() {
               height={"100%"}
               viewBox="0 0 100 40"
               role="img"
-              aria-label="Ilustrasi penghijauan lokal BONI sementara sampai foto asli pemilahan atau penimbangan warga tersedia"
+              aria-label="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
             >
               <defs>
                 <clipPath
@@ -116,66 +198,80 @@ export default function AboutSection3() {
                 width={"100%"}
                 height={"100%"}
                 href="/media/hero-planting-poster.jpg"
-              ></image>
+              />
             </svg>
-            <figcaption className="pointer-events-none absolute bottom-3.5 left-[11%] hidden rounded-full border border-emerald-300/30 bg-[#081C11]/75 px-3 py-1 text-[11px] font-medium text-emerald-50 backdrop-blur-sm sm:inline-block">
-              Ilustrasi penghijauan lokal Surabaya · Ekosistem BONI
-            </figcaption>
+            {/* 4 kanal media sosial tersusun vertikal di ruang cutout kiri (x < 7.3%, y > 47%) */}
+            <div
+              aria-label="Kanal media sosial BONI"
+              className="hidden sm:absolute sm:bottom-1 sm:left-0 sm:top-[49%] sm:z-10 sm:flex sm:w-[6.6%] sm:flex-col sm:items-center sm:justify-between sm:py-0.5"
+            >
+              {socialChannels.map((channel) => (
+                <a
+                  key={channel.icon}
+                  href="#kolaborasi"
+                  onClick={(e) => handleAnchorClick(e, "#kolaborasi")}
+                  title={channel.name}
+                  aria-label={channel.name}
+                  className="flex h-6 w-6 items-center justify-center rounded-lg border border-emerald-900/12 bg-white/95 shadow-[0_2px_8px_-4px_rgba(15,61,46,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1D9E75] hover:bg-emerald-50 md:h-8 md:w-8 lg:h-10 lg:w-10"
+                >
+                  <Image
+                    src={channel.icon}
+                    alt={channel.name}
+                    width={20}
+                    height={20}
+                    className="h-3.5 w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5"
+                  />
+                </a>
+              ))}
+            </div>
+            {/* Kartu ringkas 31 kecamatan pas mengisi ruang cutout kanan bawah (x > 79.5%, y > 76.2%) */}
+            <div className="mt-4 flex flex-col justify-center gap-2.5 rounded-2xl border border-emerald-900/12 bg-white/95 px-4 py-3 shadow-[0_6px_20px_-10px_rgba(15,61,46,0.14)] lg:absolute lg:bottom-0.5 lg:left-[79.5%] lg:right-0.5 lg:top-[76.2%] lg:mt-0 lg:gap-2 lg:px-3.5 lg:py-2.5 xl:gap-2.5 xl:px-4 xl:py-3">
+              <div className="flex items-center gap-3">
+                <Odometer31 className="text-3xl font-extrabold leading-none tracking-tight text-[#0F3D2E] xl:text-[34px]" />
+                <span className="text-xs font-semibold leading-snug text-[#2D5542]">
+                  Kecamatan di
+                  <br />
+                  Kota Surabaya
+                </span>
+              </div>
+              <a
+                href="#standar-material"
+                onClick={(e) => handleAnchorClick(e, "#standar-material")}
+                className="inline-flex items-center justify-between border-t border-emerald-900/10 pt-2 text-xs font-semibold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
+              >
+                <span>Lihat standar pilah</span>
+                <ArrowRight size={13} className="rotate-90" />
+              </a>
+            </div>
           </TimelineContent>
 
-          {/* Stats — selaras dengan ruang notch kanan bawah tanpa menabrak gambar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 py-4 text-sm lg:justify-start">
-            <TimelineContent
-              as="div"
-              animationNum={2}
-              timelineRef={heroRef}
-              customVariants={revealVariants}
-              className="flex flex-wrap items-center gap-x-4 gap-y-1"
-            >
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                <span className="font-extrabold text-[#1D9E75]">5</span>
-                <span className="text-[#426352]">kategori aksi hijau</span>
-              </div>
-              <span className="text-emerald-900/20" aria-hidden="true">|</span>
-              <div className="flex items-center gap-1.5 text-xs sm:text-sm">
-                <span className="font-extrabold text-[#1D9E75]">31</span>
-                <span className="text-[#426352]">kecamatan Surabaya</span>
-              </div>
-            </TimelineContent>
-
-            <div className="flex items-center gap-3 lg:absolute lg:bottom-12 lg:right-0 lg:w-[20.5%] lg:flex-col lg:items-end lg:gap-0.5 lg:text-right">
-              <TimelineContent
-                as="div"
-                animationNum={3}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="flex items-baseline gap-1.5 text-lg sm:text-2xl xl:text-[26px] xl:leading-tight"
+          {/* Kanal sosial versi mobile */}
+          <div className="mt-3 flex items-center gap-2.5 sm:hidden" aria-label="Kanal media sosial BONI">
+            {socialChannels.map((channel) => (
+              <a
+                key={channel.icon}
+                href="#kolaborasi"
+                onClick={(e) => handleAnchorClick(e, "#kolaborasi")}
+                title={channel.name}
+                aria-label={channel.name}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-900/12 bg-white shadow-sm transition-colors hover:border-[#1D9E75] hover:bg-emerald-50"
               >
-                <span className="font-extrabold text-[#0F3D2E]">3</span>
-                <span className="font-bold uppercase tracking-tight text-[#426352]">Peran</span>
-              </TimelineContent>
-              <TimelineContent
-                as="div"
-                animationNum={4}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="flex items-center gap-1.5 text-xs sm:text-sm"
-              >
-                <span className="font-bold text-[#1D9E75]">Surabaya</span>
-                <span className="text-[#426352]">wilayah fokus</span>
-              </TimelineContent>
-            </div>
+                <Image src={channel.icon} alt={channel.name} width={18} height={18} />
+              </a>
+            ))}
           </div>
         </div>
-        {/* Main Content */}
-        <div className="mt-4 grid gap-8 md:grid-cols-3">
-          <div className="md:col-span-2">
-            <h1 className="mb-6 text-2xl font-extrabold !leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-4xl md:text-5xl">
+
+        {/* Konten Utama Editorial */}
+        <div className="mt-8 grid gap-10 border-t border-emerald-900/12 pt-8 md:mt-10 md:grid-cols-12 md:gap-12">
+          <div className="md:col-span-8">
+            <h1 className="mb-6 text-2xl font-extrabold !leading-[1.18] tracking-tight text-[#0F3D2E] sm:text-4xl md:text-5xl">
               <VerticalCutReveal
                 splitBy="words"
                 staggerDuration={0.07}
                 staggerFrom="first"
-                reverse={true}
+                reverse={false}
+                wordLevelClassName="pt-[0.04em] pb-[0.18em]"
                 transition={{
                   type: "spring",
                   stiffness: 180,
@@ -192,83 +288,63 @@ export default function AboutSection3() {
               animationNum={4}
               timelineRef={heroRef}
               customVariants={revealVariants}
-              className="grid gap-6 text-[#2D5542] md:grid-cols-2 md:gap-8"
+              className="grid gap-6 text-[#2D5542] sm:grid-cols-2 sm:gap-8"
             >
-              <TimelineContent
-                as="div"
-                animationNum={5}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="text-xs sm:text-base"
-              >
-                <p className="leading-relaxed">
-                  Sampah rumah tangga yang langsung tercampur sisa makanan sulit
-                  dipilah kembali dan berakhir menjadi beban TPA Benowo. Memilah
-                  plastik, kardus, dan minyak jelantah sejak di rumah menjaga nilai
-                  material sekaligus mencegah saluran air tersumbat.
-                </p>
-              </TimelineContent>
-              <TimelineContent
-                as="div"
-                animationNum={6}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="text-xs sm:text-base"
-              >
-                <p className="leading-relaxed">
-                  BONI menghubungkan aksi bersih warga yang terverifikasi foto,
-                  jaringan pengepul serta bank sampah, pelaku UMKM lokal, dan
-                  pemantauan agregat 31 kecamatan oleh Pemerintah Kota Surabaya.
-                </p>
-              </TimelineContent>
+              <p className="text-sm leading-relaxed sm:text-base">
+                Sampah rumah tangga yang langsung tercampur sisa makanan sulit
+                dipilah kembali dan berakhir menjadi beban TPA Benowo. Memilah
+                plastik, kardus, dan minyak jelantah sejak di rumah menjaga nilai
+                material sekaligus mencegah saluran air tersumbat.
+              </p>
+              <p className="text-sm leading-relaxed sm:text-base">
+                BONI menghubungkan aksi bersih warga yang terverifikasi foto,
+                jaringan pengepul serta bank sampah, pelaku UMKM lokal, dan
+                pemantauan agregat 31 kecamatan oleh Pemerintah Kota Surabaya.
+              </p>
             </TimelineContent>
           </div>
 
-          <div className="md:col-span-1">
-            <div className="md:text-right">
-              <TimelineContent
-                as="div"
-                animationNum={5}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="mb-1 text-2xl font-black tracking-tight text-[#0F3D2E]"
-              >
-                BONI
-              </TimelineContent>
-              <TimelineContent
-                as="div"
-                animationNum={6}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="mb-6 text-sm font-medium text-[#1D9E75]"
-              >
-                Ekosistem Aksi Hijau &amp; Setoran · Surabaya
-              </TimelineContent>
+          <div className="flex flex-col justify-between border-t border-emerald-900/10 pt-6 md:col-span-4 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+            <TimelineContent
+              as="div"
+              animationNum={5}
+              timelineRef={heroRef}
+              customVariants={revealVariants}
+              className="divide-y divide-emerald-900/10 text-xs"
+            >
+              <div className="flex items-baseline justify-between py-2.5 first:pt-0">
+                <span className="text-[#527362]">Aksi Warga</span>
+                <span className="font-bold text-[#0F3D2E]">5 Kategori Hijau</span>
+              </div>
+              <div className="flex items-baseline justify-between py-2.5">
+                <span className="text-[#527362]">Ekosistem</span>
+                <span className="font-bold text-[#0F3D2E]">Warga · Pengepul · Pemkot</span>
+              </div>
+              <div className="flex items-baseline justify-between py-2.5">
+                <span className="text-[#527362]">Manfaat Lokal</span>
+                <span className="font-bold text-[#0F3D2E]">Voucher UMKM Kampung</span>
+              </div>
+            </TimelineContent>
 
-              <TimelineContent
-                as="div"
-                animationNum={7}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
-                className="mb-5"
-              >
-                <p className="text-sm font-medium leading-relaxed text-[#2D5542]">
-                  Ingin menjajaki uji coba pemilahan dan kolaborasi ekosistem lokal bersama tim kami?
-                </p>
-              </TimelineContent>
-
-              <TimelineContent
-                as="a"
-                animationNum={8}
-                timelineRef={heroRef}
-                customVariants={revealVariants}
+            <TimelineContent
+              as="div"
+              animationNum={6}
+              timelineRef={heroRef}
+              customVariants={revealVariants}
+              className="mt-6"
+            >
+              <p className="mb-3.5 text-xs leading-relaxed text-[#426352]">
+                Ingin menjajaki uji coba pemilahan dan kolaborasi ekosistem lokal bersama tim kami?
+              </p>
+              <a
                 href="#kolaborasi"
-                className="group inline-flex w-fit cursor-pointer items-center gap-2 rounded-full bg-[#0F3D2E] px-6 py-3 text-sm font-bold text-white shadow-md shadow-emerald-950/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#18533F] md:ml-auto"
+                onClick={(e) => handleAnchorClick(e, "#kolaborasi")}
+                className="group inline-flex w-fit items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#18533F] sm:text-sm"
               >
                 <span>Ajak kolaborasi</span>
                 <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-1" />
-              </TimelineContent>
-            </div>
+              </a>
+            </TimelineContent>
           </div>
         </div>
       </div>

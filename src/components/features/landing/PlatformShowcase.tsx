@@ -505,7 +505,6 @@ export default function PlatformShowcase() {
   // Indeks di salinan tengah (4..7). Default 5 = Verifikasi Aksi di tengah-kiri
   const [trackIdx, setTrackIdx] = useState(N + 1);
   const [animated, setAnimated] = useState(true);
-  const [paused, setPaused] = useState(false);
   const [phase, setPhase] = useState(0);
 
   const activeIndex = ((trackIdx % N) + N) % N;
@@ -523,30 +522,25 @@ export default function PlatformShowcase() {
     setTrackIdx((i) => i + diff);
   }
 
-  // Animasi internal step-by-step (0 -> 1 -> 2) di dalam kartu tengah seperti Linear
+  // Animasi internal sekali jalan (0 -> 1 -> 2) per box, lalu otomatis lanjut ke box berikutnya tanpa ngeloop
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
-    const id = setInterval(() => {
-      setPhase((p) => (p + 1) % 3);
-    }, 1750);
-    return () => clearInterval(id);
-  }, [activeIndex]);
-
-  // Auto-play geser otomatis tiap 5.4 detik (berhenti sementara saat kursor di atas kartu/tombol)
-  useEffect(() => {
-    if (paused) return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return;
-    }
-    const id = setInterval(() => {
+    setPhase(0);
+    const t1 = setTimeout(() => setPhase(1), 1400);
+    const t2 = setTimeout(() => setPhase(2), 2900);
+    const tNext = setTimeout(() => {
       setAnimated(true);
-      setPhase(0);
       setTrackIdx((i) => i + 1);
     }, 5400);
-    return () => clearInterval(id);
-  }, [paused]);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(tNext);
+    };
+  }, [activeIndex]);
 
   // Setelah animasi selesai, reset diam-diam ke salinan tengah (4..7) jika sudah keluar batas
   useEffect(() => {
@@ -570,7 +564,7 @@ export default function PlatformShowcase() {
   const shiftPx = (trackIdx - 1) * stepPx;
 
   return (
-    <section className="relative isolate flex min-h-[calc(100svh-5rem)] flex-col justify-between overflow-hidden border-b border-white/10 bg-[#081C11] pt-16 pb-0 text-white sm:pt-24">
+    <section className="relative isolate flex min-h-[min(calc(100svh-5rem),820px)] flex-col justify-end overflow-hidden border-b border-white/10 bg-[#081C11] pt-16 pb-0 text-white sm:pt-20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_420px_at_50%_0%,rgba(29,158,117,0.14)_0%,transparent_75%)]"
@@ -623,11 +617,11 @@ export default function PlatformShowcase() {
                       >
                         {isActive && (
                           <motion.span
-                            key={`${activeIndex}-${paused ? "paused" : "run"}`}
+                            key={activeIndex}
                             initial={{ scaleX: 0 }}
-                            animate={{ scaleX: paused ? 0.35 : 1 }}
+                            animate={{ scaleX: 1 }}
                             transition={{
-                              duration: paused ? 0.2 : 5.4,
+                              duration: 5.4,
                               ease: "linear",
                             }}
                             style={{ transformOrigin: "left" }}
@@ -663,17 +657,13 @@ export default function PlatformShowcase() {
         </div>
       </motion.div>
 
-      {/* Sliding Carousel Track (pause auto-play saat hover/fokus) */}
+      {/* Sliding Carousel Track (countdown tetap berjalan meski di-hover) */}
       <motion.div
         initial={{ opacity: 0, y: 48 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.15 }}
         transition={{ duration: 1.15, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
-        className="relative mt-10 flex flex-1 flex-col justify-end overflow-hidden sm:mt-14"
+        className="relative mt-10 overflow-hidden sm:mt-14"
       >
         <div
           aria-hidden="true"
@@ -702,7 +692,7 @@ export default function PlatformShowcase() {
         <div className="mx-auto hidden w-full max-w-[1440px] md:block [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_82%,transparent_100%)]">
           <div className="relative left-1/2 w-[1540px] -translate-x-1/2 overflow-hidden">
             <div
-              className={`flex min-h-[460px] gap-5 motion-reduce:transition-none ${
+              className={`flex min-h-[470px] gap-5 motion-reduce:transition-none xl:min-h-[500px] ${
                 animated ? "transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]" : ""
               }`}
               style={{ transform: `translateX(-${shiftPx}px)` }}

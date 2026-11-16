@@ -34,6 +34,18 @@ export default function HeroConsole() {
   const [fase, setFase] = useState<Fase>("terverifikasi");
   const [kuantitas, setKuantitas] = useState<number>(GREEN_ACTIONS.waste_sorting.quantity.default);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const criteriaRef = useRef<HTMLDivElement>(null);
+  const [criteriaHeight, setCriteriaHeight] = useState<number | "auto">("auto");
+
+  useEffect(() => {
+    const el = criteriaRef.current;
+    if (!el) return;
+    const measure = () => setCriteriaHeight(el.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [aktif]);
 
   const aksi = GREEN_ACTIONS[aktif];
   const baseSaldo = 500;
@@ -196,19 +208,28 @@ export default function HeroConsole() {
                 })}
               </div>
 
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.p
-                  key={aktif}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="mt-2.5 rounded-lg bg-[#F9FAFB] px-3 py-2 text-xs text-neutral-600"
-                >
-                  <span className="font-semibold text-neutral-700">Kriteria bukti:</span> {aksi.evidenceRequirement}{" "}
-                  <span className="text-neutral-400">· Batas {aksi.dailyLimit} kali per hari</span>
-                </motion.p>
-              </AnimatePresence>
+              <motion.div
+                initial={false}
+                animate={{ height: criteriaHeight }}
+                transition={{ type: "spring", stiffness: 240, damping: 30 }}
+                className="mt-2.5 overflow-hidden"
+              >
+                <div ref={criteriaRef}>
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.p
+                      key={aktif}
+                      initial={{ opacity: 0, y: 4, filter: "blur(2px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -4, filter: "blur(2px)" }}
+                      transition={{ duration: 0.22, ease: "easeOut" }}
+                      className="rounded-lg bg-[#F9FAFB] px-3 py-2 text-xs text-neutral-600"
+                    >
+                      <span className="font-semibold text-neutral-700">Kriteria bukti:</span> {aksi.evidenceRequirement}{" "}
+                      <span className="text-neutral-400">· Batas {aksi.dailyLimit} kali per hari</span>
+                    </motion.p>
+                  </AnimatePresence>
+                </div>
+              </motion.div>
             </div>
 
             {/* 2. UNGGAH FOTO BUKTI + 3. KUANTITAS (Side-by-side compact preview) */}

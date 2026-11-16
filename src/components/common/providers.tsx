@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
 import { MotionConfig } from "framer-motion";
+import { SmoothScroll } from "@/components/common/SmoothScroll";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Respect the OS "reduce motion" setting for all Framer Motion animations. */}
-      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      <MotionConfig reducedMotion="user">
+        <SmoothScroll />
+        {children}
+      </MotionConfig>
       <Toaster
         position="bottom-right"
         richColors

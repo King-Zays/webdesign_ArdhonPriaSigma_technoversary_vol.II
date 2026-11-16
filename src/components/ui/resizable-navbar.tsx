@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -93,12 +93,22 @@ export const Navbar = ({ children, className }: NavbarProps) => {
 };
 
 export const NavBody = ({ children, className, visible = false }: NavBodyProps) => {
+  const [vw, setVw] = useState<number>(1440);
+
+  useEffect(() => {
+    const update = () => setVw(document.documentElement.clientWidth || window.innerWidth);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const targetMaxWidth = visible ? Math.min(Math.round(vw * 0.92), 1040) : vw;
+
   return (
     <motion.div
       initial={false}
       animate={{
-        width: visible ? "82%" : "100%",
-        maxWidth: visible ? "980px" : "2400px",
+        maxWidth: targetMaxWidth,
         y: visible ? 14 : 0,
         borderRadius: visible ? 9999 : 0,
         paddingTop: visible ? 10 : 16,
@@ -113,9 +123,6 @@ export const NavBody = ({ children, className, visible = false }: NavBodyProps) 
           : "0 1px 0 0 rgba(15, 61, 46, 0.08), 0 4px 20px -4px rgba(15, 61, 46, 0.03)",
       }}
       transition={SMOOTH_SPRING}
-      style={{
-        minWidth: "760px",
-      }}
       className={cn(
         "pointer-events-auto relative z-[60] mx-auto hidden w-full overflow-hidden backdrop-blur-md lg:block",
         className
@@ -130,7 +137,7 @@ export const NavBody = ({ children, className, visible = false }: NavBodyProps) 
         className="pointer-events-none absolute inset-x-0 top-0 h-[2.5px] bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-700"
       />
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-row items-center justify-between gap-4">
         {children}
       </div>
     </motion.div>
@@ -145,7 +152,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "relative hidden flex-1 flex-row items-center justify-center space-x-1 text-sm font-semibold text-neutral-600 lg:flex",
+        "hidden flex-row items-center justify-center gap-1 whitespace-nowrap text-sm font-semibold text-neutral-600 lg:flex",
         className
       )}
     >
@@ -161,7 +168,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
             onMouseEnter={() => setHovered(idx)}
             onClick={onItemClick}
             className={cn(
-              "relative rounded-full px-4 py-2 transition-colors",
+              "relative shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 transition-colors xl:px-4",
               isActive
                 ? "font-bold text-[#0F3D2E]"
                 : "text-neutral-600 hover:text-[#0F3D2E]"

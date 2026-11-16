@@ -210,33 +210,6 @@ export default function ContactPageClient({ questions }: { questions: FaqItem[] 
           </motion.div>
         </div>
       </section>
-
-      {/* 3. Centered Community Encouragement Quote (Vercel Enterprise layout 3) */}
-      <section
-        aria-label="Semangat gerakan pilah dari rumah"
-        className="px-6 pb-12 pt-20 text-center sm:pb-16 sm:pt-28"
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 1.05, ease: EASE_OUT_EXPO }}
-          className="mx-auto max-w-[920px]"
-        >
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#1D9E75]">
-            BERSAMA WARGA SURABAYA
-          </p>
-          <blockquote className="mt-6 text-2xl font-semibold leading-[1.22] tracking-[-0.03em] text-[#0F3D2E] sm:text-[32px] lg:text-[36px]">
-            “Perubahan kota yang bersih tidak menunggu dari langkah yang besar, ia tumbuh dari satu botol terpilah dan satu aksi hijau yang kita mulai dari rumah.”
-          </blockquote>
-          <p className="mt-8 text-[13px] tracking-[-0.01em] text-[#527362]">
-            <strong className="font-semibold text-[#0F3D2E]">Tim BONI</strong>
-            <span className="ml-2.5">
-              Gerakan Pilah Sampah &amp; Aksi Hijau Warga Surabaya
-            </span>
-          </p>
-        </motion.div>
-      </section>
     </div>
   );
 }
