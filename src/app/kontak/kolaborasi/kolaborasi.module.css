@@ -1,0 +1,10 @@
+.selectClean {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-image: none !important;
+}
+
+.selectClean::-ms-expand {
+  display: none;
+}

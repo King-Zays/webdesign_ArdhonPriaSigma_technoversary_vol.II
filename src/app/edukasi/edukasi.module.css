@@ -1,0 +1,9 @@
+.heroPerspectiveContainer {
+  position: relative;
+}
+
+.heroPerspectiveCard {
+  box-shadow:
+    0 24px 60px -24px rgba(15, 61, 46, 0.14),
+    0 4px 16px -4px rgba(15, 61, 46, 0.06);
+}

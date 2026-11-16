@@ -63,7 +63,9 @@ export default function SortingReadinessCheck() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   const current = CHECKLISTS[material];
-  const doneCount = current.items.filter((item) => checked[item.id]).length;
+  const petDone = CHECKLISTS.pet.items.filter((item) => checked[item.id]).length;
+  const cbDone = CHECKLISTS.cardboard.items.filter((item) => checked[item.id]).length;
+  const doneCount = material === "pet" ? petDone : cbDone;
   const allReady = doneCount === current.items.length;
   const missingItems = current.items.filter((item) => !checked[item.id]);
 
@@ -75,69 +77,128 @@ export default function SortingReadinessCheck() {
     <section
       id="cek-kesiapan"
       aria-labelledby="cek-kesiapan-title"
-      className="scroll-mt-24 rounded-3xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-5 sm:p-8"
+      className="scroll-mt-24 grid grid-cols-1 gap-6 lg:grid-cols-12"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div className="max-w-2xl">
-          <span className="inline-block rounded-full border border-emerald-900/10 bg-emerald-50 px-3.5 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-[#0F3D2E]">
-            Langkah 02 · Pemeriksaan Mandiri Interaktif
-          </span>
-          <h2 id="cek-kesiapan-title" className="mt-3 text-xl font-black text-[#0F3D2E] sm:text-2xl">
-            Checklist kesiapan sebelum diajukan
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-[#3B5B49]">
-            {current.subtitle}
-          </p>
+      {/* Left/Background Recessed Timeline Panel — mirrors Linear Planning roadmap */}
+      <div className="order-2 flex flex-col justify-between rounded-2xl border border-emerald-950/[0.08] bg-white/95 p-5 shadow-[0_12px_28px_-12px_rgba(15,61,46,0.06)] sm:p-6 lg:order-1 lg:col-start-1 lg:col-end-7 lg:row-start-1">
+        <div>
+          <div className="grid grid-cols-4 border-b border-emerald-950/[0.07] pb-3 text-[10px] font-semibold uppercase tracking-wider tabular-nums text-[#4D6D5B]/75">
+            <span>Tahap 01</span>
+            <span>Tahap 02</span>
+            <span>Tahap 03</span>
+            <span className="text-right text-[#1D9E75]">Siap</span>
+          </div>
+
+          <div className="relative mt-6 space-y-5">
+            {/* Timeline track: PET */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#0F3D2E]">Botol PET (Kode 1)</span>
+                <span className="tabular-nums text-[11px] font-medium text-[#4D6D5B]">
+                  {petDone}/3 syarat
+                </span>
+              </div>
+              <div className="h-7 rounded-lg border border-emerald-950/[0.08] bg-[#FAFDFB] p-1">
+                <div
+                  className="flex h-full items-center rounded-md bg-[#F0FAF4] px-2 text-[10px] font-semibold text-[#0F3D2E] transition-all duration-300"
+                  style={{ width: `${Math.max(28, Math.round((petDone / 3) * 100))}%` }}
+                >
+                  <span className="truncate">
+                    {petDone === 3 ? "Siap ditimbang" : "Pilah · Tiriskan"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline track: Kardus */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#0F3D2E]">Kardus &amp; Karton</span>
+                <span className="tabular-nums text-[11px] font-medium text-[#4D6D5B]">
+                  {cbDone}/3 syarat
+                </span>
+              </div>
+              <div className="h-7 rounded-lg border border-emerald-950/[0.08] bg-[#FAFDFB] p-1">
+                <div
+                  className="flex h-full items-center rounded-md bg-[#F0FAF4] px-2 text-[10px] font-semibold text-[#0F3D2E] transition-all duration-300"
+                  style={{ width: `${Math.max(28, Math.round((cbDone / 3) * 100))}%` }}
+                >
+                  <span className="truncate">
+                    {cbDone === 3 ? "Siap ditimbang" : "Bersih · Lipat rata"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div
-          role="tablist"
-          aria-label="Pilih jenis material"
-          className="inline-flex w-fit rounded-full border border-emerald-200 bg-white p-1"
-        >
-          {(Object.keys(CHECKLISTS) as MaterialKey[]).map((key) => {
-            const active = material === key;
-            return (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setMaterial(key)}
-                className={`rounded-full px-4 py-2 text-xs font-bold transition-colors sm:text-sm ${
-                  active
-                    ? "bg-[#0F3D2E] text-white"
-                    : "text-[#3B5B49] hover:text-[#0F3D2E]"
-                }`}
-              >
-                {key === "pet" ? "Botol PET" : "Kardus"}
-              </button>
-            );
-          })}
-        </div>
+        <p className="mt-8 max-w-xs text-xs leading-relaxed text-[#4D6D5B]/90">
+          Progres pemeriksaan mandiri bersifat lokal untuk persiapan sebelum penimbangan fisik oleh pengepul.
+        </p>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[3fr_2fr]">
-        <ul className="space-y-3">
+      {/* Right/Foreground Elevated Interactive Checklist Panel — mirrors Linear Monitoring overlay */}
+      <div className="order-1 relative z-10 rounded-2xl border border-emerald-950/[0.1] bg-white p-5 shadow-[0_24px_56px_-16px_rgba(15,61,46,0.16)] sm:p-6 lg:order-2 lg:col-start-5 lg:col-end-13 lg:row-start-1 lg:mt-14">
+        <div className="flex flex-col gap-4 border-b border-emerald-950/[0.07] pb-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h3
+              id="cek-kesiapan-title"
+              className="text-base font-semibold tracking-tight text-[#0F3D2E] sm:text-lg"
+            >
+              Checklist kesiapan sebelum diajukan
+            </h3>
+            <p className="mt-1 text-xs leading-relaxed text-[#4D6D5B] sm:text-[13px]">
+              {current.subtitle}
+            </p>
+          </div>
+
+          <div
+            role="tablist"
+            aria-label="Pilih jenis material"
+            className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full border border-emerald-200 bg-[#FAFDFB] p-1"
+          >
+            {(Object.keys(CHECKLISTS) as MaterialKey[]).map((key) => {
+              const active = material === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setMaterial(key)}
+                  className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                    active
+                      ? "bg-[#0F3D2E] text-white"
+                      : "text-[#3B5B49] hover:text-[#0F3D2E]"
+                  }`}
+                >
+                  {key === "pet" ? "Botol PET" : "Kardus"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <ul className="mt-5 space-y-2.5">
           {current.items.map((item) => {
             const isChecked = Boolean(checked[item.id]);
             return (
               <li key={item.id}>
                 <label
-                  className={`flex cursor-pointer items-start gap-3 rounded-2xl border bg-white p-4 transition-colors ${
+                  className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition-colors ${
                     isChecked
                       ? "border-emerald-500/60 bg-emerald-50/40"
-                      : "border-emerald-950/[0.08] hover:border-emerald-300"
+                      : "border-emerald-950/[0.08] bg-[#FAFDFB] hover:border-emerald-300"
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={isChecked}
                     onChange={() => toggle(item.id)}
-                    className="mt-1 h-4 w-4 shrink-0 rounded border-emerald-400 text-[#0F3D2E] focus:ring-emerald-600"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-emerald-400 text-[#0F3D2E] focus:ring-emerald-600"
                   />
-                  <div>
-                    <span className="block text-sm font-semibold text-[#0F3D2E]">
+                  <div className="min-w-0">
+                    <span className="block text-[13px] font-semibold leading-snug text-[#0F3D2E]">
                       {item.text}
                     </span>
                     <span className="mt-1 block text-xs leading-relaxed text-[#4D6D5B]">
@@ -152,72 +213,53 @@ export default function SortingReadinessCheck() {
 
         <div
           aria-live="polite"
-          className="flex flex-col justify-between rounded-2xl border border-emerald-950/[0.08] bg-white p-5 sm:p-6"
+          className="mt-5 flex flex-col gap-4 rounded-xl border border-emerald-950/[0.08] bg-[#FAFDFB] p-4 sm:flex-row sm:items-center sm:justify-between"
         >
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-emerald-800">
-                Hasil Pemeriksaan Mandiri
-              </span>
-              <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 font-mono text-xs font-bold text-[#0F3D2E]">
-                {doneCount}/{current.items.length} syarat
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              {allReady ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[#1D9E75]" aria-hidden="true" />
+              ) : (
+                <CircleAlert className="h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
+              )}
+              <span className="text-xs font-semibold text-[#0F3D2E]">
+                {allReady
+                  ? `${current.label} siap diajukan (${doneCount}/${current.items.length} syarat)`
+                  : `Masih ada ${missingItems.length} syarat yang perlu diperiksa (${doneCount}/${current.items.length})`}
               </span>
             </div>
-
-            {allReady ? (
-              <div className="mt-4 flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
-                <div>
-                  <p className="font-bold text-[#0F3D2E]">
-                    {current.label} siap diajukan untuk diperiksa pengepul
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[#4D6D5B]">
-                    Pemeriksaan mandiri ini membantu memastikan kondisi awal dari rumah. Pemeriksaan fisik material dan penimbangan akhir tetap dilakukan oleh pengepul saat setor atau jemput.
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4 flex items-start gap-3">
-                <CircleAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />
-                <div>
-                  <p className="font-bold text-[#0F3D2E]">
-                    Masih ada {missingItems.length} syarat yang perlu diperiksa mandiri
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[#4D6D5B]">
-                    Pastikan seluruh langkah persiapan di samping terpenuhi agar material tidak ditolak saat diperiksa pengepul.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 border-t border-emerald-100 pt-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/dashboard/eco-action"
-                className="inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-5 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#18533F]"
+            <p className="mt-1 text-xs leading-relaxed text-[#4D6D5B]">
+              {allReady
+                ? "Pemeriksaan fisik dan penimbangan akhir tetap dilakukan pengepul saat setor atau jemput."
+                : "Pastikan seluruh syarat di atas terpenuhi agar material tidak ditolak saat penimbangan."}
+            </p>
+            <div className="mt-2.5 flex flex-wrap items-center gap-4">
+              <a
+                href="#setor-atau-jemput"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F3D2E] hover:text-[#1D9E75]"
               >
-                <span>Uji bukti foto di Aksi Hijau</span>
-                <ArrowRight size={15} aria-hidden="true" />
-              </Link>
+                <span>Lanjut ke Langkah 03: Setor atau jemput</span>
+                <ArrowDown size={12} aria-hidden="true" />
+              </a>
               {doneCount > 0 && (
                 <button
                   type="button"
                   onClick={() => setChecked({})}
-                  className="text-xs font-semibold text-slate-600 underline underline-offset-4 hover:text-[#0F3D2E]"
+                  className="text-xs font-semibold text-[#4D6D5B] underline underline-offset-4 hover:text-[#0F3D2E]"
                 >
                   Atur ulang
                 </button>
               )}
             </div>
-            <a
-              href="#setor-atau-jemput"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-[#0F3D2E]"
-            >
-              <span>Lanjut ke Langkah 03: Setor atau jemput</span>
-              <ArrowDown size={13} aria-hidden="true" />
-            </a>
           </div>
+
+          <Link
+            href="/dashboard/eco-action"
+            className="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#0F3D2E] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#18533F]"
+          >
+            <span>Uji bukti foto di Aksi Hijau</span>
+            <ArrowRight size={14} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

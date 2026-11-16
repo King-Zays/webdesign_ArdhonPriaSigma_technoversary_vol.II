@@ -49,7 +49,7 @@ export default function DistrictTable({
       >
         <table
           className={cn(
-            "w-full min-w-[860px] border-collapse text-left font-sans text-xs",
+            "w-full min-w-[760px] border-collapse text-left font-sans text-xs",
             dark ? "text-gray-200" : "text-gray-800"
           )}
         >
@@ -67,13 +67,13 @@ export default function DistrictTable({
             >
               <th
                 scope="col"
-                className="min-w-[156px] whitespace-nowrap py-3 pl-4 pr-3 text-left font-bold"
+                className="min-w-[140px] whitespace-nowrap py-3 pl-4 pr-2.5 text-left font-bold"
               >
                 Kecamatan
               </th>
               <th
                 scope="col"
-                className="min-w-[92px] whitespace-nowrap px-3 py-3 text-left font-bold"
+                className="min-w-[74px] whitespace-nowrap px-2.5 py-3 text-left font-bold"
               >
                 Wilayah
               </th>
@@ -86,7 +86,7 @@ export default function DistrictTable({
                     scope="col"
                     aria-sort={isSorted ? "descending" : "none"}
                     className={cn(
-                      "min-w-[98px] p-0 text-right align-bottom font-bold transition-colors",
+                      "min-w-[84px] p-0 text-right align-bottom font-bold transition-colors",
                       isSorted &&
                         (dark
                           ? "border-b-2 border-[#34D399] bg-emerald-500/15 text-emerald-300"
@@ -98,8 +98,8 @@ export default function DistrictTable({
                       onClick={() => handleSort(c)}
                       aria-label={`Urutkan menurun berdasarkan ${METRIC_META[c].label}`}
                       className={cn(
-                        "group flex w-full items-center justify-end gap-1.5 py-3 text-right leading-snug transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1D9E75]",
-                        isLast ? "pl-3 pr-4" : "px-3",
+                        "group flex w-full items-center justify-end gap-1 py-3 text-right leading-snug transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#1D9E75]",
+                        isLast ? "pl-2.5 pr-4" : "px-2.5",
                         dark ? "hover:bg-white/10" : "hover:bg-gray-100/80",
                         isSorted && (dark ? "font-extrabold text-emerald-300" : "font-extrabold text-[#0F3D2E]")
                       )}
@@ -139,7 +139,7 @@ export default function DistrictTable({
                   <th
                     scope="row"
                     className={cn(
-                      "whitespace-nowrap py-3 pl-4 pr-3 text-left text-xs font-bold sm:text-[13px]",
+                      "whitespace-nowrap py-3 pl-4 pr-2.5 text-left text-xs font-bold sm:text-[13px]",
                       dark ? "text-white" : "text-[#0F3D2E]"
                     )}
                   >
@@ -157,7 +157,7 @@ export default function DistrictTable({
                   </th>
                   <td
                     className={cn(
-                      "whitespace-nowrap px-3 py-3 text-left text-xs font-medium",
+                      "whitespace-nowrap px-2.5 py-3 text-left text-xs font-medium",
                       dark ? "text-gray-300" : "text-gray-600"
                     )}
                   >
@@ -171,7 +171,7 @@ export default function DistrictTable({
                         key={c}
                         className={cn(
                           "whitespace-nowrap py-3 text-right text-xs tabular-nums sm:text-[13px]",
-                          isLast ? "pl-3 pr-4" : "px-3",
+                          isLast ? "pl-2.5 pr-4" : "px-2.5",
                           isSorted
                             ? dark
                               ? "bg-emerald-500/5 font-bold text-emerald-200"

@@ -17,10 +17,10 @@ export default function WeighingPhotoIllustration({
     >
       {!compact && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-wider text-amber-900">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-900">
             Ilustrasi berlabel · Sampai foto asli tersedia
           </span>
-          <span className="font-mono text-[11px] font-semibold text-[#3B5B49]">
+          <span className="text-[11px] font-semibold text-[#3B5B49]">
             1 bingkai foto = material + angka timbang
           </span>
         </div>
@@ -76,7 +76,7 @@ export default function WeighingPhotoIllustration({
             fill="#ECFDF5"
             fontSize="11"
             fontWeight="700"
-            fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+            fontFamily="var(--font-jakarta), 'Plus Jakarta Sans', sans-serif"
           >
             KAMERA BUKTI BONI
           </text>
@@ -107,7 +107,7 @@ export default function WeighingPhotoIllustration({
             fill="#A7F3D0"
             fontSize="9.5"
             fontWeight="700"
-            fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+            fontFamily="var(--font-jakarta), 'Plus Jakarta Sans', sans-serif"
           >
             BERAT AKTUAL
           </text>
@@ -118,7 +118,7 @@ export default function WeighingPhotoIllustration({
             fill="#6EE7B7"
             fontSize="30"
             fontWeight="800"
-            fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+            fontFamily="var(--font-jakarta), 'Plus Jakarta Sans', sans-serif"
           >
             3.45 kg
           </text>
