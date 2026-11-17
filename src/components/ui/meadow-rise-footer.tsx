@@ -125,6 +125,8 @@ export interface MeadowRiseFooterProps {
   serifFamily?: string
   /** Extra root class names. */
   className?: string
+  /** Optional non-overlapping action element docked cleanly at the bottom-right above the legal bar. */
+  bottomAction?: React.ReactNode
 }
 
 /** Any subset of a palette, merged over the preset. */
@@ -843,13 +845,13 @@ export default function MeadowRiseFooter({
   fontFamily = SANS_STACK,
   serifFamily = SERIF_STACK,
   className = "",
+  bottomAction,
 }: MeadowRiseFooterProps) {
   const rootRef = React.useRef(null as HTMLElement | null)
   const heroRef = React.useRef(null as HTMLDivElement | null)
   const sceneRef = React.useRef(null as HTMLDivElement | null)
   const canvasRef = React.useRef(null as HTMLCanvasElement | null)
-  // When the reveal began (performance.now()), shared by the CSS and the
-  // canvas so a re-layout or theme change never replays it.
+  // The canvas reveal starts once the hill layers are ready.
   const revealAt = React.useRef(null as number | null)
   const [inView, setInView] = React.useState(false)
   const [dark, setDark] = React.useState(false)
@@ -886,7 +888,10 @@ export default function MeadowRiseFooter({
     const canvas = canvasRef.current
     if (!root || !hero || !scene || !canvas) return
     const ctx = canvas.getContext("2d")
-    if (!ctx) return
+    if (!ctx || typeof IntersectionObserver === "undefined") {
+      setInView(true)
+      return
+    }
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const rgb = (c: string, fb: number[]) => mrfHex(c) || fb
@@ -1064,7 +1069,7 @@ export default function MeadowRiseFooter({
       // The light: a soft sun (or a moon) that drifts toward the pointer.
       const ox = W * ((night ? 0.84 : 0.7) + px * 0.3)
       const oy = H * (night ? 0.1 : 0.14) + py * H * 0.08
-      const dawn = dt < 0 ? 0 : mrfSmooth(0, 1600, dt)
+      const dawn = dt < 0 ? 0 : mrfSmooth(0, 1100, dt)
       if (night) {
         for (let i = 0; i < stars.length; i += 4) {
           const tw = reduced ? 0.8 : 0.55 + 0.45 * Math.sin(now * 0.0013 + stars[i + 3])
@@ -1094,10 +1099,10 @@ export default function MeadowRiseFooter({
 
       // A pencil horizon draws out from the centre while the ridges paint, then
       // the hills rise through it and it fades.
-      if (dt < 1400 && (dt >= 0 || seenAt !== null)) {
-        const p = dt >= 0 ? 1 : Math.min(progress(), mrfEase((now - (seenAt || now)) / 900))
+      if (dt < 750 && (dt >= 0 || seenAt !== null)) {
+        const p = dt >= 0 ? 1 : Math.min(progress(), mrfEase((now - (seenAt ?? now)) / 450))
         const lw = mrfEase(p) * W * 0.78
-        const la = (1 - (dt < 0 ? 0 : mrfSmooth(150, 1100, dt))) * 0.42
+        const la = (1 - (dt < 0 ? 0 : mrfSmooth(80, 650, dt))) * 0.42
         if (la > 0 && lw > 0.5) {
           const y = Math.round(H * specs[0].base)
           const lg = ctx.createLinearGradient(W / 2 - lw / 2, 0, W / 2 + lw / 2, 0)
@@ -1115,7 +1120,7 @@ export default function MeadowRiseFooter({
       for (let i = 0; i < (dt < 0 ? 0 : n); i++) {
         const L = layers[i]
         if (!L) continue
-        const e = dt < 0 ? 0 : mrfEase((dt - 150 - i * 120) / 1700)
+        const e = mrfEase((dt - i * 85) / 1250)
         const rise = (1 - e) * H * (0.2 + 0.07 * i)
         const sy = par * (10 + i * 22)
         const lx = -px * (2 + i * 5)
@@ -1127,7 +1132,7 @@ export default function MeadowRiseFooter({
           const speed = (i === 1 ? 7 : 11) * o.drift
           const off = reduced ? 0 : ((now * speed) / 1000) % bw
           const y = H * specs[i + 1].base - bh * 0.62 + rise * 0.6 + sy
-          ctx.globalAlpha = o.mist * (i === 1 ? 0.9 : 0.65) * (dt < 0 ? 0 : mrfSmooth(900, 2600, dt))
+          ctx.globalAlpha = o.mist * (i === 1 ? 0.9 : 0.65) * mrfSmooth(450, 1850, dt)
           ctx.drawImage(mistC, -off + lx * 1.4, y, bw, bh)
           ctx.drawImage(mistC, bw - off + lx * 1.4, y, bw, bh)
           ctx.globalAlpha = 1
@@ -1144,7 +1149,7 @@ export default function MeadowRiseFooter({
       ctx.globalCompositeOperation = "source-over"
 
       // The fog everything rises out of.
-      const fog = dt < 0 ? 1 : 1 - mrfSmooth(100, 2100, dt)
+      const fog = dt < 0 ? 1 : 1 - mrfSmooth(30, 1450, dt)
       if (fog > 0) {
         const f = ctx.createLinearGradient(0, 0, 0, SH)
         f.addColorStop(0, css(sky0, fog))
@@ -1168,9 +1173,8 @@ export default function MeadowRiseFooter({
       // Painting carries on off-screen, so the footer is ready by the time it is reached.
       const busy = building < n
       if (busy) work(revealAt.current === null ? 14 : visible ? 8 : 6)
-      if (revealAt.current === null && seenAt !== null && building >= n && (reduced || now - seenAt > 650)) {
+      if (revealAt.current === null && seenAt !== null && building >= n) {
         revealAt.current = reduced ? -1e9 : now
-        setInView(true)
       }
       if (!visible) {
         if (busy) raf = requestAnimationFrame(tick)
@@ -1189,7 +1193,7 @@ export default function MeadowRiseFooter({
         root.style.setProperty("--mrf-k", k.toFixed(4))
       }
       const easing = Math.abs((live ? tx : 0) - px) > 0.001 || Math.abs((live ? ty : 0) - py) > 0.001 || Math.abs(kT - k) > 0.001
-      const intro = (revealAt.current === null && seenAt !== null) || (revealAt.current !== null && now - revealAt.current < 3000)
+      const intro = (revealAt.current === null && seenAt !== null) || (revealAt.current !== null && now - revealAt.current < 1900)
       const ambient = !reduced && ((o.mist > 0 && o.drift > 0) || night)
       if (busy || intro || easing || now - last > 33) {
         draw(now)
@@ -1234,10 +1238,12 @@ export default function MeadowRiseFooter({
         const e = entries[0]
         if (!e) return
         visible = e.isIntersecting
-        if (e.isIntersecting && e.intersectionRatio >= 0.12 && seenAt === null) seenAt = performance.now()
+        if (visible && seenAt === null) {
+          seenAt = performance.now()
+          setInView(true)
+        }
         if (visible) wake()
       },
-      { threshold: [0, 0.12, 0.3] },
     )
     io.observe(root)
     wake()
@@ -1483,6 +1489,8 @@ export default function MeadowRiseFooter({
           </div>
 
           <div className="mrf-spacer" />
+
+          {bottomAction ? <div className="mrf-action-slot">{bottomAction}</div> : null}
 
           <div className="mrf-bottom">
             <span className="mrf-rule" aria-hidden="true" />

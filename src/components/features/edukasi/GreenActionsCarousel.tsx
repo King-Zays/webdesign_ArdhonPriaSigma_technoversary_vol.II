@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Plus, Minus } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   EVIDENCE_RULES,
   GREEN_ACTION_LIST,
@@ -16,40 +15,32 @@ const TRACK_SLIDES = [...GREEN_ACTION_LIST, ...GREEN_ACTION_LIST, ...GREEN_ACTIO
 const AUTO_SWITCH_MS = 4500;
 const PHASE_STEP_MS = 1500;
 
-interface EvidenceSpecItem {
+interface EvidenceHighlightItem {
   id: string;
+  metric: string;
   label: string;
   summary: string;
-  detail: string;
 }
 
-const EVIDENCE_SPECS_COL_1: EvidenceSpecItem[] = [
+const EVIDENCE_HIGHLIGHTS: EvidenceHighlightItem[] = [
   {
-    id: "format",
-    label: "Format & Ukuran",
-    summary: `JPEG/PNG/WebP · maks. ${maxSizeMb} MB`,
-    detail: `Sistem menerima foto JPEG, PNG, atau WebP hingga ${maxSizeMb} MB per pengajuan.`,
+    id: "format-size",
+    metric: `Maks. ${maxSizeMb} MB`,
+    label: `Format JPEG, PNG, WebP · min. ${EVIDENCE_RULES.minDimension}px`,
+    summary: `Foto bukti aksi diterima hingga ${maxSizeMb} MB dengan dimensi terpendek minimal ${EVIDENCE_RULES.minDimension}px agar detail kegiatan terbaca jelas.`,
   },
-  {
-    id: "resolution",
-    label: "Resolusi Minimum",
-    summary: `Min. ${EVIDENCE_RULES.minDimension}px`,
-    detail: `Dimensi terpendek minimal ${EVIDENCE_RULES.minDimension}px agar bukti aksi terbaca jelas.`,
-  },
-];
-
-const EVIDENCE_SPECS_COL_2: EvidenceSpecItem[] = [
   {
     id: "timing",
-    label: "Usia Foto & Jeda",
-    summary: `Maks. ${EVIDENCE_RULES.maxEvidenceAgeHours} jam · jeda ${EVIDENCE_RULES.minIntervalSeconds} detik`,
-    detail: `Foto maksimal berusia ${EVIDENCE_RULES.maxEvidenceAgeHours} jam dengan jeda ${EVIDENCE_RULES.minIntervalSeconds} detik antar pengiriman.`,
+    metric: `Maks. ${EVIDENCE_RULES.maxEvidenceAgeHours} Jam`,
+    label: `Usia foto · jeda ${EVIDENCE_RULES.minIntervalSeconds} detik`,
+    summary: `Setiap bukti foto diambil paling lama ${EVIDENCE_RULES.maxEvidenceAgeHours} jam sebelum dikirim dengan jeda pengajuan ${EVIDENCE_RULES.minIntervalSeconds} detik.`,
   },
   {
     id: "hash",
-    label: "Pemeriksaan Duplikasi",
-    summary: "Hash SHA-256",
-    detail: "Setiap berkas diperiksa dengan hash SHA-256 agar foto yang sama tidak diunggah ulang.",
+    metric: "SHA-256",
+    label: "Pemeriksaan anti-duplikasi foto",
+    summary:
+      "Kelima kategori Aksi Hijau di demo Portal Warga diperiksa sidik jari berkasnya agar foto yang sama tidak diajukan ulang.",
   },
 ];
 
@@ -157,7 +148,6 @@ export default function GreenActionsCarousel() {
   const [isTrackHovered, setIsTrackHovered] = useState(false);
   const [isDotsHovered, setIsDotsHovered] = useState(false);
   const [navTick, setNavTick] = useState(0);
-  const [openSpecId, setOpenSpecId] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pointerStartXRef = useRef<number | null>(null);
   const didSwipeRef = useRef(false);
@@ -242,45 +232,6 @@ export default function GreenActionsCarousel() {
     const raf = requestAnimationFrame(() => setAnimated(true));
     return () => cancelAnimationFrame(raf);
   }, [animated]);
-
-  const toggleSpec = (id: string) => {
-    setOpenSpecId((prev) => (prev === id ? null : id));
-  };
-
-  const renderSpecGroup = (items: EvidenceSpecItem[]) => (
-    <div className="space-y-3">
-      {items.map((item) => {
-        const isOpen = openSpecId === item.id;
-        return (
-          <div key={item.id}>
-            <button
-              type="button"
-              onClick={() => toggleSpec(item.id)}
-              aria-expanded={isOpen}
-              className="group flex w-full items-center justify-between gap-3 text-left text-[13px] transition-colors"
-            >
-              <span className="inline-flex items-center gap-1.5 font-semibold text-[#0F3D2E] group-hover:text-[#1D9E75]">
-                <span>{item.label}</span>
-                {isOpen ? (
-                  <Minus size={13} className="text-[#426352]" aria-hidden="true" />
-                ) : (
-                  <Plus size={13} className="text-[#426352]" aria-hidden="true" />
-                )}
-              </span>
-              <span className="text-xs font-medium tabular-nums text-[#426352]">
-                {item.summary}
-              </span>
-            </button>
-            {isOpen && (
-              <p className="mt-1.5 text-xs leading-relaxed text-[#426352]">
-                {item.detail}
-              </p>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
 
   return (
     <div ref={rootRef}>
@@ -470,24 +421,21 @@ export default function GreenActionsCarousel() {
         </button>
       </div>
 
-      {/* Bottom 3-Column Feature/Rule Strip matching Linear's bottom footer */}
-      <div className="mt-10 grid grid-cols-1 gap-6 border-t border-emerald-950/[0.06] pt-8 md:grid-cols-12 md:gap-8">
-        <div className="space-y-1.5 md:col-span-4">
-          <p className="text-xs font-medium text-[#4D6D5B]">Syarat Bukti Foto</p>
-          <p className="text-xs leading-relaxed text-[#4D6D5B]/90">
-            Aturan umum untuk kelima kategori Aksi Hijau di demo Portal Warga.
-          </p>
-          <Link
-            href="/login?role=warga"
-            className="inline-flex items-center gap-1 pt-1 text-xs font-semibold text-[#0F3D2E] transition-colors hover:text-[#1F6A4A]"
-          >
-            <span>Uji di Portal Warga</span>
-            <span aria-hidden="true">→</span>
-          </Link>
-        </div>
-
-        <div className="md:col-span-4">{renderSpecGroup(EVIDENCE_SPECS_COL_1)}</div>
-        <div className="md:col-span-4">{renderSpecGroup(EVIDENCE_SPECS_COL_2)}</div>
+      {/* Bottom 3-Column Open Metric Strip (mirrors Vercel Enterprise 3-col layout) */}
+      <div className="mt-12 grid grid-cols-1 gap-8 border-t border-emerald-950/[0.06] pt-10 md:grid-cols-3 md:gap-10 lg:gap-12">
+        {EVIDENCE_HIGHLIGHTS.map((item) => (
+          <div key={item.id}>
+            <p className="text-3xl font-extrabold tracking-tight tabular-nums text-[#0F3D2E] sm:text-4xl lg:text-[40px]">
+              {item.metric}
+            </p>
+            <h3 className="mt-2 text-sm font-bold tracking-tight text-[#0F3D2E] sm:text-[15px]">
+              {item.label}
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-[#426352]">
+              {item.summary}
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );

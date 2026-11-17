@@ -11,7 +11,6 @@ import {
   FileCode2,
   ListChecks,
 } from "lucide-react";
-import LinearRuleColumns, { type LinearRuleTopic } from "./LinearRuleColumns";
 
 type VerificationWindowKey = "queue" | "spec";
 
@@ -155,45 +154,34 @@ const SPEC_DIFF_LINES: SpecDiffLine[] = [
   },
 ];
 
-const FEATURE_COL_1: LinearRuleTopic[] = [
+interface HighlightColumn {
+  id: string;
+  metric: string;
+  label: string;
+  summary: string;
+}
+
+const VERIFICATION_HIGHLIGHTS: HighlightColumn[] = [
   {
     id: "one-frame",
-    label: "1 Bingkai Timbang",
+    metric: "1 Bingkai",
+    label: "Material & layar timbangan",
     summary:
-      "Material terpilah dan angka layar timbangan digital wajib terekam jelas dalam satu foto yang sama.",
+      "Botol PET atau kardus terpilah dan angka timbangan wajib terekam dalam satu foto yang sama. Foto buram, terpotong, atau terpisah otomatis masuk tinjauan manual.",
   },
   {
-    id: "ai-screening",
-    label: "Penyaringan AI (01–04)",
+    id: "four-checks",
+    metric: "4 Cek Foto",
+    label: "Penyaringan AI & sidik jari SHA-256",
     summary:
-      "Membantu memeriksa jenis material, membaca angka timbangan (OCR), ketajaman foto, dan indikasi duplikasi.",
+      "Sistem membantu memeriksa jenis material, membaca angka berat (OCR), menilai ketajaman, dan mencatat hash SHA-256 agar foto yang sama tidak dikirim ganda.",
   },
   {
-    id: "accept-reject",
-    label: "Aturan Layak vs Tinjau",
+    id: "field-check",
+    metric: "Cek Fisik",
+    label: "Validasi lapangan & uji 5 Aksi Hijau",
     summary:
-      "Foto yang buram, terpotong, atau diambil terpisah otomatis diarahkan ke pemeriksaan manual tanpa langsung gagal permanen.",
-  },
-];
-
-const FEATURE_COL_2: LinearRuleTopic[] = [
-  {
-    id: "sha256-hash",
-    label: "Pemeriksaan Hash SHA-256",
-    summary:
-      "Setiap berkas foto diperiksa sidik jarinya agar foto transaksi yang sama tidak diajukan berulang kali.",
-  },
-  {
-    id: "manual-fallback",
-    label: "Cek Fisik Pengepul",
-    summary:
-      "AI hanya menjadi penyaring awal; pengepul mitra dan admin tetap memeriksa fisik material di lapangan.",
-  },
-  {
-    id: "active-demo",
-    label: "Demo Aksi Hijau Aktif",
-    summary:
-      "Sambil menunggu alur setoran pengepul aktif, verifikasi foto 5 kebiasaan hijau sudah bisa dicoba langsung di Portal Warga.",
+      "AI hanya menjadi penyaring awal sebelum pengepul dan admin memeriksa material di lokasi. Sambil menunggu rute aktif, uji foto 5 Aksi Hijau sudah berjalan di Portal Warga.",
   },
 ];
 
@@ -610,22 +598,22 @@ export default function VerificationShowcaseStage() {
         </div>
       </div>
 
-      {/* Bottom 3-Column Feature Strip (mirrors Linear "Features | 3 + 3 expandable items") */}
-      <LinearRuleColumns
-        defaultOpenId="one-frame"
-        leftColumn={
-          <div className="space-y-1.5">
-            <p className="text-xs font-bold text-[#0F3D2E]">
-              Pemeriksaan &amp; Validasi
+      {/* Bottom 3-Column Open Metric Strip (mirrors Vercel Enterprise 3-col layout) */}
+      <div className="mt-12 grid grid-cols-1 gap-8 border-t border-emerald-950/[0.06] pt-10 md:grid-cols-3 md:gap-10 lg:gap-12">
+        {VERIFICATION_HIGHLIGHTS.map((item) => (
+          <div key={item.id}>
+            <p className="text-3xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-4xl lg:text-[40px]">
+              {item.metric}
             </p>
-            <p className="text-xs leading-relaxed text-[#426352]">
-              Kombinasi 1 bingkai foto timbang, penyaringan AI, cek hash SHA-256, dan pemeriksaan fisik mitra.
+            <h3 className="mt-2 text-sm font-bold tracking-tight text-[#0F3D2E] sm:text-[15px]">
+              {item.label}
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-[#426352]">
+              {item.summary}
             </p>
           </div>
-        }
-        col1={FEATURE_COL_1}
-        col2={FEATURE_COL_2}
-      />
+        ))}
+      </div>
     </div>
   );
 }

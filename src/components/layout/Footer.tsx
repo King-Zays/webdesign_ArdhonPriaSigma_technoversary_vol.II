@@ -98,6 +98,42 @@ export default function Footer() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const scrollTopAction = (
+    <AnimatePresence>
+      {showTopBtn && (
+        <motion.button
+          type="button"
+          onClick={handleScrollTop}
+          aria-label="Kembali ke atas halaman"
+          title="Kembali ke atas"
+          initial={{ opacity: 0, y: 12, scale: 0.92 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 8, scale: 0.92 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            gridTemplateColumns: expandTopBtn ? "16px 1fr" : "16px 0fr",
+          }}
+          className="group relative z-20 grid h-11 items-center overflow-hidden rounded-full border border-emerald-300/30 bg-[#0F3D2E] px-[13px] text-white shadow-[0_12px_28px_-8px_rgba(7,23,14,0.65)] transition-[grid-template-columns,background-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-[#1D9E75]"
+        >
+          <ArrowUp
+            size={16}
+            aria-hidden="true"
+            className="shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
+          />
+          <span className="min-w-0 overflow-hidden">
+            <span
+              className={`block whitespace-nowrap pl-2 pr-0.5 text-xs font-bold tracking-tight transition-opacity duration-300 ${
+                expandTopBtn ? "opacity-100 delay-100" : "opacity-0"
+              }`}
+            >
+              Kembali ke atas
+            </span>
+          </span>
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+
   return (
     <div ref={footerRef} className="relative">
       <MeadowRiseFooter
@@ -130,41 +166,8 @@ export default function Footer() {
         height="920px"
         heroHeight="clamp(440px, 60svh, 580px)"
         fontFamily="var(--font-jakarta), system-ui, sans-serif"
+        bottomAction={scrollTopAction}
       />
-
-      <AnimatePresence>
-        {showTopBtn && (
-          <motion.button
-            type="button"
-            onClick={handleScrollTop}
-            aria-label="Kembali ke atas halaman"
-            title="Kembali ke atas"
-            initial={{ opacity: 0, y: 16, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.9 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            style={{
-              gridTemplateColumns: expandTopBtn ? "16px 1fr" : "16px 0fr",
-            }}
-            className="group fixed bottom-6 right-6 z-40 grid h-11 items-center overflow-hidden rounded-full border border-emerald-300/30 bg-[#0F3D2E] px-[13px] text-white shadow-[0_12px_28px_-8px_rgba(7,23,14,0.65)] transition-[grid-template-columns,background-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-[#1D9E75]"
-          >
-            <ArrowUp
-              size={16}
-              aria-hidden="true"
-              className="shrink-0 transition-transform duration-200 group-hover:-translate-y-0.5"
-            />
-            <span className="min-w-0 overflow-hidden">
-              <span
-                className={`block whitespace-nowrap pl-2 pr-0.5 text-xs font-bold tracking-tight transition-opacity duration-300 ${
-                  expandTopBtn ? "opacity-100 delay-100" : "opacity-0"
-                }`}
-              >
-                Kembali ke atas
-              </span>
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

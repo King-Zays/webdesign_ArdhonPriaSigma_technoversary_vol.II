@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
 import type { EcosystemReference } from "./ecosystem-references";
 import styles from "./edukasi.module.css";
 
@@ -35,36 +34,30 @@ function ReferenceList({
     >
       {references.map(({ name, href, logo }) => {
         const cardClass =
-          "group inline-flex min-h-12 items-center gap-2.5 rounded-xl border border-emerald-950/[0.09] bg-white/95 px-3 py-2 text-[13px] font-semibold leading-tight text-[#0F3D2E] shadow-[0_6px_18px_-12px_rgba(15,61,46,0.22)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1D9E75]/40 hover:bg-white hover:shadow-[0_12px_26px_-14px_rgba(15,61,46,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1D9E75]";
+          "group inline-flex min-h-10 items-center gap-2.5 rounded-lg px-1 py-1 text-[15px] font-bold leading-tight tracking-tight text-[#0F3D2E]/75 transition-all duration-200 hover:-translate-y-0.5 hover:text-[#0F3D2E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1D9E75] sm:text-base";
 
         const inner = (
           <>
             {logo ? (
-              <span className="flex h-8 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-emerald-950/[0.06] bg-[#FAFDFB] p-1">
+              <span className="flex h-7 w-8 shrink-0 items-center justify-center">
                 <Image
                   src={logo}
                   alt=""
-                  width={48}
+                  width={44}
                   height={32}
-                  className="h-full w-full object-contain transition-transform duration-200 group-hover:scale-105"
+                  className="h-full w-full object-contain opacity-90 transition-transform duration-200 group-hover:scale-105 group-hover:opacity-100"
                 />
               </span>
             ) : (
               <span
                 aria-hidden="true"
-                className="flex h-8 w-9 shrink-0 items-center justify-center rounded-lg border border-emerald-900/10 bg-[#EFF8F3] text-[11px] font-extrabold tracking-tight text-[#1D9E75] transition-colors duration-200 group-hover:bg-[#1D9E75] group-hover:text-white"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#1D9E75]/10 text-[11px] font-extrabold tracking-tight text-[#1D9E75] transition-colors duration-200 group-hover:bg-[#1D9E75] group-hover:text-white"
               >
                 {getInitials(name)}
               </span>
             )}
 
             <span className="whitespace-nowrap">{name}</span>
-
-            <ArrowUpRight
-              size={13}
-              aria-hidden="true"
-              className="shrink-0 text-[#4D6D5B]/70 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#1D9E75]"
-            />
           </>
         );
 
@@ -86,42 +79,66 @@ function ReferenceList({
   );
 }
 
+const ROW_DIRECTIONS = ["left", "right", "left"] as const;
+const ROW_SECOND_PER_ITEM = [4.0, 4.7, 4.3] as const;
+
 export default function EcosystemMarquee({
-  id,
-  label,
+  id = "peluang-kolaborasi",
   references,
-  direction = "left",
 }: {
-  id: string;
-  label: string;
+  id?: string;
   references: readonly EcosystemReference[];
-  direction?: "left" | "right";
 }) {
+  const rows: EcosystemReference[][] = [[], [], []];
+  references.forEach((item, index) => {
+    rows[index % 3].push(item);
+  });
+
   return (
-    <section id={id} aria-labelledby={id + "-label"} className="scroll-mt-28 w-full">
-      <div className="mx-auto mb-2.5 flex max-w-6xl items-center gap-2 px-4 sm:px-6">
-        <span
-          aria-hidden="true"
-          className="h-1.5 w-1.5 rounded-full bg-[#1D9E75]"
-        />
+    <section
+      id={id}
+      aria-labelledby={id + "-label"}
+      className="scroll-mt-28 w-full"
+    >
+      <div className="mx-auto mb-10 max-w-4xl px-4 text-center sm:mb-12 sm:px-6">
         <h2
           id={id + "-label"}
-          className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#4D6D5B]"
+          className="text-[28px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl"
         >
-          {label}
+          Kandidat kolaborasi dan{" "}
+          <span className="text-[#1D9E75]">integrasi ekosistem</span>
         </h2>
+        <p className="mx-auto mt-3.5 max-w-2xl text-sm leading-relaxed text-[#426352] sm:text-base">
+          Pemetaan riset awal BONI untuk peluang kolaborasi komunitas dan
+          kampus di Surabaya serta potensi integrasi aplikasi dan layanan
+          pendukung warga.
+        </p>
       </div>
 
-      <div id={id + "-track"} className={styles.referenceViewport}>
-        <div
-          className={`${styles.referenceTrack} ${
-            direction === "right" ? styles.referenceTrackReverse : ""
-          }`}
-          style={{ animationDuration: `${references.length * 3.8}s` }}
-        >
-          <ReferenceList references={references} />
-          <ReferenceList references={references} duplicate />
-        </div>
+      <div className="space-y-4 sm:space-y-5">
+        {rows.map((rowItems, rowIndex) => (
+          <div
+            key={rowIndex}
+            id={`${id}-track-${rowIndex + 1}`}
+            className={styles.referenceViewport}
+          >
+            <div
+              className={`${styles.referenceTrack} ${
+                ROW_DIRECTIONS[rowIndex] === "right"
+                  ? styles.referenceTrackReverse
+                  : ""
+              }`}
+              style={{
+                animationDuration: `${(
+                  rowItems.length * ROW_SECOND_PER_ITEM[rowIndex]
+                ).toFixed(1)}s`,
+              }}
+            >
+              <ReferenceList references={rowItems} />
+              <ReferenceList references={rowItems} duplicate />
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

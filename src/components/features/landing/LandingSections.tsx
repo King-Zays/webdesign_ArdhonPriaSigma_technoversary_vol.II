@@ -161,7 +161,7 @@ export function Problem() {
         </motion.h2>
 
         {/* 3 Pilar Angka Lingkungan (Gambar 1) */}
-        <div className="mt-12 grid border-y border-emerald-900/12 sm:grid-cols-3 sm:divide-x sm:divide-emerald-900/12">
+        <div className="mt-12 grid border-y border-emerald-900/12 md:grid-cols-3 md:divide-x md:divide-emerald-900/12">
           {ringkasanKota.map(({ label, angka, judul, deskripsi }, idx) => (
             <motion.div
               key={label}
@@ -169,7 +169,7 @@ export function Problem() {
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 1.0, delay: idx * 0.18, ease: EASE_OUT_EXPO }}
-              className="border-b border-emerald-900/10 py-7 last:border-b-0 sm:border-b-0 sm:px-7 sm:first:pl-0 sm:last:pr-0"
+              className="border-b border-emerald-900/10 py-7 last:border-b-0 md:border-b-0 md:px-7 md:first:pl-0 md:last:pr-0"
             >
               <span className="text-xs font-semibold text-[#1D9E75]">{label}</span>
               <p className="mt-3 text-2xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-3xl">
@@ -420,12 +420,14 @@ export function CaraKerjaDemo() {
           transition={{ duration: 1.15, delay: 0.14, ease: EASE_OUT_EXPO }}
           className="mt-12 overflow-hidden rounded-2xl border border-neutral-200/90 bg-white shadow-[0_20px_50px_-24px_rgba(15,61,46,0.14)]"
         >
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 bg-[#F8FAF9] px-4 py-2.5 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-              <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-              <span className="ml-2 rounded-md border border-neutral-200/80 bg-white px-2.5 py-0.5 font-mono text-[11px] text-neutral-500">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-200/80 bg-[#F8FAF9] px-3.5 py-2.5 text-xs sm:px-4">
+            <div className="flex min-w-0 max-w-full items-center gap-2">
+              <div className="hidden shrink-0 items-center gap-2 sm:flex" aria-hidden="true">
+                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+              </div>
+              <span className="truncate rounded-md border border-neutral-200/80 bg-white px-2 py-0.5 font-mono text-[10.5px] text-neutral-500 sm:px-2.5 sm:text-[11px]">
                 boni.app/gov/dashboard · Tiket Laporan Sampah
               </span>
             </div>
@@ -588,7 +590,11 @@ export function CaraKerjaDemo() {
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.95, delay: idx * 0.16, ease: EASE_OUT_EXPO }}
-              className="flex flex-col justify-between border-b border-emerald-900/10 py-6 last:border-b-0 sm:px-5 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
+              className={`flex flex-col justify-between border-b border-emerald-900/10 py-6 last:border-b-0 ${
+                idx % 2 === 0
+                  ? "sm:border-r sm:border-emerald-900/12 sm:pl-0 sm:pr-6"
+                  : "sm:pl-6 sm:pr-0"
+              } ${idx >= 2 ? "sm:border-b-0" : ""} lg:border-b-0 lg:border-r-0 lg:px-5 lg:first:pl-0 lg:last:pr-0`}
             >
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold text-[#1D9E75]">
@@ -924,7 +930,11 @@ export function BuiltForSurabaya() {
               whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 1.0, delay: idx * 0.16, ease: EASE_OUT_EXPO }}
-              className="border-b border-white/15 py-7 transition-colors hover:bg-white/[0.02] last:border-b-0 sm:px-6 sm:first:pl-0 sm:last:pr-0 lg:border-b-0"
+              className={`border-b border-white/15 py-7 transition-colors hover:bg-white/[0.02] last:border-b-0 ${
+                idx % 2 === 0
+                  ? "sm:border-r sm:border-white/15 sm:pl-0 sm:pr-6"
+                  : "sm:pl-6 sm:pr-0"
+              } ${idx >= 2 ? "sm:border-b-0" : ""} lg:border-b-0 lg:border-r-0 lg:px-6 lg:first:pl-0 lg:last:pr-0`}
             >
               <span className="text-xs font-bold text-[#7AC74F]">{kode}</span>
               <h3 className="mt-3 text-base font-bold text-white">{judul}</h3>

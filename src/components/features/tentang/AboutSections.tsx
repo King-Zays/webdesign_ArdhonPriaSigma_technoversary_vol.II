@@ -476,11 +476,11 @@ export default function AboutSections() {
           >
             {/* Window Chrome Titlebar */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200/80 bg-[#F8FAF9] px-4 py-2.5 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-                <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-                <span className="ml-2 rounded-md border border-neutral-200/80 bg-white px-2.5 py-0.5 font-mono text-[11px] text-neutral-500">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-neutral-200" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-neutral-200" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-neutral-200" />
+                <span className="ml-2 max-w-[175px] truncate rounded-md border border-neutral-200/80 bg-white px-2.5 py-0.5 font-mono text-[11px] text-neutral-500 sm:max-w-none">
                   {tahap.rute}
                 </span>
               </div>
@@ -531,7 +531,7 @@ export default function AboutSections() {
                     Alur Setoran &amp; Aksi
                   </p>
 
-                  <nav aria-label="Tahapan aplikasi BONI" className="mt-1.5 grid grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-1">
+                  <nav aria-label="Tahapan aplikasi BONI" className="mt-1.5 grid grid-cols-2 gap-1.5 lg:grid-cols-1 lg:gap-1">
                     {depositStages.map((s, idx) => {
                       const active = idx === aktifTahap;
                       return (
@@ -539,7 +539,7 @@ export default function AboutSections() {
                           key={s.id}
                           type="button"
                           onClick={() => setAktifTahap(idx)}
-                          className={`relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs transition-colors ${
+                          className={`relative flex items-start gap-2 rounded-lg px-2.5 py-2 text-left text-xs leading-snug transition-colors lg:items-center lg:gap-2.5 ${
                             active
                               ? "font-semibold text-[#0F3D2E]"
                               : "text-neutral-500 hover:bg-emerald-50/50 hover:text-[#0F3D2E]"
@@ -552,8 +552,8 @@ export default function AboutSections() {
                               className="pointer-events-none absolute inset-0 rounded-lg bg-[#E6F4EC]"
                             />
                           )}
-                          <span className="relative z-10 font-mono text-[11px] font-bold text-[#1D9E75]">{s.nomor}</span>
-                          <span className="relative z-10 truncate">{s.menuLabel}</span>
+                          <span className="relative z-10 shrink-0 font-mono text-[11px] font-bold text-[#1D9E75]">{s.nomor}</span>
+                          <span className="relative z-10 min-w-0 break-words">{s.menuLabel}</span>
                         </button>
                       );
                     })}
@@ -970,8 +970,8 @@ export default function AboutSections() {
                           }`}
                         >
                           <div className="min-w-0">
-                            <p className="truncate font-bold text-[#0F3D2E]">Gratis Kopi Susu (Bawa Tumbler)</p>
-                            <p className="mt-0.5 truncate text-[11px] text-[#426352]">
+                            <p className="font-bold leading-snug text-[#0F3D2E]">Gratis Kopi Susu (Bawa Tumbler)</p>
+                            <p className="mt-0.5 text-[11px] leading-snug text-[#426352]">
                               Kopi Kampung Genteng · 150 pts
                             </p>
                           </div>
@@ -997,8 +997,8 @@ export default function AboutSections() {
                           className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200/80 bg-white p-3.5 text-xs"
                         >
                           <div className="min-w-0">
-                            <p className="truncate font-bold text-[#1A1A1A]">Paket Sayur Segar Lokal, Diskon 15%</p>
-                            <p className="mt-0.5 truncate text-[11px] text-neutral-500">
+                            <p className="font-bold leading-snug text-[#1A1A1A]">Paket Sayur Segar Lokal, Diskon 15%</p>
+                            <p className="mt-0.5 text-[11px] leading-snug text-neutral-500">
                               Warung Sayur Bu Tini · 200 pts
                             </p>
                           </div>
@@ -1056,7 +1056,7 @@ export default function AboutSections() {
                 <li
                   key={s.id}
                   onClick={() => setAktifTahap(idx)}
-                  className={`cursor-pointer border-b border-emerald-900/12 py-6 transition-opacity last:border-b-0 sm:px-6 sm:first:pl-0 sm:last:pr-0 lg:border-b-0 ${
+                  className={`cursor-pointer border-b border-emerald-900/12 py-6 transition-opacity last:border-b-0 sm:px-6 sm:[&:nth-child(odd)]:pl-0 sm:[&:nth-child(even)]:border-l sm:[&:nth-child(even)]:border-emerald-900/12 sm:[&:nth-child(even)]:pr-0 sm:[&:nth-child(n+3)]:border-b-0 lg:border-b-0 lg:px-6 lg:[&:nth-child(even)]:border-l-0 lg:[&:nth-child(even)]:pr-6 lg:first:pl-0 lg:last:pr-0 ${
                     active ? "opacity-100" : "opacity-55 hover:opacity-95"
                   }`}
                 >
@@ -1118,11 +1118,11 @@ export default function AboutSections() {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 viewport={{ once: false, amount: 0.2 }}
                 transition={{ duration: 0.95, delay: idx * 0.14, ease: EASE_OUT_EXPO }}
-                className="border-b border-emerald-900/10 py-8 last:border-b-0 md:border-b-0 md:px-7 md:first:pl-0 md:last:pr-0"
+                className="border-b border-emerald-900/10 py-8 last:border-b-0 md:border-b-0 md:px-5 md:first:pl-0 md:last:pr-0 lg:px-7"
               >
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono font-bold text-[#1D9E75]">{nomor}</span>
-                  <span className="font-medium text-[#527362]">{status}</span>
+                <div className="flex items-start justify-between gap-3 text-xs">
+                  <span className="shrink-0 font-mono font-bold text-[#1D9E75]">{nomor}</span>
+                  <span className="text-right font-medium leading-snug text-[#527362]">{status}</span>
                 </div>
                 <h3 className="mt-3 text-lg font-bold text-[#0F3D2E]">{partner}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#426352]">{detail}</p>

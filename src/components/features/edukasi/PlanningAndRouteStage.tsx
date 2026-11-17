@@ -270,7 +270,7 @@ export default function PlanningAndRouteStage() {
             className="w-full max-w-[660px]"
           >
             <div
-              className="relative min-h-[465px] w-full [--front-x:12%] sm:min-h-[418px] sm:[--front-x:42%]"
+              className="relative grid w-full pb-6 [--front-x:12%] sm:[--front-x:42%]"
               style={{ perspective: 1200 }}
             >
               {cardsOrder.map((cardKey) => {
@@ -325,7 +325,7 @@ export default function PlanningAndRouteStage() {
                             }
                           }
                     }
-                    className={`absolute left-0 top-0 w-[88%] rounded-2xl border p-5 transition-shadow duration-300 sm:w-[70%] sm:p-6 ${
+                    className={`relative col-start-1 row-start-1 w-[88%] self-start rounded-2xl border p-5 transition-shadow duration-300 sm:w-[70%] sm:p-6 ${
                       isFront
                         ? "border-emerald-950/[0.12] bg-white shadow-[0_28px_64px_-22px_rgba(15,61,46,0.22)]"
                         : "cursor-pointer border-emerald-950/[0.09] bg-[#F4FAF6]/95 shadow-[0_14px_30px_-18px_rgba(15,61,46,0.16)]"
@@ -451,7 +451,7 @@ export default function PlanningAndRouteStage() {
             <div
               role="tablist"
               aria-label="Navigasi titik kartu opsi setor"
-              className="mt-5 flex items-center justify-center gap-2"
+              className="mt-6 flex items-center justify-center gap-2"
             >
               {cardsOrder.map((cardKey) => {
                 const isActive = frontCard === cardKey;

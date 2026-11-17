@@ -349,11 +349,11 @@ export default function SortingReadinessCheck() {
       ref={sectionRef}
       id="cek-kesiapan"
       aria-labelledby="cek-kesiapan-title"
-      className="scroll-mt-20 relative isolate flex flex-col justify-between overflow-hidden border-y border-emerald-950/[0.08] bg-gradient-to-b from-[#F5FAF7] via-[#FAFDFB] to-[#FAFDFB] py-16 text-[#0F3D2E] sm:py-24"
+      className="scroll-mt-20 relative isolate flex flex-col justify-between overflow-hidden bg-gradient-to-b from-[#FAFDFB] via-[#EFF7F2]/60 to-[#FAFDFB] py-20 text-[#0F3D2E] sm:py-28"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_420px_at_50%_0%,rgba(29,158,117,0.08)_0%,transparent_75%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_72%_48%_at_50%_50%,rgba(29,158,117,0.08),transparent)]"
       />
 
       {/* Top Editorial Header (Clean & Airy) + Floating Material Segmented Bar Right Above Cards */}
@@ -470,7 +470,7 @@ export default function SortingReadinessCheck() {
             transition={{ duration: 0.34, ease: EASE_OUT_EXPO }}
           >
             {/* Mobile Sliding Track (< 768px) */}
-            <div className="overflow-hidden px-4 pb-2 md:hidden">
+            <div className="overflow-x-clip px-4 pb-6 md:hidden">
               <div
                 className="flex transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
                 style={{ transform: `translateX(-${activeIndex * 100}%)` }}
@@ -530,7 +530,7 @@ export default function SortingReadinessCheck() {
 
               {/* Alpha Masked Sliding Deck */}
               <div className="w-full [mask-image:linear-gradient(to_right,transparent_0%,black_17%,black_83%,transparent_100%)]">
-                <div className="relative left-1/2 w-[1540px] -translate-x-1/2 overflow-hidden py-5">
+                <div className="relative left-1/2 w-[1540px] -translate-x-1/2 overflow-x-clip pb-11 pt-5">
                   <div
                     className={`flex gap-5 motion-reduce:transition-none ${
                       animated ? "transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]" : ""
@@ -556,8 +556,8 @@ export default function SortingReadinessCheck() {
                           } ${
                             isCenter
                               ? isChecked
-                                ? "translate-y-0 scale-100 border-[#1D9E75]/45 bg-white opacity-100 shadow-[0_22px_48px_-20px_rgba(29,158,117,0.28)] hover:-translate-y-1.5 hover:shadow-[0_28px_56px_-18px_rgba(29,158,117,0.32)]"
-                                : "translate-y-0 scale-100 border-emerald-950/[0.12] bg-white opacity-100 shadow-[0_22px_48px_-20px_rgba(15,61,46,0.16)] hover:-translate-y-1.5 hover:border-[#1D9E75]/35 hover:shadow-[0_28px_56px_-18px_rgba(15,61,46,0.22)]"
+                                ? "translate-y-0 scale-100 border-[#1D9E75]/45 bg-white opacity-100 shadow-[0_16px_36px_-18px_rgba(29,158,117,0.28)] hover:-translate-y-1.5 hover:shadow-[0_20px_42px_-18px_rgba(29,158,117,0.32)]"
+                                : "translate-y-0 scale-100 border-emerald-950/[0.12] bg-white opacity-100 shadow-[0_16px_36px_-18px_rgba(15,61,46,0.16)] hover:-translate-y-1.5 hover:border-[#1D9E75]/35 hover:shadow-[0_20px_42px_-18px_rgba(15,61,46,0.22)]"
                               : "translate-y-2 scale-[0.95] cursor-pointer border-emerald-950/[0.08] bg-[#F7FBF9] opacity-70 hover:translate-y-0 hover:scale-[0.98] hover:border-[#1D9E75]/30 hover:opacity-95"
                           }`}
                         >
@@ -584,7 +584,7 @@ export default function SortingReadinessCheck() {
         <div
           onMouseEnter={() => setIsDotsHovered(true)}
           onMouseLeave={() => setIsDotsHovered(false)}
-          className="mx-auto mt-3 flex max-w-6xl flex-col items-center gap-4 px-4 sm:mt-4 sm:px-6"
+          className="mx-auto mt-2 flex max-w-6xl flex-col items-center gap-4 px-4 sm:mt-3 sm:px-6"
         >
           <div className="flex items-center justify-center gap-2 sm:gap-2.5">
             {/* Mobile Compact Prev Button Beside Bottom Stepper */}

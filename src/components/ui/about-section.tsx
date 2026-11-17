@@ -134,18 +134,18 @@ export default function AboutSection3() {
       <div className="mx-auto max-w-6xl">
         <div className="relative">
           {/* Baris atas di dalam ruang cutout atas (0% - 84%): Judul halaman & navigasi bagian */}
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3 sm:absolute sm:top-1 sm:left-0 sm:z-10 sm:mb-0 sm:w-[83%] md:top-2 lg:top-3.5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2 sm:absolute sm:top-1 sm:left-0 sm:z-10 sm:mb-0 sm:w-[83%] sm:flex-nowrap md:top-2 lg:top-3.5">
             <TimelineContent
               as="span"
               animationNum={0}
               timelineRef={heroRef}
               customVariants={revealVariants}
-              className="text-xs font-bold tracking-tight text-[#0F3D2E] sm:text-sm"
+              className="shrink-0 text-xs font-bold tracking-tight text-[#0F3D2E] sm:text-sm"
             >
               Tentang Ekosistem BONI
             </TimelineContent>
 
-            <nav aria-label="Bagian halaman Tentang" className="hidden items-center gap-5 sm:flex">
+            <nav aria-label="Bagian halaman Tentang" className="hidden shrink-0 items-center gap-3.5 sm:flex md:gap-5">
               {sectionLinks.map((item, idx) => (
                 <TimelineContent
                   key={item.href}
@@ -157,7 +157,7 @@ export default function AboutSection3() {
                   <a
                     href={item.href}
                     onClick={(e) => handleAnchorClick(e, item.href)}
-                    className="text-xs font-medium text-[#426352] transition-colors hover:text-[#0F3D2E]"
+                    className="whitespace-nowrap text-xs font-medium text-[#426352] transition-colors hover:text-[#0F3D2E]"
                   >
                     {item.label}
                   </a>
@@ -173,59 +173,72 @@ export default function AboutSection3() {
             customVariants={scaleVariants}
             className="relative"
           >
-            <svg
-              className="w-full"
-              width={"100%"}
-              height={"100%"}
-              viewBox="0 0 100 40"
-              role="img"
-              aria-label="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
-            >
-              <defs>
-                <clipPath
-                  id="clip-inverted"
-                  clipPathUnits={"objectBoundingBox"}
-                >
-                  <path
-                    d="M0.0998072 1H0.422076H0.749756C0.767072 1 0.774207 0.961783 0.77561 0.942675V0.807325C0.777053 0.743631 0.791844 0.731953 0.799059 0.734076H0.969813C0.996268 0.730255 1.00088 0.693206 0.999875 0.675159V0.0700637C0.999875 0.0254777 0.985045 0.00477707 0.977629 0H0.902473C0.854975 0 0.890448 0.138535 0.850165 0.138535H0.0204424C0.00408849 0.142357 0 0.180467 0 0.199045V0.410828C0 0.449045 0.0136283 0.46603 0.0204424 0.469745H0.0523086C0.0696245 0.471019 0.0735527 0.497877 0.0733523 0.511146V0.915605C0.0723903 0.983121 0.090588 1 0.0998072 1Z"
-                    fill="#D9D9D9"
-                  />
-                </clipPath>
-              </defs>
-              <image
-                clipPath="url(#clip-inverted)"
-                preserveAspectRatio="xMidYMid slice"
+            {/* Bungkus foto & ikon kiri terpisah dari kartu bawah agar social rail tidak meluber di breakpoint tablet */}
+            <div className="relative">
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-emerald-900/10 sm:hidden">
+                <Image
+                  src="/media/hero-planting-poster.jpg"
+                  alt="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
+                  fill
+                  sizes="(max-width: 639px) 100vw, 1px"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              <svg
+                className="hidden w-full sm:block"
                 width={"100%"}
                 height={"100%"}
-                href="/media/hero-planting-poster.jpg"
-              />
-            </svg>
-            {/* 4 kanal media sosial tersusun vertikal di ruang cutout kiri (x < 7.3%, y > 47%) */}
-            <div
-              aria-label="Kanal media sosial BONI"
-              className="hidden sm:absolute sm:bottom-1 sm:left-0 sm:top-[49%] sm:z-10 sm:flex sm:w-[6.6%] sm:flex-col sm:items-center sm:justify-between sm:py-0.5"
-            >
-              {socialChannels.map((channel) => (
-                <a
-                  key={channel.icon}
-                  href="#kolaborasi"
-                  onClick={(e) => handleAnchorClick(e, "#kolaborasi")}
-                  title={channel.name}
-                  aria-label={channel.name}
-                  className="flex h-6 w-6 items-center justify-center rounded-lg border border-emerald-900/12 bg-white/95 shadow-[0_2px_8px_-4px_rgba(15,61,46,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1D9E75] hover:bg-emerald-50 md:h-8 md:w-8 lg:h-10 lg:w-10"
-                >
-                  <Image
-                    src={channel.icon}
-                    alt={channel.name}
-                    width={20}
-                    height={20}
-                    className="h-3.5 w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5"
-                  />
-                </a>
-              ))}
+                viewBox="0 0 100 40"
+                role="img"
+                aria-label="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
+              >
+                <defs>
+                  <clipPath
+                    id="clip-inverted"
+                    clipPathUnits={"objectBoundingBox"}
+                  >
+                    <path
+                      d="M0.0998072 1H0.422076H0.749756C0.767072 1 0.774207 0.961783 0.77561 0.942675V0.807325C0.777053 0.743631 0.791844 0.731953 0.799059 0.734076H0.969813C0.996268 0.730255 1.00088 0.693206 0.999875 0.675159V0.0700637C0.999875 0.0254777 0.985045 0.00477707 0.977629 0H0.902473C0.854975 0 0.890448 0.138535 0.850165 0.138535H0.0204424C0.00408849 0.142357 0 0.180467 0 0.199045V0.410828C0 0.449045 0.0136283 0.46603 0.0204424 0.469745H0.0523086C0.0696245 0.471019 0.0735527 0.497877 0.0733523 0.511146V0.915605C0.0723903 0.983121 0.090588 1 0.0998072 1Z"
+                      fill="#D9D9D9"
+                    />
+                  </clipPath>
+                </defs>
+                <image
+                  clipPath="url(#clip-inverted)"
+                  preserveAspectRatio="xMidYMid slice"
+                  width={"100%"}
+                  height={"100%"}
+                  href="/media/hero-planting-poster.jpg"
+                />
+              </svg>
+              {/* 4 kanal media sosial tersusun vertikal di ruang cutout kiri (x < 7.3%, y > 47%) */}
+              <div
+                aria-label="Kanal media sosial BONI"
+                className="hidden sm:absolute sm:bottom-1 sm:left-0 sm:top-[49%] sm:z-10 sm:flex sm:w-[6.6%] sm:flex-col sm:items-center sm:justify-between sm:py-0.5"
+              >
+                {socialChannels.map((channel) => (
+                  <a
+                    key={channel.icon}
+                    href="#kolaborasi"
+                    onClick={(e) => handleAnchorClick(e, "#kolaborasi")}
+                    title={channel.name}
+                    aria-label={channel.name}
+                    className="flex h-6 w-6 items-center justify-center rounded-lg border border-emerald-900/12 bg-white/95 shadow-[0_2px_8px_-4px_rgba(15,61,46,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1D9E75] hover:bg-emerald-50 md:h-8 md:w-8 lg:h-10 lg:w-10"
+                  >
+                    <Image
+                      src={channel.icon}
+                      alt={channel.name}
+                      width={20}
+                      height={20}
+                      className="h-3.5 w-3.5 md:h-4 md:w-4 lg:h-5 lg:w-5"
+                    />
+                  </a>
+                ))}
+              </div>
             </div>
             {/* Kartu ringkas 31 kecamatan pas mengisi ruang cutout kanan bawah (x > 79.5%, y > 76.2%) */}
-            <div className="mt-4 flex flex-col justify-center gap-2.5 rounded-2xl border border-emerald-900/12 bg-white/95 px-4 py-3 shadow-[0_6px_20px_-10px_rgba(15,61,46,0.14)] lg:absolute lg:bottom-0.5 lg:left-[79.5%] lg:right-0.5 lg:top-[76.2%] lg:mt-0 lg:gap-2 lg:px-3.5 lg:py-2.5 xl:gap-2.5 xl:px-4 xl:py-3">
+            <div className="mt-4 flex flex-col justify-center gap-2.5 rounded-2xl border border-emerald-900/12 bg-white/95 px-4 py-3 shadow-[0_6px_20px_-10px_rgba(15,61,46,0.14)] lg:absolute lg:bottom-0.5 lg:left-[79.5%] lg:right-0.5 lg:top-[76.2%] lg:mt-0 lg:gap-1.5 lg:px-3 lg:py-2 xl:gap-2.5 xl:px-4 xl:py-3">
               <div className="flex items-center gap-3">
                 <Odometer31 className="text-3xl font-extrabold leading-none tracking-tight text-[#0F3D2E] xl:text-[34px]" />
                 <span className="text-xs font-semibold leading-snug text-[#2D5542]">
@@ -237,7 +250,7 @@ export default function AboutSection3() {
               <a
                 href="#standar-material"
                 onClick={(e) => handleAnchorClick(e, "#standar-material")}
-                className="inline-flex items-center justify-between border-t border-emerald-900/10 pt-2 text-xs font-semibold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
+                className="inline-flex items-center justify-between border-t border-emerald-900/10 pt-2 text-xs font-semibold text-[#1D9E75] transition-colors hover:text-[#0F3D2E] lg:pt-1.5 xl:pt-2"
               >
                 <span>Lihat standar pilah</span>
                 <ArrowRight size={13} className="rotate-90" />
@@ -312,17 +325,17 @@ export default function AboutSection3() {
               customVariants={revealVariants}
               className="divide-y divide-emerald-900/10 text-xs"
             >
-              <div className="flex items-baseline justify-between py-2.5 first:pt-0">
-                <span className="text-[#527362]">Aksi Warga</span>
-                <span className="font-bold text-[#0F3D2E]">5 Kategori Hijau</span>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2.5 first:pt-0">
+                <span className="shrink-0 text-[#527362]">Aksi Warga</span>
+                <span className="text-right font-bold text-[#0F3D2E]">5 Kategori Hijau</span>
               </div>
-              <div className="flex items-baseline justify-between py-2.5">
-                <span className="text-[#527362]">Ekosistem</span>
-                <span className="font-bold text-[#0F3D2E]">Warga · Pengepul · Pemkot</span>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2.5">
+                <span className="shrink-0 text-[#527362]">Ekosistem</span>
+                <span className="text-right font-bold text-[#0F3D2E]">Warga · Pengepul · Pemkot</span>
               </div>
-              <div className="flex items-baseline justify-between py-2.5">
-                <span className="text-[#527362]">Manfaat Lokal</span>
-                <span className="font-bold text-[#0F3D2E]">Voucher UMKM Kampung</span>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-2.5">
+                <span className="shrink-0 text-[#527362]">Manfaat Lokal</span>
+                <span className="text-right font-bold text-[#0F3D2E]">Voucher UMKM Kampung</span>
               </div>
             </TimelineContent>
 

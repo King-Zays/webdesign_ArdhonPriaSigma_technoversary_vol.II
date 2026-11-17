@@ -1,5 +1,11 @@
 # Riwayat pembaruan BONI
 
+## 17 November 2026 — Kemunculan footer
+
+- Judul, tombol, dan tautan footer mulai muncul saat footer masuk layar, dengan gerakan bertahap. Animasi bukit berjalan setelah ilustrasi siap.
+- Sambungan antarbagian Edukasi dirapikan dengan menghilangkan garis batas bagian, merapatkan jarak, dan memudarkan pola galeri di kedua tepi.
+- Bayangan kartu Cek Kesiapan diberi ruang untuk memudar dan jarak menuju opsi Setor atau Jemput dirapatkan.
+
 ## Calon pendukung untuk pembahasan lanjutan
 
 Bagian instansi dan calon pendukung ditunda dari halaman Edukasi. Daftar ini menyimpan usulan peran dari riset awal tim.

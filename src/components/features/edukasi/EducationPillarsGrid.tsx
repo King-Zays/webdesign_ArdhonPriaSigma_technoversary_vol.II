@@ -1,9 +1,445 @@
-import { Check, Camera, Scale, Recycle, PackageCheck, ShieldCheck } from "lucide-react";
-import ScrollReveal from "./ScrollReveal";
+"use client";
+
+import { useState, type ReactNode } from "react";
+import Image from "next/image";
+import { Check } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+
+const illustrationSizes = "(min-width: 768px) 220px, 260px";
+const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const SPRING_SNAPPY = { type: "spring" as const, stiffness: 320, damping: 24, mass: 0.85 };
+
+const cameraCorners = [
+  "left-0 top-0 rounded-tl-[9px] border-l-2 border-t-2",
+  "right-0 top-0 rounded-tr-[9px] border-r-2 border-t-2",
+  "bottom-0 left-0 rounded-bl-[9px] border-b-2 border-l-2",
+  "bottom-0 right-0 rounded-br-[9px] border-b-2 border-r-2",
+];
+
+function PillarCard({
+  fig,
+  tag,
+  title,
+  description,
+  label,
+  delay = 0,
+  className = "",
+  renderIllustration,
+}: {
+  fig: string;
+  tag: string;
+  title: string;
+  description: string;
+  label: string;
+  delay?: number;
+  className?: string;
+  renderIllustration: (hovered: boolean, reducedMotion: boolean) => ReactNode;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const reducedMotion = Boolean(useReducedMotion());
+
+  return (
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.75, delay, ease: EASE_OUT_EXPO }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`group relative flex flex-col justify-between py-9 transition-colors duration-300 hover:bg-[#F5FAF7]/65 md:px-7 md:py-10 ${className}`}
+    >
+      {/* Top figure caption bar */}
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] tabular-nums text-[#4D6D5B]/85 transition-colors duration-300 group-hover:text-[#0F3D2E]">
+          {fig}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#1D9E75]">
+          <motion.span
+            aria-hidden="true"
+            animate={
+              reducedMotion
+                ? undefined
+                : hovered
+                  ? { scale: 1.35, opacity: 1 }
+                  : { scale: 1, opacity: 0.6 }
+            }
+            transition={{ duration: 0.25 }}
+            className="h-1.5 w-1.5 rounded-full bg-[#1D9E75]"
+          />
+          <span>{tag}</span>
+        </span>
+      </div>
+
+      {/* Interactive illustration canvas with soft emerald atmospheric glow */}
+      <div
+        role="img"
+        aria-label={label}
+        className="relative mx-auto my-7 h-52 w-full max-w-[260px]"
+      >
+        <motion.div
+          aria-hidden="true"
+          initial={false}
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { scale: 1.14, opacity: 0.95 }
+                : { scale: 0.96, opacity: 0.45 }
+          }
+          transition={{ duration: 0.45, ease: "easeOut" }}
+          className="pointer-events-none absolute inset-4 rounded-full bg-[radial-gradient(circle_at_center,rgba(29,158,117,0.14),transparent_70%)]"
+        />
+        {renderIllustration(hovered, reducedMotion)}
+      </div>
+
+      <div>
+        <h3 className="text-lg font-bold tracking-tight text-[#0F3D2E] transition-colors duration-300 group-hover:text-[#14845F]">
+          {title}
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-[#426352]">
+          {description}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Shared idle gentle vertical float paused smoothly on hover or reduced-motion. */
+function AmbientFloat({
+  paused,
+  reducedMotion,
+  delay = 0,
+  children,
+}: {
+  paused: boolean;
+  reducedMotion: boolean;
+  delay?: number;
+  children: ReactNode;
+}) {
+  return (
+    <motion.div
+      animate={
+        reducedMotion || paused
+          ? { y: 0 }
+          : { y: [-2.5, 2.5] }
+      }
+      transition={
+        reducedMotion || paused
+          ? { duration: 0.35, ease: "easeOut" }
+          : {
+              y: {
+                duration: 2.3,
+                delay,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut",
+              },
+            }
+      }
+      className="relative h-full w-full"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/** FIG 0.1 — Botol PET & kardus terangkat memisahkan diri dari tempat sampah basah saat hover. */
+function PilahIllustration({
+  hovered,
+  reducedMotion,
+}: {
+  hovered: boolean;
+  reducedMotion: boolean;
+}) {
+  return (
+    <>
+      {/* Subtle grounded contact shadow */}
+      <motion.div
+        aria-hidden="true"
+        animate={
+          reducedMotion
+            ? undefined
+            : hovered
+              ? { scaleX: 0.94, opacity: 0.35 }
+              : { scaleX: 1, opacity: 0.2 }
+        }
+        transition={{ duration: 0.35 }}
+        className="pointer-events-none absolute bottom-1.5 left-4 h-3 w-[56%] rounded-full bg-[#0F3D2E]/30 blur-md"
+      />
+
+      {/* Back layer: wet waste bin recedes smoothly on hover */}
+      <motion.div
+        aria-hidden="true"
+        initial={reducedMotion ? false : { opacity: 0, y: 12, scale: 0.88 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, delay: 0.08, ease: EASE_OUT_EXPO }}
+        className="absolute right-0 top-4 aspect-square w-[34%]"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { x: 8, y: -4, scale: 0.89, rotate: 4, opacity: 0.68 }
+                : { x: 0, y: 0, scale: 1, rotate: 0, opacity: 1 }
+          }
+          transition={SPRING_SNAPPY}
+          className="relative h-full w-full"
+        >
+          <Image src="/images/edukasi/wadah.webp" alt="" fill sizes="90px" className="object-contain" />
+        </motion.div>
+      </motion.div>
+
+      {/* Foreground layer: sorted PET + cardboard gently breathes idle and lifts forward on hover */}
+      <motion.div
+        aria-hidden="true"
+        initial={reducedMotion ? false : { opacity: 0, y: 20, scale: 0.93 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.72, delay: 0.14, ease: EASE_OUT_EXPO }}
+        className="absolute bottom-2 left-0 aspect-square w-[68%]"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { x: -6, y: -6, scale: 1.06, rotate: -1.5 }
+                : { x: 0, y: 0, scale: 1, rotate: 0 }
+          }
+          transition={SPRING_SNAPPY}
+          className="relative h-full w-full"
+        >
+          <AmbientFloat paused={hovered} reducedMotion={reducedMotion} delay={0}>
+            <Image
+              src="/images/edukasi/pilah.webp"
+              alt=""
+              fill
+              sizes={illustrationSizes}
+              className="object-contain"
+            />
+          </AmbientFloat>
+        </motion.div>
+      </motion.div>
+    </>
+  );
+}
+
+/** FIG 0.2 — Botol & kardus terlipat mengangkat diri disertai lencana centang berdenyut hidup. */
+function KesiapanIllustration({
+  hovered,
+  reducedMotion,
+}: {
+  hovered: boolean;
+  reducedMotion: boolean;
+}) {
+  return (
+    <>
+      <motion.div
+        aria-hidden="true"
+        animate={
+          reducedMotion
+            ? undefined
+            : hovered
+              ? { scaleX: 0.92, opacity: 0.32 }
+              : { scaleX: 1, opacity: 0.2 }
+        }
+        transition={{ duration: 0.35 }}
+        className="pointer-events-none absolute bottom-1.5 left-1/2 h-3 w-[68%] -translate-x-1/2 rounded-full bg-[#0F3D2E]/30 blur-md"
+      />
+
+      {/* Main material cluster */}
+      <motion.div
+        aria-hidden="true"
+        initial={reducedMotion ? false : { opacity: 0, y: 18, scale: 0.94 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.72, delay: 0.1, ease: EASE_OUT_EXPO }}
+        className="absolute inset-x-[10%] inset-y-2"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { y: -6, scale: 1.05 }
+                : { y: 0, scale: 1 }
+          }
+          transition={SPRING_SNAPPY}
+          className="relative h-full w-full"
+        >
+          <AmbientFloat paused={hovered} reducedMotion={reducedMotion} delay={0.5}>
+            <Image
+              src="/images/edukasi/kesiapan.webp"
+              alt=""
+              fill
+              sizes={illustrationSizes}
+              className="object-contain"
+            />
+          </AmbientFloat>
+        </motion.div>
+      </motion.div>
+
+      {/* Checkmark seal with ambient emerald ripple & spring pop on hover */}
+      <motion.div
+        aria-hidden="true"
+        initial={reducedMotion ? false : { opacity: 0, scale: 0.45, rotate: -18 }}
+        whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ type: "spring", stiffness: 280, damping: 18, delay: 0.22 }}
+        className="absolute bottom-4 right-[7%]"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { scale: 1.18, y: -7, rotate: 8 }
+                : { scale: 1, y: 0, rotate: 0 }
+          }
+          transition={SPRING_SNAPPY}
+          className="relative"
+        >
+          {!reducedMotion && (
+            <motion.span
+              animate={
+                hovered
+                  ? { scale: [1, 1.55], opacity: [0.55, 0] }
+                  : { scale: [1, 1.38], opacity: [0.35, 0] }
+              }
+              transition={{
+                duration: hovered ? 1.15 : 2.6,
+                repeat: Infinity,
+                ease: "easeOut",
+              }}
+              className="pointer-events-none absolute inset-0 rounded-full bg-[#1D9E75]/35"
+            />
+          )}
+          <span className="relative grid size-12 place-items-center rounded-full border border-[#ABD7C0] bg-gradient-to-br from-[#E2F7EB] to-[#B9E9D0] text-[#0E7355] shadow-[0_7px_14px_-6px_rgba(15,61,46,0.35)]">
+            <Check size={25} strokeWidth={2.6} />
+          </span>
+        </motion.div>
+      </motion.div>
+    </>
+  );
+}
+
+/** FIG 0.3 — Bingkai kamera mengunci fokus (`autofocus snap`) + garis pindai AI lembut saat hover. */
+function BuktiIllustration({
+  hovered,
+  reducedMotion,
+}: {
+  hovered: boolean;
+  reducedMotion: boolean;
+}) {
+  return (
+    <>
+      <motion.div
+        aria-hidden="true"
+        animate={
+          reducedMotion
+            ? undefined
+            : hovered
+              ? { scaleX: 0.94, opacity: 0.32 }
+              : { scaleX: 1, opacity: 0.2 }
+        }
+        transition={{ duration: 0.35 }}
+        className="pointer-events-none absolute bottom-2.5 left-1/2 h-3 w-[68%] -translate-x-1/2 rounded-full bg-[#0F3D2E]/30 blur-md"
+      />
+
+      {/* Scale + materials photo target */}
+      <motion.div
+        aria-hidden="true"
+        initial={reducedMotion ? false : { opacity: 0, y: 16, scale: 0.94 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.72, delay: 0.1, ease: EASE_OUT_EXPO }}
+        className="absolute inset-x-[9%] inset-y-5"
+      >
+        <motion.div
+          animate={
+            reducedMotion
+              ? undefined
+              : hovered
+                ? { y: -4, scale: 1.05 }
+                : { y: 0, scale: 1 }
+          }
+          transition={SPRING_SNAPPY}
+          className="relative h-full w-full"
+        >
+          <AmbientFloat paused={hovered} reducedMotion={reducedMotion} delay={1.0}>
+            <Image
+              src="/images/edukasi/bukti.webp"
+              alt=""
+              fill
+              sizes={illustrationSizes}
+              className="object-contain"
+            />
+          </AmbientFloat>
+        </motion.div>
+      </motion.div>
+
+      {/* Outer centering anchor separated cleanly from Framer Motion scale transform */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-2 left-1/2 w-[85%] max-w-[200px] -translate-x-1/2"
+      >
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, scale: 1.12 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.65, delay: 0.2, ease: EASE_OUT_EXPO }}
+          className="relative h-full w-full"
+        >
+          <motion.div
+            animate={
+              reducedMotion
+                ? undefined
+                : hovered
+                  ? { scale: 0.92 }
+                  : { scale: 1 }
+            }
+            transition={SPRING_SNAPPY}
+            className="relative h-full w-full"
+          >
+            {cameraCorners.map((corner) => (
+              <span
+                key={corner}
+                className={`absolute size-5 transition-colors duration-300 ${
+                  hovered ? "border-[#1D9E75]" : "border-[#14845F]"
+                } ${corner}`}
+              />
+            ))}
+
+            {/* AI scan beam clipped neatly inside bracket frame when hovered */}
+            <div className="pointer-events-none absolute inset-1.5 overflow-hidden rounded-[8px]">
+              {!reducedMotion && hovered && (
+                <motion.div
+                  initial={{ top: "4%", opacity: 0 }}
+                  animate={{
+                    top: ["6%", "90%", "6%"],
+                    opacity: [0, 0.95, 0],
+                  }}
+                  transition={{
+                    duration: 2.1,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute inset-x-1 h-[2px] rounded-full bg-gradient-to-r from-transparent via-[#1D9E75] to-transparent shadow-[0_0_12px_2px_rgba(29,158,117,0.45)]"
+                />
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </>
+  );
+}
 
 export default function EducationPillarsGrid() {
   return (
-    <div className="relative border-y border-emerald-950/[0.08]">
+    <div id="standar-pilah" className="relative scroll-mt-28 border-y border-emerald-950/[0.08]">
       {/* Architectural corner crosshair ticks */}
       <span
         aria-hidden="true"
@@ -31,222 +467,43 @@ export default function EducationPillarsGrid() {
       </span>
 
       <div className="grid grid-cols-1 divide-y divide-emerald-950/[0.08] md:grid-cols-3 md:divide-x md:divide-y-0">
-        {/* ── Column 1: FIG 0.1 — Pilah material ── */}
-        <ScrollReveal
+        <PillarCard
+          fig="FIG 0.1"
+          tag="2 Material Utama"
+          title="Pilah material"
+          description="Pisahkan botol plastik PET (kode 1) dan kardus kering dari sisa makanan atau sampah dapur yang mudah membusuk."
+          label="Botol PET dan kardus terlipat dipisahkan dari tempat sampah basah."
           delay={0}
-          className="group relative flex flex-col justify-between py-9 transition-colors duration-300 hover:bg-[#F5FAF7]/60 md:px-7 md:py-10 md:first:pl-4"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] tabular-nums text-[#4D6D5B]/85">
-              FIG 0.1
-            </span>
-            <span className="text-[11px] font-semibold text-[#1D9E75]">
-              2 Material Utama
-            </span>
-          </div>
+          className="md:first:pl-4"
+          renderIllustration={(hovered, reducedMotion) => (
+            <PilahIllustration hovered={hovered} reducedMotion={reducedMotion} />
+          )}
+        />
 
-          {/* Open Floating UI Vignette 01: Layered Material Classification Cards */}
-          <div className="relative my-7 flex h-52 items-center justify-center">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-4 inset-y-2 rounded-full bg-[radial-gradient(circle_at_center,rgba(29,158,117,0.10),transparent_70%)]"
-            />
-
-            <div className="relative w-full max-w-[268px] space-y-2">
-              {/* Card 1: Botol PET */}
-              <div className="flex items-center justify-between rounded-xl border border-emerald-950/[0.09] bg-white px-3 py-2 shadow-[0_10px_24px_-14px_rgba(15,61,46,0.18)] transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EBF7F1] text-[#0F3D2E]">
-                    <Recycle className="h-3.5 w-3.5 text-[#1D9E75]" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-bold text-[#0F3D2E]">Botol Plastik PET</p>
-                    <p className="truncate text-[10.5px] text-[#4D6D5B]">Kode 1 · Bening &amp; kering</p>
-                  </div>
-                </div>
-                <span className="shrink-0 rounded-full border border-[#1D9E75]/25 bg-[#F2FAF6] px-2 py-0.5 text-[10px] font-bold text-[#1D9E75]">
-                  Diterima
-                </span>
-              </div>
-
-              {/* Card 2: Kardus Kering */}
-              <div className="flex items-center justify-between rounded-xl border border-emerald-950/[0.09] bg-white px-3 py-2 shadow-[0_10px_24px_-14px_rgba(15,61,46,0.18)] transition-transform duration-300 delay-75 motion-safe:group-hover:-translate-y-0.5">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EBF7F1] text-[#0F3D2E]">
-                    <PackageCheck className="h-3.5 w-3.5 text-[#1D9E75]" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-bold text-[#0F3D2E]">Kardus &amp; Karton</p>
-                    <p className="truncate text-[10.5px] text-[#4D6D5B]">Dilipat rata · Bebas minyak</p>
-                  </div>
-                </div>
-                <span className="shrink-0 rounded-full border border-[#1D9E75]/25 bg-[#F2FAF6] px-2 py-0.5 text-[10px] font-bold text-[#1D9E75]">
-                  Diterima
-                </span>
-              </div>
-
-              {/* Card 3: Separated Organic/Wet Residue */}
-              <div className="flex items-center justify-between rounded-xl border border-dashed border-emerald-950/[0.12] bg-[#F7FAF8]/90 px-3 py-1.5 opacity-75">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-amber-500/80" />
-                  <p className="truncate text-[10.5px] font-medium text-[#4D6D5B]">
-                    Sisa makanan &amp; basah
-                  </p>
-                </div>
-                <span className="shrink-0 text-[10px] font-semibold text-[#4D6D5B]">
-                  Dipisahkan
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold tracking-tight text-[#0F3D2E]">
-              Pilah material
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#426352]">
-              Pisahkan botol plastik PET (kode 1) dan kardus kering dari sisa makanan atau sampah dapur yang mudah membusuk.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        {/* ── Column 2: FIG 0.2 — Cek kesiapan ── */}
-        <ScrollReveal
+        <PillarCard
+          fig="FIG 0.2"
+          tag="3 Syarat Mandiri"
+          title="Cek kesiapan"
+          description="Gunakan checklist interaktif untuk memastikan botol kering, lakban berlebih lepas, dan kardus sudah terlipat rata."
+          label="Botol kosong dan kardus yang terlipat rata tanpa lakban berlebih, dengan tanda centang."
           delay={0.08}
-          className="group relative flex flex-col justify-between py-9 transition-colors duration-300 hover:bg-[#F5FAF7]/60 md:px-7 md:py-10"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] tabular-nums text-[#4D6D5B]/85">
-              FIG 0.2
-            </span>
-            <span className="text-[11px] font-semibold text-[#1D9E75]">
-              3 Syarat Mandiri
-            </span>
-          </div>
+          renderIllustration={(hovered, reducedMotion) => (
+            <KesiapanIllustration hovered={hovered} reducedMotion={reducedMotion} />
+          )}
+        />
 
-          {/* Open Floating UI Vignette 02: Interactive-style Readiness Checklist Card */}
-          <div className="relative my-7 flex h-52 items-center justify-center">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-4 inset-y-2 rounded-full bg-[radial-gradient(circle_at_center,rgba(29,158,117,0.10),transparent_70%)]"
-            />
-
-            <div className="relative w-full max-w-[268px] rounded-2xl border border-emerald-950/[0.09] bg-white p-3.5 shadow-[0_14px_30px_-16px_rgba(15,61,46,0.18)] transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
-              {/* Top progress header */}
-              <div className="mb-3 flex items-center justify-between border-b border-emerald-950/[0.06] pb-2.5">
-                <span className="text-[11px] font-bold text-[#0F3D2E]">
-                  Kesiapan Material
-                </span>
-                <span className="rounded-full bg-[#0F3D2E] px-2 py-0.5 text-[10px] font-bold tabular-nums text-white">
-                  3/3 Siap
-                </span>
-              </div>
-
-              {/* 3 Checklist Rows */}
-              <div className="space-y-2">
-                {[
-                  "Sisa cairan dikosongkan & dibilas",
-                  "Tutup botol & lakban dilepas",
-                  "Kardus dilipat pipih & diikat rapi",
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="flex items-center gap-2.5 rounded-lg bg-[#F5FAF7] px-2.5 py-1.5"
-                  >
-                    <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#1D9E75] text-white">
-                      <Check className="h-2.5 w-2.5 stroke-[3]" />
-                    </span>
-                    <span className="text-[11.5px] font-medium text-[#0F3D2E]">
-                      {item}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold tracking-tight text-[#0F3D2E]">
-              Cek kesiapan
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#426352]">
-              Gunakan checklist interaktif untuk memastikan botol kering, lakban berlebih lepas, dan kardus sudah terlipat rata.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        {/* ── Column 3: FIG 0.3 — Siapkan bukti foto ── */}
-        <ScrollReveal
+        <PillarCard
+          fig="FIG 0.3"
+          tag="1 Bingkai Bukti"
+          title="Siapkan bukti foto"
+          description="Pahami syarat satu foto material bersama angka timbangan serta uji pemeriksaan foto AI yang aktif di demo Warga."
+          label="Botol PET, kardus, dan angka 3,45 kg pada layar timbangan terlihat dalam satu bingkai kamera."
           delay={0.16}
-          className="group relative flex flex-col justify-between py-9 transition-colors duration-300 hover:bg-[#F5FAF7]/60 md:px-7 md:py-10 md:last:pr-4"
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] tabular-nums text-[#4D6D5B]/85">
-              FIG 0.3
-            </span>
-            <span className="text-[11px] font-semibold text-[#1D9E75]">
-              1 Bingkai Bukti
-            </span>
-          </div>
-
-          {/* Open Floating UI Vignette 03: Camera Viewfinder + Digital Scale Readout */}
-          <div className="relative my-7 flex h-52 items-center justify-center">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-x-4 inset-y-2 rounded-full bg-[radial-gradient(circle_at_center,rgba(29,158,117,0.10),transparent_70%)]"
-            />
-
-            <div className="relative w-full max-w-[268px] overflow-hidden rounded-2xl border border-emerald-950/15 bg-[#0F3D2E] p-3.5 text-white shadow-[0_14px_30px_-14px_rgba(15,61,46,0.28)] transition-transform duration-300 motion-safe:group-hover:-translate-y-0.5">
-              {/* Viewfinder top bar */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold tracking-wide text-emerald-300">
-                  <Camera className="h-3 w-3" />
-                  <span>FRAME BUKTI SETOR</span>
-                </div>
-                <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9.5px] font-semibold text-emerald-200">
-                  EXIF Aman
-                </span>
-              </div>
-
-              {/* Dual-target capture preview */}
-              <div className="mt-2.5 grid grid-cols-12 gap-2">
-                <div className="col-span-7 flex flex-col justify-between rounded-xl border border-emerald-400/25 bg-white/[0.06] p-2.5">
-                  <span className="text-[9.5px] font-medium text-emerald-200/80">
-                    Objek Terpilah
-                  </span>
-                  <p className="mt-1 text-xs font-bold text-white">
-                    PET &amp; Kardus Utuh
-                  </p>
-                  <span className="mt-1.5 inline-flex items-center gap-1 text-[9.5px] font-semibold text-emerald-300">
-                    <ShieldCheck className="h-3 w-3" /> Terbaca Jelas
-                  </span>
-                </div>
-
-                <div className="col-span-5 flex flex-col justify-between rounded-xl border border-emerald-400/35 bg-[#09271D] p-2.5">
-                  <div className="flex items-center justify-between text-[9.5px] text-emerald-300/80">
-                    <span>Timbangan</span>
-                    <Scale className="h-2.5 w-2.5" />
-                  </div>
-                  <p className="mt-1 text-base font-extrabold tabular-nums tracking-tight text-[#6EE7B7]">
-                    3.45 <span className="text-[10px] font-bold">kg</span>
-                  </p>
-                  <span className="mt-1 text-[9px] font-medium text-emerald-200/75">
-                    Layar Tajam
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-bold tracking-tight text-[#0F3D2E]">
-              Siapkan bukti foto
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-[#426352]">
-              Pahami syarat satu foto material bersama angka timbangan serta uji pemeriksaan foto AI yang aktif di demo Warga.
-            </p>
-          </div>
-        </ScrollReveal>
+          className="md:last:pr-4"
+          renderIllustration={(hovered, reducedMotion) => (
+            <BuktiIllustration hovered={hovered} reducedMotion={reducedMotion} />
+          )}
+        />
       </div>
     </div>
   );

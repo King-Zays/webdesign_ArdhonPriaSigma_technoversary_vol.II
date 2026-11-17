@@ -268,14 +268,14 @@ const SLIDES: SlideItem[] = [
                     transition={{ duration: 0.22 }}
                     className="flex items-center justify-between gap-2 rounded-md bg-emerald-500/15 px-2.5 py-2 text-left"
                   >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <CheckCircle2 size={15} className="shrink-0 text-[#7AC74F]" />
+                    <div className="flex items-start gap-2 min-w-0">
+                      <CheckCircle2 size={15} className="mt-0.5 shrink-0 text-[#7AC74F]" />
                       <div className="min-w-0">
-                        <p className="truncate text-[11px] font-bold text-white">
-                          Bukti Sesuai · Botol PET & Kardus
+                        <p className="text-[11px] font-bold leading-snug text-white">
+                          Bukti Sesuai · Botol PET &amp; Kardus
                         </p>
-                        <p className="truncate text-[10px] text-emerald-200/70">
-                          Metadata lokasi GPS telah dibersihkan
+                        <p className="text-[10px] leading-snug text-emerald-200/75">
+                          EXIF GPS dibersihkan otomatis
                         </p>
                       </div>
                     </div>
@@ -292,22 +292,22 @@ const SLIDES: SlideItem[] = [
             <p className="text-[11px] font-semibold text-emerald-200/60">Riwayat Aksi Hijau</p>
             <div className="mt-2 divide-y divide-white/[0.05] rounded-lg border border-white/[0.07] bg-[#081A10] text-xs">
               <div
-                className={`flex items-center justify-between px-3.5 py-2.5 transition-colors duration-300 ${
+                className={`flex items-center justify-between gap-2 px-3 py-2.5 transition-colors duration-300 ${
                   stepPhase === 2 ? "bg-emerald-500/10" : ""
                 }`}
               >
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                    Terverifikasi
+                <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                  <span className="shrink-0 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                    Valid
                   </span>
                   <span className="truncate text-emerald-100/85">Pilah Sampah · 1.5 kg</span>
                 </div>
                 <span className="shrink-0 font-mono font-semibold text-emerald-300">+40 poin</span>
               </div>
-              <div className="flex items-center justify-between px-3.5 py-2.5">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                    Terverifikasi
+              <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                  <span className="shrink-0 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                    Valid
                   </span>
                   <span className="truncate text-emerald-100/85">Transportasi · 4 km</span>
                 </div>
@@ -670,8 +670,8 @@ export default function PlatformShowcase() {
           className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-[#081C11] via-[#081C11]/85 to-transparent"
         />
 
-        {/* Mobile Sliding Track (< 768px) */}
-        <div className="overflow-hidden px-4 pb-8 md:hidden">
+        {/* Mobile & Tablet Single-Card Track (< 1024px) */}
+        <div className="mx-auto max-w-[460px] overflow-hidden px-4 pb-8 lg:hidden">
           <div
             className="flex transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
             style={{ transform: `translateX(-${activeIndex * 100}%)` }}
@@ -688,8 +688,8 @@ export default function PlatformShowcase() {
           </div>
         </div>
 
-        {/* Desktop Sliding 4-Card Window with Alpha Mask (>= 768px) */}
-        <div className="mx-auto hidden w-full max-w-[1440px] md:block [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_82%,transparent_100%)]">
+        {/* Desktop Sliding 4-Card Window with Alpha Mask (>= 1024px) */}
+        <div className="mx-auto hidden w-full max-w-[1440px] lg:block [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_82%,transparent_100%)]">
           <div className="relative left-1/2 w-[1540px] -translate-x-1/2 overflow-hidden">
             <div
               className={`flex min-h-[470px] gap-5 motion-reduce:transition-none xl:min-h-[500px] ${

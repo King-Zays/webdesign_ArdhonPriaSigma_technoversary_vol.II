@@ -79,18 +79,20 @@ export default function HeroConsole() {
       <div id="how-it-works" className="scroll-mt-24" />
 
       {/* Top Browser/App Window Frame */}
-      <div className="flex items-center justify-between border-b border-neutral-200/80 bg-white px-4 py-2.5 text-xs">
-        <div className="flex items-center gap-2">
-          <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-          <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-          <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
-          <span className="ml-2 rounded-md border border-neutral-200/80 bg-[#F8FAF9] px-2.5 py-0.5 font-mono text-[11px] text-neutral-500">
+      <div className="flex items-center justify-between gap-2 border-b border-neutral-200/80 bg-white px-3.5 py-2.5 text-xs sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
+          <div className="hidden shrink-0 items-center gap-2 sm:flex" aria-hidden="true">
+            <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+            <span className="h-2.5 w-2.5 rounded-full bg-neutral-200" />
+          </div>
+          <span className="truncate rounded-md border border-neutral-200/80 bg-[#F8FAF9] px-2 py-0.5 font-mono text-[10.5px] text-neutral-500 sm:ml-2 sm:px-2.5 sm:text-[11px]">
             boni.app/dashboard/eco-action
           </span>
         </div>
         <Link
           href="/login?role=warga"
-          className="font-semibold text-[#2D5F3F] transition-colors hover:text-[#0F3D2E]"
+          className="shrink-0 whitespace-nowrap text-[11px] font-semibold text-[#2D5F3F] transition-colors hover:text-[#0F3D2E] sm:text-xs"
         >
           Buka halaman penuh →
         </Link>
