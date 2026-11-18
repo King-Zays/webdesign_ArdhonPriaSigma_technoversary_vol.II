@@ -239,7 +239,7 @@ function PersistentVideoPlayer({
         <div className="min-h-0 flex-1 w-full">
           <iframe
             className="h-full w-full"
-            src="https://www.youtube-nocookie.com/embed/ZrTQqDXzVYQ?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3"
+            src="https://www.youtube-nocookie.com/embed/NBJ_LEYxBkw?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3"
             title="Video Pengenalan Ekosistem BONI"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"

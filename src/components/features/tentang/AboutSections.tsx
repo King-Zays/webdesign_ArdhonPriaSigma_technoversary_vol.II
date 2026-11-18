@@ -1207,7 +1207,7 @@ export default function AboutSections() {
                     className="absolute inset-0 overflow-hidden rounded-2xl bg-[#0A2315] shadow-[0_32px_80px_-32px_rgba(15,61,46,0.28)]"
                   >
                     <Image
-                      src="https://i.ytimg.com/vi/ZrTQqDXzVYQ/hqdefault.jpg"
+                      src="https://i.ytimg.com/vi/NBJ_LEYxBkw/hqdefault.jpg"
                       alt="Pratinjau video pengenalan ekosistem BONI"
                       fill
                       unoptimized
