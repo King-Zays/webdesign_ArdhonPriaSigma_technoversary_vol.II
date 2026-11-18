@@ -190,7 +190,7 @@ const collaborationTracks = [
   {
     nomor: "03",
     partner: "Pengelola Program & Mitra UMKM",
-    status: "Penjajakan insentif voucher kampung",
+    status: "Penjajakan voucher UMKM lokal",
     detail:
       "Meninjau rekap agregat partisipasi 31 kecamatan dan merumuskan skema penukaran EcoPoints di warung serta usaha warga setempat.",
   },
@@ -466,26 +466,6 @@ export default function AboutSections() {
                 sudah dapat dicoba langsung di peramban ini, sedangkan penimbangan fisik di pengepul dan OCR timbangan
                 berada pada tahap rancangan.
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-6 text-sm">
-                <Link
-                  href="/edukasi"
-                  className="group inline-flex items-center gap-1.5 font-bold text-[#0F3D2E] transition-colors hover:text-[#1D9E75]"
-                >
-                  <span>Buka panduan edukasi</span>
-                  <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-                <Link
-                  href="/#gateway"
-                  className="group inline-flex items-center gap-1.5 font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
-                >
-                  <span>Pilih portal demo</span>
-                  <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-              </div>
             </div>
           </motion.div>
 
@@ -1131,8 +1111,7 @@ export default function AboutSections() {
 
             <div className="max-w-lg">
               <p className="text-base leading-relaxed text-[#2D5542]">
-                Status di bawah mencerminkan kesiapan uji coba prototipe saat ini—kemitraan operasional ditetapkan
-                bertahap bersama pihak yang bersedia menguji di lapangan.
+                BONI membagi peran uji coba lapangan antara komunitas warga, bank sampah, pengelola program, dan UMKM.
               </p>
               <div className="mt-4">
                 <Link

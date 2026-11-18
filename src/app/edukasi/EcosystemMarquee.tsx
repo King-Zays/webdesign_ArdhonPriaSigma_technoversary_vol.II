@@ -105,13 +105,12 @@ export default function EcosystemMarquee({
           id={id + "-label"}
           className="text-[28px] font-extrabold leading-[1.15] tracking-[-0.03em] text-[#0F3D2E] sm:text-4xl"
         >
-          Kandidat kolaborasi dan{" "}
-          <span className="text-[#1D9E75]">integrasi ekosistem</span>
+          Ekosistem{" "}
+          <span className="text-[#1D9E75]">lingkungan Surabaya</span>
         </h2>
         <p className="mx-auto mt-3.5 max-w-2xl text-sm leading-relaxed text-[#426352] sm:text-base">
-          Pemetaan riset awal BONI untuk peluang kolaborasi komunitas dan
-          kampus di Surabaya serta potensi integrasi aplikasi dan layanan
-          pendukung warga.
+          BONI memetakan komunitas, kampus, dan layanan warga di Surabaya
+          sebagai dasar rancangan kolaborasi dan integrasi.
         </p>
       </div>
 

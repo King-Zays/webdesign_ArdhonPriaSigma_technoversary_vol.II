@@ -78,7 +78,7 @@ const ROLE_OPTIONS: readonly ContactSelectOption<ContactRole>[] = [
   {
     value: "umkm",
     label: "Mitra UMKM Lokal",
-    description: "Penyedia reward & voucher kampung",
+    description: "Penyedia hadiah dan voucher",
     icon: Store,
   },
   {
@@ -105,7 +105,7 @@ const TOPIC_META: Record<
 > = {
   collaboration: {
     badge: "Kemitraan Ekosistem",
-    hint: "Cocok untuk pengelola bank sampah, UMKM voucher kampung, sekolah, dan komunitas Surabaya.",
+    hint: "Cocok untuk pengelola bank sampah, UMKM lokal, sekolah, dan komunitas Surabaya.",
     icon: Handshake,
   },
   demo: {

@@ -15,7 +15,7 @@ const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 /* ── 1. Hero Section (Video Latar Belakang & Panggung Kaca Kristal) ── */
 export function Hero() {
   return (
-    <section className="relative isolate overflow-hidden border-b border-emerald-900/10 bg-[#F5FAF7]">
+    <section className="relative isolate overflow-hidden bg-[#FAFDFB]">
       {/* Video latar merawat tanaman & lingkungan agar suasana hijau langsung terasa */}
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
         <video
@@ -27,7 +27,7 @@ export function Hero() {
           playsInline
           className="h-full w-full object-cover opacity-35"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F5FAF7]/90 via-[#F5FAF7]/80 to-[#F5FAF7]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#F5FAF7]/90 via-[#F5FAF7]/80 to-[#FAFDFB] to-95%" />
       </div>
 
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-14 sm:px-6 sm:pb-24 sm:pt-20 2xl:max-w-7xl">
@@ -398,17 +398,6 @@ export function CaraKerjaDemo() {
               Laporan titik sampah berkoordinat di portal Warga langsung terhubung dengan antrean tindak lanjut petugas
               di portal Pemkot Surabaya.
             </p>
-            <div className="mt-5 flex flex-wrap items-center gap-5">
-              <Link
-                href="/gov/login"
-                className="group inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
-              >
-                <span>Buka pratinjau portal Pemkot</span>
-                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </div>
           </div>
         </motion.div>
 

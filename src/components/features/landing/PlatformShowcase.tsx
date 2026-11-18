@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Camera,
   CheckCircle2,
@@ -500,8 +500,13 @@ const SLIDES: SlideItem[] = [
 // 3 salinan agar animasi geser ke kiri maupun ke kanan selalu berputar mulus tanpa batas
 const TRACK_SLIDES = [...SLIDES, ...SLIDES, ...SLIDES];
 const N = SLIDES.length;
+const AUTO_SCROLL_MS = 5400;
 
 export default function PlatformShowcase() {
+  const reduceMotion = useReducedMotion();
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
+  const autoPlaying = !reduceMotion && !isHovered && !hasFocus;
   // Indeks di salinan tengah (4..7). Default 5 = Verifikasi Aksi di tengah-kiri
   const [trackIdx, setTrackIdx] = useState(N + 1);
   const [animated, setAnimated] = useState(true);
@@ -530,17 +535,20 @@ export default function PlatformShowcase() {
     setPhase(0);
     const t1 = setTimeout(() => setPhase(1), 1400);
     const t2 = setTimeout(() => setPhase(2), 2900);
-    const tNext = setTimeout(() => {
-      setAnimated(true);
-      setTrackIdx((i) => i + 1);
-    }, 5400);
-
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(tNext);
     };
   }, [activeIndex]);
+
+  useEffect(() => {
+    if (!autoPlaying) return;
+    const timer = window.setTimeout(() => {
+      setAnimated(true);
+      setTrackIdx((index) => index + 1);
+    }, AUTO_SCROLL_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, autoPlaying]);
 
   // Setelah animasi selesai, reset diam-diam ke salinan tengah (4..7) jika sudah keluar batas
   useEffect(() => {
@@ -559,18 +567,16 @@ export default function PlatformShowcase() {
     return () => cancelAnimationFrame(raf);
   }, [animated]);
 
-  // Lebar kartu desktop 370px + gap 20px = 390px per langkah; geser 1 kartu ke kanan agar slot [trackIdx-1] di pinggir kiri
-  const stepPx = 390;
-  const shiftPx = (trackIdx - 1) * stepPx;
+  const shiftPx = trackIdx * (370 + 20);
 
   return (
-    <section className="relative isolate flex min-h-[min(calc(100svh-5rem),820px)] flex-col justify-end overflow-hidden border-b border-white/10 bg-[#081C11] pt-16 pb-0 text-white sm:pt-20">
+    <section className="relative isolate overflow-hidden border-b border-white/10 bg-[#081C11] py-16 text-white sm:py-20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(900px_420px_at_50%_0%,rgba(29,158,117,0.14)_0%,transparent_75%)]"
       />
 
-      {/* Header + Carousel Controls */}
+      {/* Showcase heading */}
       <motion.div
         initial={{ opacity: 0, y: 40, filter: "blur(6px)" }}
         whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -581,105 +587,40 @@ export default function PlatformShowcase() {
         <div className="grid gap-6 md:grid-cols-[1fr_1.15fr] md:items-start md:gap-12">
           <h2 className="text-3xl font-extrabold leading-[1.12] tracking-[-0.03em] text-white sm:text-5xl">
             Dari pilah di rumah <br />
-            hingga voucher kampung
+            hingga voucher UMKM lokal
           </h2>
 
           <div className="max-w-lg md:pt-1">
             <p className="text-base leading-relaxed text-emerald-100/75 sm:text-[17px]">
-              Setiap layar di aplikasi BONI dirancang agar kebiasaan bersih warga langsung tercatat lewat verifikasi
-              foto, terpantau per kecamatan, dan dapat ditukarkan di UMKM sekitar.
+              Di demo BONI, warga mencatat aksi hijau lewat verifikasi foto dan mencoba menukar EcoPoints dengan voucher UMKM lokal. Portal Pemkot menampilkan ringkasan aksi per kecamatan.
             </p>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
-              <Link
-                href="/login?role=warga"
-                className="group inline-flex items-center gap-1.5 text-sm font-medium text-emerald-200/80 transition-colors hover:text-white"
-              >
-                <span>Buka aplikasi warga</span>
-                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-
-              {/* Carousel Navigation Bar */}
-              <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-1.5 sm:flex">
-                  {SLIDES.map((s, idx) => {
-                    const isActive = idx === activeIndex;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => jumpTo(idx)}
-                        aria-label={`Tampilkan ${s.label}`}
-                        className={`relative h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
-                          isActive ? "w-7 bg-white/20" : "w-1.5 bg-white/25 hover:bg-white/45"
-                        }`}
-                      >
-                        {isActive && (
-                          <motion.span
-                            key={activeIndex}
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{
-                              duration: 5.4,
-                              ease: "linear",
-                            }}
-                            style={{ transformOrigin: "left" }}
-                            className="block h-full w-full rounded-full bg-[#7AC74F]"
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-                <span className="ml-1 font-mono text-xs text-emerald-200/70">
-                  {String(activeIndex + 1).padStart(2, "0")}/{String(N).padStart(2, "0")}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => step(-1)}
-                  aria-label="Geser ke kiri"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-all hover:scale-105 hover:bg-white/[0.12] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7AC74F]"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => step(1)}
-                  aria-label="Geser ke kanan"
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition-all hover:scale-105 hover:bg-white/[0.12] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7AC74F]"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Sliding Carousel Track (countdown tetap berjalan meski di-hover) */}
       <motion.div
         initial={{ opacity: 0, y: 48 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: false, amount: 0.15 }}
         transition={{ duration: 1.15, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mt-10 overflow-hidden sm:mt-14"
+        className="relative mx-auto mt-8 w-full max-w-[1440px] sm:mt-10"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onFocus={() => setHasFocus(true)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
+        }}
       >
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-36 bg-gradient-to-t from-[#081C11] via-[#081C11]/85 to-transparent"
-        />
-
         {/* Mobile & Tablet Single-Card Track (< 1024px) */}
-        <div className="mx-auto max-w-[460px] overflow-hidden px-4 pb-8 lg:hidden">
+        <div className="mx-auto max-w-[460px] overflow-hidden px-4 [mask-image:linear-gradient(to_right,transparent,black_1rem,black_calc(100%_-_1rem),transparent)] sm:px-6 sm:[mask-image:linear-gradient(to_right,transparent,black_1.5rem,black_calc(100%_-_1.5rem),transparent)] lg:hidden">
           <div
             className="flex transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
             style={{ transform: `translateX(-${activeIndex * 100}%)` }}
           >
             {SLIDES.map((s, idx) => (
-              <div key={s.id} className="w-full shrink-0 px-0.5">
-                <div className="rounded-t-2xl bg-gradient-to-b from-white/[0.20] via-white/[0.07] to-transparent pt-px px-px">
-                  <div className="flex min-h-[380px] flex-col gap-4 rounded-t-[15px] bg-gradient-to-b from-[#0C2618] via-[#0A2115] to-[#081C11] p-5 pb-16">
+              <div key={s.id} className="w-full shrink-0 px-1">
+                <div className="rounded-2xl bg-gradient-to-b from-white/[0.20] via-white/[0.07] to-white/[0.10] p-px">
+                  <div className="flex min-h-[380px] flex-col gap-4 rounded-[15px] bg-gradient-to-b from-[#0C2618] via-[#0A2115] to-[#081C11] p-5">
                     {s.render(idx === activeIndex, phase)}
                   </div>
                 </div>
@@ -689,10 +630,10 @@ export default function PlatformShowcase() {
         </div>
 
         {/* Desktop Sliding 4-Card Window with Alpha Mask (>= 1024px) */}
-        <div className="mx-auto hidden w-full max-w-[1440px] lg:block [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_82%,transparent_100%)]">
-          <div className="relative left-1/2 w-[1540px] -translate-x-1/2 overflow-hidden">
+        <div className="mx-auto hidden w-full max-w-[1440px] lg:block overflow-x-clip pb-4 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)] xl:[mask-image:linear-gradient(to_right,transparent,black_17%,black_83%,transparent)]">
+          <div className="mx-auto w-[760px]">
             <div
-              className={`flex min-h-[470px] gap-5 motion-reduce:transition-none xl:min-h-[500px] ${
+              className={`flex min-h-[405px] gap-5 motion-reduce:transition-none ${
                 animated ? "transition-transform duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]" : ""
               }`}
               style={{ transform: `translateX(-${shiftPx}px)` }}
@@ -704,16 +645,16 @@ export default function PlatformShowcase() {
                   <div
                     key={`${slide.id}-${idx}`}
                     onClick={() => !isCenter && step(delta > 1 ? 1 : -1)}
-                    className={`w-[370px] shrink-0 rounded-t-2xl pt-px px-px ${
+                    className={`w-[370px] shrink-0 rounded-2xl pt-px px-px ${
                       animated ? "transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]" : ""
                     } ${
                       isCenter
-                        ? "translate-y-0 scale-100 opacity-100 bg-gradient-to-b from-white/[0.22] via-white/[0.08] to-transparent shadow-[0_-18px_48px_-20px_rgba(122,199,79,0.16)]"
-                        : "translate-y-3 scale-[0.96] opacity-70 cursor-pointer bg-gradient-to-b from-white/[0.14] via-white/[0.05] to-transparent hover:translate-y-1 hover:opacity-95 hover:from-white/[0.22]"
+                        ? "translate-y-0 scale-100 opacity-100 bg-gradient-to-b from-white/[0.22] via-white/[0.08] to-white/[0.10] shadow-[0_-18px_48px_-20px_rgba(122,199,79,0.16)]"
+                        : "translate-y-3 scale-[0.96] opacity-70 cursor-pointer bg-gradient-to-b from-white/[0.14] via-white/[0.05] to-white/[0.06] hover:translate-y-1 hover:opacity-95 hover:from-white/[0.22]"
                     }`}
                   >
                     <div
-                      className={`flex h-full flex-col gap-4 rounded-t-[15px] p-6 pb-20 ${
+                      className={`flex h-full flex-col gap-4 rounded-[15px] p-6 ${
                         isCenter
                           ? "bg-gradient-to-b from-[#0C2618] via-[#0A2115] to-[#081C11]"
                           : "bg-gradient-to-b from-[#0B2316] via-[#0A2014] to-[#081C11]"
@@ -726,6 +667,53 @@ export default function PlatformShowcase() {
               })}
             </div>
           </div>
+        </div>
+        <div role="group" aria-label="Navigasi carousel demo BONI" className="relative mx-auto mt-4 flex min-h-11 max-w-[460px] items-center justify-center gap-2 px-14 lg:static lg:max-w-none lg:px-0">
+          <button
+            type="button"
+            onClick={() => step(-1)}
+            aria-label="Pratinjau sebelumnya"
+            className="absolute left-4 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-[#123727] text-white transition-colors hover:bg-[#1A4933] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7AC74F] lg:left-8 lg:top-[calc(50%-1.25rem)] lg:-translate-y-1/2"
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          {SLIDES.map((s, idx) => {
+            const isActive = idx === activeIndex;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => jumpTo(idx)}
+                aria-label={`Tampilkan ${s.label}`}
+                aria-pressed={isActive}
+                className={`relative h-2 overflow-hidden rounded-full transition-all duration-300 motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7AC74F] ${
+                  isActive ? "w-8 bg-white/20" : "w-2 bg-white/25 hover:bg-white/45"
+                }`}
+              >
+                {isActive && (
+                  <motion.span
+                    key={autoPlaying ? `playing-${activeIndex}` : "idle"}
+                    initial={{ scaleX: reduceMotion ? 1 : 0 }}
+                    animate={{ scaleX: reduceMotion || autoPlaying ? 1 : 0.35 }}
+                    transition={{
+                      duration: autoPlaying ? AUTO_SCROLL_MS / 1000 : 0.2,
+                      ease: "linear",
+                    }}
+                    style={{ transformOrigin: "left" }}
+                    className="block h-full w-full rounded-full bg-[#7AC74F]"
+                  />
+                )}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => step(1)}
+            aria-label="Pratinjau berikutnya"
+            className="absolute right-4 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-[#123727] text-white transition-colors hover:bg-[#1A4933] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7AC74F] lg:right-8 lg:top-[calc(50%-1.25rem)] lg:-translate-y-1/2"
+          >
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
         </div>
       </motion.div>
     </section>

@@ -606,7 +606,7 @@ export default function SortingReadinessCheck() {
                 const isActive = idx === activeIndex;
                 const isDone = Boolean(checkedMap[s.id]);
                 return (
-                  <div key={s.id} className="group/dot relative flex items-center">
+                  <div key={s.id} className="flex items-center">
                     <button
                       type="button"
                       onClick={() => jumpToStep(idx)}
@@ -637,14 +637,6 @@ export default function SortingReadinessCheck() {
                         />
                       )}
                     </button>
-
-                    {/* Floating Interactive Step Preview Pill on Dot Hover */}
-                    <span
-                      aria-hidden="true"
-                      className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-full border border-emerald-950/10 bg-[#0F3D2E] px-2.5 py-0.5 text-[10px] font-bold text-white opacity-0 shadow-sm transition-all duration-200 group-hover/dot:-translate-y-0.5 group-hover/dot:opacity-100 sm:inline-flex"
-                    >
-                      {s.stepNumber} · {s.badge}
-                    </span>
                   </div>
                 );
               })}

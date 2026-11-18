@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { HelpCircle } from "lucide-react";
 import ContactForm from "./ContactForm";
@@ -118,27 +117,6 @@ export default function ContactPageClient({ questions }: { questions: FaqItem[] 
             </motion.div>
 
             {/* Subtle Secondary Channel Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 26, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 1.05, delay: 0.36, ease: EASE_OUT_EXPO }}
-              className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-[#426352]"
-            >
-              <Link
-                href="/kontak/kolaborasi"
-                className="group inline-flex items-center gap-1 transition-colors hover:text-[#0F3D2E]"
-              >
-                <span>Panduan kolaborasi</span>
-                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-              </Link>
-              <Link
-                href="/kontak/bantuan"
-                className="group inline-flex items-center gap-1 transition-colors hover:text-[#0F3D2E]"
-              >
-                <span>Pusat bantuan</span>
-                <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
-              </Link>
-            </motion.div>
           </div>
 
           {/* Right Column: Clean 2-Column Interactive Form Card */}
@@ -157,9 +135,10 @@ export default function ContactPageClient({ questions }: { questions: FaqItem[] 
       <section
         id="faq"
         aria-labelledby="faq-title"
-        className="scroll-mt-24 px-4 py-20 sm:px-6 sm:py-24"
+        className="relative isolate scroll-mt-24 py-20 sm:py-24"
       >
-        <div className="mx-auto w-full max-w-6xl">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_55%,rgba(29,158,117,0.09),transparent_70%)]" />
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -181,34 +160,22 @@ export default function ContactPageClient({ questions }: { questions: FaqItem[] 
               </h2>
             </div>
 
-            <div className="space-y-4 md:col-span-6 md:col-start-7 md:pt-7">
+            <div className="md:col-span-6 md:col-start-7 md:pt-7">
               <p className="max-w-lg text-[15px] leading-relaxed text-[#2D5542]">
                 Geser kartu pertanyaan untuk melihat cakupan demo Warga &amp; Pemkot, rancangan alur pengepul, pemeriksaan bukti foto AI, dan aturan simulasi EcoPoints.
               </p>
-              <Link
-                href="/kontak/bantuan"
-                className="group inline-flex items-center gap-1.5 text-sm font-bold text-[#1D9E75] transition-colors hover:text-[#0F3D2E]"
-              >
-                <span>Buka pusat bantuan lengkap</span>
-                <span
-                  aria-hidden="true"
-                  className="transition-transform duration-200 group-hover:translate-x-1"
-                >
-                  →
-                </span>
-              </Link>
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 32, filter: "blur(5px)" }}
-            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            viewport={{ once: false, amount: 0.15 }}
-            transition={{ duration: 1.0, delay: 0.12, ease: EASE_OUT_EXPO }}
-          >
-            <FaqCarousel questions={questions} />
-          </motion.div>
         </div>
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 1.0, delay: 0.12, ease: EASE_OUT_EXPO }}
+        >
+          <FaqCarousel questions={questions} />
+        </motion.div>
       </section>
     </div>
   );

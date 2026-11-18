@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { FaqItem } from "./ContactPageClient";
+
+const AUTO_SCROLL_MS = 4500;
 
 /**
  * Carousel horizontal bergaya etalase dua-kartu terpusat dengan kartu tepi
@@ -18,9 +21,67 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
     questions.length >= 4 ? 1 : 0,
   );
   const [mobileIndex, setMobileIndex] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(carouselRef, { amount: 0.4 });
+  const reduceMotion = useReducedMotion();
+  const [isHovered, setIsHovered] = useState(false);
+  const [hasFocus, setHasFocus] = useState(false);
+  const autoPlaying =
+    isInView && !reduceMotion && !isHovered && !hasFocus &&
+    questions.length > 1;
+
+  useEffect(() => {
+    if (!autoPlaying) return;
+
+    const timer = window.setTimeout(() => {
+      setDesktopStart((index) => (index + 1) % (maxDesktopStart + 1));
+      setMobileIndex((index) => (index + 1) % questions.length);
+    }, AUTO_SCROLL_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    desktopStart,
+    mobileIndex,
+    autoPlaying,
+    maxDesktopStart,
+    questions.length,
+  ]);
 
   const canPrevDesktop = desktopStart > 0;
   const canNextDesktop = desktopStart < maxDesktopStart;
+
+  function renderIndicator(
+    index: number,
+    active: boolean,
+    label: string,
+    onClick: () => void,
+  ) {
+    return (
+      <button
+        key={index}
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        aria-pressed={active}
+        className={`relative h-2 overflow-hidden rounded-full transition-all duration-300 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75] focus-visible:ring-offset-2 ${
+          active
+            ? "w-8 bg-[#0F3D2E]/15"
+            : "w-2 bg-emerald-950/20 hover:scale-125 hover:bg-[#1D9E75]/60"
+        }`}
+      >
+        {active && (
+          <motion.span
+            key={autoPlaying ? `playing-${desktopStart}-${mobileIndex}` : "idle"}
+            aria-hidden="true"
+            initial={{ scaleX: reduceMotion ? 1 : 0 }}
+            animate={{ scaleX: reduceMotion ? 1 : autoPlaying ? 1 : 0.35 }}
+            transition={{ duration: reduceMotion ? 0 : autoPlaying ? AUTO_SCROLL_MS / 1000 : 0.2, ease: "linear" }}
+            className="block h-full w-full origin-left rounded-full bg-[#1D9E75]"
+          />
+        )}
+      </button>
+    );
+  }
 
   function handleDesktopCardClick(index: number) {
     if (index < desktopStart) {
@@ -52,7 +113,7 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
                 style={{ backgroundColor: item.dotColor ?? "#1D9E75" }}
                 aria-hidden="true"
               />
-              <h3 className="text-[14px] font-bold leading-snug text-[#0F3D2E]">
+              <h3 className="text-base font-extrabold leading-snug text-[#0F3D2E]">
                 {item.question}
               </h3>
             </div>
@@ -61,15 +122,15 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
             </span>
           </div>
 
-          <div className="mt-3.5 rounded-xl border border-emerald-950/[0.06] bg-[#FAFDFB] p-3.5">
-            <p className="text-xs leading-relaxed text-[#2D4F3E]">
+          <div className="mt-4 rounded-xl border border-emerald-950/[0.08] bg-[#F6FAF8] p-4">
+            <p className="text-sm leading-relaxed text-[#2D4F3E]">
               {item.answer}
             </p>
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-emerald-950/[0.06] pt-3 text-xs">
-          <span className="font-mono text-[11px] font-semibold text-[#4D6D5B]">
+          <span className="shrink-0 text-[11px] font-semibold text-[#4D6D5B]">
             Topik {numberLabel}
           </span>
 
@@ -103,53 +164,53 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
   }
 
   return (
-    <div>
+    <div
+      ref={carouselRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setHasFocus(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHasFocus(false);
+      }}
+    >
       {/* Desktop & Tablet Horizontal Vignette Stage (md 768px+) */}
       <div className="hidden md:block">
         <div
-          className="relative overflow-hidden py-3 [--card-w:300px] lg:[--card-w:328px]"
+          className="relative [--card-w:300px] lg:[--card-w:370px]"
           role="region"
           aria-label="Daftar pertanyaan umum BONI"
           tabIndex={0}
           onKeyDown={handleDesktopKeyDown}
         >
           {/* Centered two-card anchor slot + peeking edges */}
-          <div className="mx-auto w-[calc(var(--card-w)*2+16px)]">
-            <div
-              className="flex items-stretch gap-4 transition-transform duration-500 ease-out motion-reduce:transition-none"
-              style={{
-                transform: `translateX(calc(${-desktopStart} * (var(--card-w) + 16px)))`,
-              }}
-            >
-              {questions.map((item, index) => {
-                const isCentered =
-                  index === desktopStart || index === desktopStart + 1;
-                return (
-                  <article
-                    key={item.question}
-                    onClick={() => handleDesktopCardClick(index)}
-                    className={`flex w-[var(--card-w)] shrink-0 flex-col justify-between rounded-2xl border bg-white p-5 transition-all duration-300 ${
-                      isCentered
-                        ? "border-emerald-950/[0.12] opacity-100 shadow-[0_14px_32px_-12px_rgba(15,61,46,0.12)]"
-                        : "cursor-pointer border-emerald-950/[0.06] opacity-75 hover:opacity-95"
-                    }`}
-                  >
-                    {renderCardBody(item, index)}
-                  </article>
-                );
-              })}
+          <div className="overflow-x-clip pb-11 pt-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] xl:[mask-image:linear-gradient(to_right,transparent,black_17%,black_83%,transparent)]">
+            <div className="mx-auto w-[calc(var(--card-w)*2+20px)]">
+              <div
+                className="flex items-stretch gap-5 transition-transform duration-500 ease-out motion-reduce:transition-none"
+                style={{
+                  transform: `translateX(calc(${-desktopStart} * (var(--card-w) + 20px)))`,
+                }}
+              >
+                {questions.map((item, index) => {
+                  const isCentered =
+                    index === desktopStart || index === desktopStart + 1;
+                  return (
+                    <article
+                      key={item.question}
+                      onClick={() => handleDesktopCardClick(index)}
+                      className={`flex w-[var(--card-w)] shrink-0 flex-col justify-between rounded-2xl border p-6 transition-all duration-300 motion-reduce:transition-none ${
+                        isCentered
+                          ? "border-emerald-950/[0.12] bg-white shadow-[0_16px_36px_-18px_rgba(15,61,46,0.2)]"
+                          : "translate-y-3 scale-[0.96] cursor-pointer border-emerald-950/[0.08] bg-white/80 opacity-45 hover:opacity-75"
+                      }`}
+                    >
+                      {renderCardBody(item, index)}
+                    </article>
+                  );
+                })}
+              </div>
             </div>
           </div>
-
-          {/* Soft left & right vignette fade matching #FAFDFB surface */}
-          <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#FAFDFB] via-[#FAFDFB]/85 to-transparent lg:w-36"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#FAFDFB] via-[#FAFDFB]/85 to-transparent lg:w-36"
-            aria-hidden="true"
-          />
 
           {/* Edge navigation arrows */}
           <button
@@ -175,26 +236,20 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
         </div>
 
         {/* Indicator dots below stage */}
-        <div className="mt-3 flex items-center justify-center gap-1.5">
-          {Array.from({ length: maxDesktopStart + 1 }).map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setDesktopStart(idx)}
-              aria-label={`Tampilkan pertanyaan ${idx + 1} dan ${idx + 2}`}
-              aria-pressed={desktopStart === idx}
-              className={`h-1.5 rounded-full transition-all ${
-                desktopStart === idx
-                  ? "w-6 bg-[#0F3D2E]"
-                  : "w-1.5 bg-emerald-950/20 hover:bg-emerald-950/40"
-              }`}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-2">
+          {questions.length > 2 && Array.from({ length: maxDesktopStart + 1 }, (_, idx) =>
+            renderIndicator(
+              idx,
+              desktopStart === idx,
+              `Tampilkan pertanyaan ${idx + 1} dan ${idx + 2}`,
+              () => setDesktopStart(idx),
+            )
+          )}
         </div>
       </div>
 
       {/* Mobile Compact Carousel (< 768px) */}
-      <div className="md:hidden">
+      <div className="mx-auto max-w-xl px-4 md:hidden">
         <div className="overflow-hidden">
           <div
             className="flex transition-transform duration-300 ease-out motion-reduce:transition-none"
@@ -202,7 +257,7 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
           >
             {questions.map((item, idx) => (
               <div key={item.question} className="w-full shrink-0 px-0.5">
-                <article className="flex h-full flex-col justify-between rounded-2xl border border-emerald-950/[0.1] bg-white p-5 shadow-[0_12px_28px_-10px_rgba(15,61,46,0.08)]">
+                <article className="flex h-full flex-col justify-between rounded-2xl border border-emerald-950/[0.12] bg-white p-5">
                   {renderCardBody(item, idx)}
                 </article>
               </div>
@@ -221,21 +276,15 @@ export default function FaqCarousel({ questions }: { questions: FaqItem[] }) {
             <ChevronLeft size={15} aria-hidden="true" />
           </button>
 
-          <div className="flex items-center gap-1.5">
-            {questions.map((item, idx) => (
-              <button
-                key={item.question}
-                type="button"
-                onClick={() => setMobileIndex(idx)}
-                aria-label={`Pilih pertanyaan ${idx + 1}`}
-                aria-pressed={mobileIndex === idx}
-                className={`h-1.5 rounded-full transition-all ${
-                  mobileIndex === idx
-                    ? "w-5 bg-[#0F3D2E]"
-                    : "w-1.5 bg-emerald-950/20"
-                }`}
-              />
-            ))}
+          <div className="flex items-center gap-2">
+            {questions.length > 1 && questions.map((_, idx) =>
+              renderIndicator(
+                idx,
+                mobileIndex === idx,
+                `Pilih pertanyaan ${idx + 1}`,
+                () => setMobileIndex(idx),
+              )
+            )}
           </div>
 
           <button
