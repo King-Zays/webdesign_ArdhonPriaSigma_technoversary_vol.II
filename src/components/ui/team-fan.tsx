@@ -155,7 +155,7 @@ function MemberFan({
   return (
     <div
       ref={fanRef}
-      className="relative flex w-full items-center justify-center pb-20 pt-20 [perspective:1200px] sm:pb-24 sm:pt-28"
+      className="relative flex w-full items-center justify-center pb-6 pt-16 [perspective:1200px] sm:pb-24 sm:pt-28"
     >
       {members.slice(0, 3).map((member, i) => {
         const slot = fanSlots[i] ?? fanSlots[1];
@@ -435,13 +435,13 @@ function MemberFan({
                   </div>
                 )}
 
-                {/* Nama & peran di bawah kartu */}
-                <div className="pointer-events-none absolute inset-x-[-10%] top-full z-20 pt-3 text-center sm:pt-4">
-                  <p className="truncate text-[11px] font-bold leading-tight text-[#0F3D2E] sm:text-base">
+                {/* Nama & peran di bawah kartu (desktop/tablet; mobile pakai grid rapi di bawah kipas) */}
+                <div className="pointer-events-none absolute inset-x-[-10%] top-full z-20 hidden pt-4 text-center sm:block">
+                  <p className="truncate text-base font-bold leading-tight text-[#0F3D2E]">
                     {member.name}
                   </p>
                   {member.role && (
-                    <p className="mt-0.5 truncate text-[10px] font-medium text-[#426352] sm:text-xs">
+                    <p className="mt-0.5 truncate text-xs font-medium text-[#426352]">
                       {member.role}
                     </p>
                   )}
@@ -544,6 +544,20 @@ export function TeamFanSection({
             cardAspect={vs.fanCard}
             animate={animate}
           />
+          <div className="mx-auto mt-3 grid max-w-md grid-cols-3 gap-2.5 px-1 text-center sm:hidden">
+            {members.slice(0, 3).map((member) => (
+              <div key={`mobile-label-${member.name}`} className="min-w-0">
+                <p className="text-[11px] font-bold leading-snug text-[#0F3D2E]">
+                  {member.name}
+                </p>
+                {member.role && (
+                  <p className="mt-0.5 text-[10px] font-medium leading-tight text-[#426352]">
+                    {member.role}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {footnote && (

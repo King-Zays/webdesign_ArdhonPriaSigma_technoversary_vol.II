@@ -177,8 +177,8 @@ export default function AboutSection3() {
             <div className="relative">
               <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl border border-emerald-900/10 sm:hidden">
                 <Image
-                  src="/media/hero-planting-poster.jpg"
-                  alt="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
+                  src="/media/hero-recycle-sorting.jpg"
+                  alt="Warga memilah botol plastik ke dalam wadah daur ulang BONI"
                   fill
                   sizes="(max-width: 639px) 100vw, 1px"
                   className="object-cover"
@@ -191,7 +191,7 @@ export default function AboutSection3() {
                 height={"100%"}
                 viewBox="0 0 100 40"
                 role="img"
-                aria-label="Warga merawat tanaman dan menjaga kebersihan lingkungan di Surabaya"
+                aria-label="Warga memilah botol plastik ke dalam wadah daur ulang BONI"
               >
                 <defs>
                   <clipPath
@@ -206,10 +206,10 @@ export default function AboutSection3() {
                 </defs>
                 <image
                   clipPath="url(#clip-inverted)"
-                  preserveAspectRatio="xMidYMid slice"
+                  preserveAspectRatio="xMidYMin slice"
                   width={"100%"}
                   height={"100%"}
-                  href="/media/hero-planting-poster.jpg"
+                  href="/media/hero-recycle-sorting.jpg"
                 />
               </svg>
               {/* 4 kanal media sosial tersusun vertikal di ruang cutout kiri (x < 7.3%, y > 47%) */}

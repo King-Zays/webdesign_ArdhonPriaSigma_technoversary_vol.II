@@ -5,7 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { teamConfig } from "@/config/site";
+import { cn } from "@/lib/utils";
 import { TeamFanSection } from "@/components/ui/team-fan";
+import { Marquee } from "@/components/ui/3d-testimonials";
 import { useVideoPlayer } from "@/components/common/GlobalVideoPlayer";
 import {
   Camera,
@@ -21,6 +23,134 @@ import {
   Ticket,
   Truck,
 } from "lucide-react";
+
+interface FieldDocSlot {
+  id: string;
+  category: "Masyarakat" | "Petugas ASN" | "Pemerintah Kota";
+  title: string;
+  image?: string;
+}
+
+// Cukup isi 7 foto di sini; galeri marquee 3D otomatis mengacak dan memutar terus di 5 kolom agar terlihat ramai tanpa kembar bersebelahan
+const FIELD_DOC_PHOTOS: FieldDocSlot[] = [
+  { id: "01", category: "Masyarakat", title: "Uji Coba Warga di Warung", image: "/images/dokumentasi/doc-01.jpg" },
+  { id: "02", category: "Masyarakat", title: "Sosialisasi Warga Surabaya", image: "/images/dokumentasi/doc-02.jpg" },
+  { id: "03", category: "Masyarakat", title: "Uji Coba Mitra & Warga", image: "/images/dokumentasi/doc-03.jpg" },
+  { id: "04", category: "Masyarakat", title: "Penggunaan Lapangan Malam Hari", image: "/images/dokumentasi/doc-04.jpg" },
+  { id: "05", category: "Petugas ASN", title: "Uji Coba Bersama Petugas ASN", image: "/images/dokumentasi/doc-05.jpg" },
+  { id: "06", category: "Petugas ASN", title: "Evaluasi Fitur Petugas ASN", image: "/images/dokumentasi/doc-06.jpg" },
+  { id: "07", category: "Pemerintah Kota", title: "Konsultasi Pemerintah Kota", image: "/images/dokumentasi/doc-07.jpg" },
+];
+
+const MARQUEE_COLS: FieldDocSlot[][] = [
+  [1, 5, 2, 6, 0, 4, 3].map((i) => FIELD_DOC_PHOTOS[i]),
+  [0, 3, 6, 1, 4, 2, 5].map((i) => FIELD_DOC_PHOTOS[i]),
+  [4, 1, 5, 0, 2, 6, 3].map((i) => FIELD_DOC_PHOTOS[i]),
+  [2, 5, 0, 4, 6, 1, 3].map((i) => FIELD_DOC_PHOTOS[i]),
+  [6, 2, 4, 1, 3, 5, 0].map((i) => FIELD_DOC_PHOTOS[i]),
+];
+
+function FieldPhotoCard({ slot }: { slot: FieldDocSlot }) {
+  return (
+    <div className="group relative aspect-video w-48 shrink-0 overflow-hidden rounded-2xl border border-emerald-900/12 bg-gradient-to-b from-[#EDF6F0] to-[#DCECE2] shadow-md sm:w-64 lg:w-72">
+      {slot.image ? (
+        <>
+          <Image
+            src={slot.image}
+            alt={slot.title}
+            fill
+            sizes="(max-width: 640px) 33vw, 380px"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+          />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0F3D2E]/85 via-[#0F3D2E]/35 to-transparent px-2.5 pb-2 pt-6 text-left sm:px-3.5 sm:pb-3">
+            <span className="inline-block rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-semibold text-white backdrop-blur-sm sm:text-[10px]">
+              {slot.category}
+            </span>
+            <p className="mt-1 truncate text-[10px] font-bold text-white sm:text-xs">{slot.title}</p>
+          </div>
+        </>
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-2 text-center sm:gap-2 sm:p-4">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-[#1D9E75] shadow-sm sm:h-10 sm:w-10">
+            <Camera size={15} className="sm:h-[18px] sm:w-[18px]" aria-hidden="true" />
+          </div>
+          <span className="rounded-full bg-[#0F3D2E]/10 px-2 py-0.5 text-[9px] font-bold text-[#0F3D2E] sm:px-2.5 sm:text-[11px]">
+            {slot.category}
+          </span>
+          <p className="line-clamp-2 text-[9.5px] font-semibold leading-tight text-[#2D5542] sm:text-xs">
+            {slot.id} · {slot.title}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FieldDocumentationMarquee() {
+  return (
+    <section
+      id="dokumentasi"
+      aria-labelledby="dokumentasi-title"
+      className="relative scroll-mt-20 overflow-hidden bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28"
+    >
+      <div className="mx-auto max-w-7xl">
+        <motion.div
+          initial={{ opacity: 0, y: 24, filter: "blur(5px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.85, ease: EASE_OUT_EXPO }}
+          className="mx-auto max-w-2xl text-center"
+        >
+          <h2
+            id="dokumentasi-title"
+            className="text-3xl font-extrabold leading-[1.12] tracking-tight text-[#0F3D2E] sm:text-5xl"
+          >
+            Dokumentasi lapangan &amp;{" "}
+            <span className="text-[#1D9E75]">uji coba nyata</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-[#2D5542] sm:text-base">
+            Potret penggunaan BONI oleh masyarakat Surabaya, uji coba bersama petugas ASN, serta sesi konsultasi bersama
+            Pemerintah Kota.
+          </p>
+        </motion.div>
+
+        <div className="relative mt-10 flex h-[460px] w-full items-center justify-center overflow-hidden bg-[#FAFDFB] [perspective:1000px] sm:mt-12 sm:h-[560px] lg:h-[620px]">
+          <div
+            style={{
+              transform: "translate3d(-56px, 0, 0) rotateX(20deg) rotateY(-10deg) rotateZ(16deg)",
+              transformStyle: "preserve-3d",
+            }}
+            className="flex flex-row items-center gap-3 sm:gap-4"
+          >
+            {MARQUEE_COLS.map((col, colIdx) => (
+              <Marquee
+                key={colIdx}
+                vertical
+                pauseOnHover
+                reverse={colIdx % 2 === 1}
+                repeat={3}
+                className={cn(
+                  "h-[220%] [--duration:42s] [--gap:1rem]",
+                  (colIdx === 0 || colIdx === 4) && "hidden sm:flex"
+                )}
+              >
+                {col.map((slot, idx) => (
+                  <FieldPhotoCard key={`mcol${colIdx}-${slot.id}-${idx}`} slot={slot} />
+                ))}
+              </Marquee>
+            ))}
+          </div>
+
+          {/* Gradient fade 4 sisi menyatu dengan background #FAFDFB */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-[#FAFDFB] via-[#FAFDFB]/55 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1/3 bg-gradient-to-t from-[#FAFDFB] via-[#FAFDFB]/55 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-1/6 bg-gradient-to-r from-[#FAFDFB] via-[#FAFDFB]/45 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-1/6 bg-gradient-to-l from-[#FAFDFB] via-[#FAFDFB]/45 to-transparent" />
+        </div>
+      </div>
+    </section>
+  );
+}
 
 const EASE_OUT_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -1148,6 +1278,9 @@ export default function AboutSections() {
           </div>
         </div>
       </section>
+
+      {/* 4B. Galeri Dokumentasi Lapangan (3D tilted vertical marquee → lurus saat scroll) */}
+      <FieldDocumentationMarquee />
 
       {/* 5. Video Pengenalan BONI (gaya editorial Vercel Enterprise, sebelum section kutipan) */}
       <section

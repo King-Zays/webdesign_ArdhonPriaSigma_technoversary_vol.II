@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
 import {
   Camera,
   CheckCircle2,
@@ -29,13 +29,36 @@ import { GreenActionIcon } from "@/components/common/icons";
 
 type Fase = "siap" | "memeriksa" | "terverifikasi";
 
+const DEMO_SEQUENCE: GreenActionType[] = [
+  "used_cooking_oil",
+  "tree_planting",
+  "energy_saving",
+  "sustainable_transport",
+  "waste_sorting",
+];
+
 export default function HeroConsole() {
   const [aktif, setAktif] = useState<GreenActionType>("waste_sorting");
   const [fase, setFase] = useState<Fase>("terverifikasi");
   const [kuantitas, setKuantitas] = useState<number>(GREEN_ACTIONS.waste_sorting.quantity.default);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const criteriaRef = useRef<HTMLDivElement>(null);
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Partial<Record<GreenActionType, HTMLButtonElement | null>>>({});
+  const verifyBtnRef = useRef<HTMLButtonElement>(null);
   const [criteriaHeight, setCriteriaHeight] = useState<number | "auto">("auto");
+
+  const isInView = useInView(consoleRef, { amount: 0.35 });
+  const reduceMotion = useReducedMotion();
+  const [demoPaused, setDemoPaused] = useState(false);
+  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number; visible: boolean }>({
+    x: 240,
+    y: 160,
+    visible: false,
+  });
+  const [cursorClicking, setCursorClicking] = useState(false);
+  const [clickPulseKey, setClickPulseKey] = useState(0);
 
   useEffect(() => {
     const el = criteriaRef.current;
@@ -54,27 +77,116 @@ export default function HeroConsole() {
   useEffect(() => {
     return () => {
       if (timer.current) clearTimeout(timer.current);
+      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
     };
   }, []);
 
-  function pilihKategori(tipe: GreenActionType) {
+  const pauseDemoTemporarily = useCallback(() => {
+    setDemoPaused(true);
+    setCursorPos((prev) => ({ ...prev, visible: false }));
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setDemoPaused(false);
+    }, 6000);
+  }, []);
+
+  const moveCursorTo = useCallback((el: HTMLElement | null) => {
+    const container = consoleRef.current;
+    if (!container || !el) return false;
+    const cRect = container.getBoundingClientRect();
+    const tRect = el.getBoundingClientRect();
+    if (tRect.width === 0 || tRect.height === 0) return false;
+    setCursorPos({
+      x: tRect.left - cRect.left + tRect.width * 0.56,
+      y: tRect.top - cRect.top + tRect.height * 0.58,
+      visible: true,
+    });
+    return true;
+  }, []);
+
+  const pilihKategori = useCallback((tipe: GreenActionType) => {
     if (timer.current) clearTimeout(timer.current);
     setAktif(tipe);
     setKuantitas(GREEN_ACTIONS[tipe].quantity.default);
     setFase("memeriksa");
     timer.current = setTimeout(() => setFase("terverifikasi"), 550);
-  }
+  }, []);
 
-  function jalankanVerifikasi() {
+  const jalankanVerifikasi = useCallback(() => {
     if (timer.current) clearTimeout(timer.current);
     setFase("memeriksa");
     timer.current = setTimeout(() => setFase("terverifikasi"), 650);
-  }
+  }, []);
+
+  // Animasi demo otomatis dengan kursor yang mengklik tab kategori lalu tombol verifikasi
+  useEffect(() => {
+    if (!isInView || demoPaused || reduceMotion) {
+      setCursorPos((prev) => ({ ...prev, visible: false }));
+      return;
+    }
+
+    let cancelled = false;
+    let stepIdx = 0;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+    const wait = (ms: number) =>
+      new Promise<void>((resolve) => {
+        const id = setTimeout(() => resolve(), ms);
+        timeouts.push(id);
+      });
+
+    const triggerClickPulse = async () => {
+      if (cancelled) return;
+      setCursorClicking(true);
+      setClickPulseKey((k) => k + 1);
+      await wait(180);
+      if (!cancelled) setCursorClicking(false);
+    };
+
+    const runLoop = async () => {
+      await wait(900);
+      while (!cancelled) {
+        const nextType = DEMO_SEQUENCE[stepIdx % DEMO_SEQUENCE.length];
+        stepIdx += 1;
+
+        const tabEl = tabRefs.current[nextType] ?? null;
+        if (moveCursorTo(tabEl)) {
+          await wait(900);
+          if (cancelled) break;
+          await triggerClickPulse();
+          if (cancelled) break;
+          pilihKategori(nextType);
+        }
+
+        await wait(1150);
+        if (cancelled) break;
+
+        if (moveCursorTo(verifyBtnRef.current)) {
+          await wait(850);
+          if (cancelled) break;
+          await triggerClickPulse();
+          if (cancelled) break;
+          jalankanVerifikasi();
+        }
+
+        await wait(2200);
+      }
+    };
+
+    runLoop();
+
+    return () => {
+      cancelled = true;
+      timeouts.forEach(clearTimeout);
+    };
+  }, [isInView, demoPaused, reduceMotion, moveCursorTo, pilihKategori, jalankanVerifikasi]);
 
   return (
     <div
+      ref={consoleRef}
       id="features"
-      className="scroll-mt-24 overflow-hidden rounded-2xl border border-neutral-200/90 bg-[#F8FAF9] text-[#1A1A1A] shadow-[0_28px_70px_-24px_rgba(15,61,46,0.22)]"
+      onPointerDown={pauseDemoTemporarily}
+      className="relative scroll-mt-24 overflow-hidden rounded-2xl border border-neutral-200/90 bg-[#F8FAF9] text-[#1A1A1A] shadow-[0_28px_70px_-24px_rgba(15,61,46,0.22)]"
     >
       <div id="how-it-works" className="scroll-mt-24" />
 
@@ -180,13 +292,19 @@ export default function HeroConsole() {
                   return (
                     <motion.button
                       key={a.type}
+                      ref={(el) => {
+                        tabRefs.current[a.type] = el;
+                      }}
                       type="button"
                       role="tab"
                       aria-selected={active}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                      onClick={() => pilihKategori(a.type)}
+                      onClick={() => {
+                        pauseDemoTemporarily();
+                        pilihKategori(a.type);
+                      }}
                       className={`relative flex flex-col items-start gap-1 rounded-xl border-2 p-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2D5F3F] ${
                         active
                           ? "border-[#2D5F3F] bg-[#F0FAF4]"
@@ -287,8 +405,12 @@ export default function HeroConsole() {
                 </div>
 
                 <button
+                  ref={verifyBtnRef}
                   type="button"
-                  onClick={jalankanVerifikasi}
+                  onClick={() => {
+                    pauseDemoTemporarily();
+                    jalankanVerifikasi();
+                  }}
                   className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#0F3D2E] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#18533F]"
                 >
                   <CheckCircle2 size={14} />
@@ -342,6 +464,54 @@ export default function HeroConsole() {
           </div>
         </div>
       </div>
+      {/* Kursor Demo Otomatis (pointer-events-none agar seluruh tombol tetap bebas diklik user) */}
+      <AnimatePresence>
+        {cursorPos.visible && (
+          <motion.div
+            aria-hidden="true"
+            initial={{ opacity: 0, scale: 0.8, x: cursorPos.x, y: cursorPos.y }}
+            animate={{
+              opacity: 1,
+              scale: cursorClicking ? 0.85 : 1,
+              x: cursorPos.x,
+              y: cursorPos.y,
+            }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+              x: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+              y: { duration: 0.75, ease: [0.22, 1, 0.36, 1] },
+              scale: { duration: 0.14, ease: "easeOut" },
+              opacity: { duration: 0.25 },
+            }}
+            className="pointer-events-none absolute left-0 top-0 z-30"
+          >
+            {clickPulseKey > 0 && (
+              <motion.span
+                key={clickPulseKey}
+                initial={{ scale: 0.3, opacity: 0.75 }}
+                animate={{ scale: 2.2, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="absolute -left-2.5 -top-2.5 h-6 w-6 rounded-full border-2 border-[#1D9E75] bg-[#1D9E75]/20"
+              />
+            )}
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="drop-shadow-[0_4px_10px_rgba(15,61,46,0.35)]"
+            >
+              <path
+                d="M5.5 3.5L19 11.2L12.6 13.1L10.3 19.5L5.5 3.5Z"
+                fill="#0F3D2E"
+                stroke="#FFFFFF"
+                strokeWidth="1.75"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
