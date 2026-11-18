@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useInView } from "framer-motion";
+import { teamConfig } from "@/config/site";
+import { TeamFanSection } from "@/components/ui/team-fan";
+import { useVideoPlayer } from "@/components/common/GlobalVideoPlayer";
 import {
   Camera,
   Check,
@@ -10,6 +14,7 @@ import {
   ClipboardCheck,
   Gift,
   MapPin,
+  Play,
   QrCode,
   Scale,
   ShieldCheck,
@@ -195,8 +200,27 @@ export default function AboutSections() {
   const [aktifTahap, setAktifTahap] = useState(0);
   const [showMaterialUnit, setShowMaterialUnit] = useState(false);
   const [stageStep, setStageStep] = useState(0);
+  const { isPlaying: isVideoPlaying, startVideo, registerSlot } = useVideoPlayer();
+  const [videoExpanded, setVideoExpanded] = useState(false);
   const flowFrameRef = useRef<HTMLDivElement>(null);
+  const videoStageRef = useRef<HTMLDivElement>(null);
   const isFlowInView = useInView(flowFrameRef, { once: true, amount: 0.25 });
+  const isVideoInView = useInView(videoStageRef, { once: true, amount: 0.8 });
+
+  useEffect(() => {
+    registerSlot(videoStageRef.current);
+    return () => registerSlot(null);
+  }, [registerSlot]);
+
+  useEffect(() => {
+    if (!isVideoInView) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVideoExpanded(true);
+      return;
+    }
+    const timer = setTimeout(() => setVideoExpanded(true), 1250);
+    return () => clearTimeout(timer);
+  }, [isVideoInView]);
 
   useEffect(() => {
     if (!isFlowInView) return;
@@ -245,7 +269,7 @@ export default function AboutSections() {
       <section
         id="standar-material"
         aria-labelledby="mulai-dari-rumah-title"
-        className="scroll-mt-20 border-b border-emerald-900/10 bg-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28"
+        className="scroll-mt-20 bg-gradient-to-b from-[#FAFDFB] via-[#FAFDFB] via-[82%] to-[#F1F8F4] px-4 py-20 sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -347,7 +371,7 @@ export default function AboutSections() {
       <section
         id="peran-ekosistem"
         aria-labelledby="peran-ekosistem-title"
-        className="scroll-mt-20 border-b border-emerald-900/10 bg-white px-4 py-20 sm:px-6 sm:py-28"
+        className="scroll-mt-20 bg-gradient-to-b from-[#F1F8F4] via-[#F6FBF8] via-[82%] to-[#EAF4EE] px-4 py-20 sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -418,7 +442,7 @@ export default function AboutSections() {
       <section
         id="rencana-setoran"
         aria-labelledby="rencana-setoran-title"
-        className="scroll-mt-20 border-b border-emerald-900/10 bg-[#F2F8F4] px-4 py-20 text-[#0F3D2E] sm:px-6 sm:py-28"
+        className="scroll-mt-20 bg-gradient-to-b from-[#EAF4EE] via-[#EFF7F2] via-[82%] to-[#FAFDFB] px-4 py-20 text-[#0F3D2E] sm:px-6 sm:py-28"
       >
         <div className="mx-auto max-w-6xl">
           <motion.div
@@ -1049,23 +1073,37 @@ export default function AboutSections() {
           </motion.div>
 
           {/* Ringkasan 4 Tahap dengan Garis Hairline Terbuka di Bawah Windowed App */}
-          <ol className="mt-10 grid border-y border-emerald-900/15 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-emerald-900/15">
+          <ol className="mt-10 grid border-y border-emerald-900/15 sm:grid-cols-2 lg:grid-cols-4">
             {depositStages.map((s, idx) => {
               const active = idx === aktifTahap;
+              const mobileBorder = idx < depositStages.length - 1 ? "border-b border-emerald-900/12" : "";
+              const smBorder = idx < 2 ? "sm:border-b sm:border-emerald-900/12" : "sm:border-b-0";
+              const smCols =
+                idx % 2 === 1
+                  ? "sm:border-l sm:border-emerald-900/15 sm:pl-6 sm:pr-0"
+                  : "sm:pl-0 sm:pr-6";
+              const lgCols = [
+                "lg:border-b-0 lg:px-6",
+                idx > 0 ? "lg:border-l lg:border-emerald-900/15" : "lg:pl-0",
+                idx === depositStages.length - 1 ? "lg:pr-0" : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
               return (
                 <li
                   key={s.id}
                   onClick={() => setAktifTahap(idx)}
-                  className={`cursor-pointer border-b border-emerald-900/12 py-6 transition-opacity last:border-b-0 sm:px-6 sm:[&:nth-child(odd)]:pl-0 sm:[&:nth-child(even)]:border-l sm:[&:nth-child(even)]:border-emerald-900/12 sm:[&:nth-child(even)]:pr-0 sm:[&:nth-child(n+3)]:border-b-0 lg:border-b-0 lg:px-6 lg:[&:nth-child(even)]:border-l-0 lg:[&:nth-child(even)]:pr-6 lg:first:pl-0 lg:last:pr-0 ${
-                    active ? "opacity-100" : "opacity-55 hover:opacity-95"
-                  }`}
+                  className={`cursor-pointer py-6 ${mobileBorder} ${smBorder} ${smCols} ${lgCols}`}
                 >
-                  <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="font-bold text-[#1D9E75]">{s.nomor}</span>
-                    <span className="text-[11px] text-[#527362]">{s.status}</span>
+                  <div className={`transition-opacity duration-200 ${active ? "opacity-100" : "opacity-55 hover:opacity-95"}`}>
+                    <div className="flex items-center justify-between font-mono text-xs">
+                      <span className="font-bold text-[#1D9E75]">{s.nomor}</span>
+                      <span className="text-[11px] text-[#527362]">{s.status}</span>
+                    </div>
+                    <h3 className="mt-2.5 text-base font-bold text-[#0F3D2E]">{s.judul}</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#426352]">{s.ringkasanBawah}</p>
                   </div>
-                  <h3 className="mt-2.5 text-base font-bold text-[#0F3D2E]">{s.judul}</h3>
-                  <p className="mt-1.5 text-xs leading-relaxed text-[#426352]">{s.ringkasanBawah}</p>
                 </li>
               );
             })}
@@ -1132,10 +1170,200 @@ export default function AboutSections() {
         </div>
       </section>
 
-      {/* 5. Kutipan Gerakan Warga Surabaya (paling bawah sebelum footer) */}
+      {/* 5. Video Pengenalan BONI (gaya editorial Vercel Enterprise, sebelum section kutipan) */}
+      <section
+        id="video-boni"
+        aria-labelledby="video-boni-title"
+        className="scroll-mt-24 bg-gradient-to-b from-[#FAFDFB] via-[#F4FAF6] via-[18%] to-[#FAFDFB] px-4 py-20 sm:px-6 sm:py-28"
+      >
+        <div className="mx-auto max-w-6xl">
+          <motion.div
+            initial={{ opacity: 0, y: 28, filter: "blur(5px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.9, ease: EASE_OUT_EXPO }}
+          >
+            {/* Baris Atas: Judul Display di Kiri + Narasi di Kanan */}
+            <div className="grid gap-6 md:grid-cols-12 md:items-start md:gap-12">
+              <div className="md:col-span-6">
+                <h2
+                  id="video-boni-title"
+                  className="text-3xl font-extrabold leading-[1.1] tracking-tight text-[#0F3D2E] sm:text-5xl"
+                >
+                  Gambaran singkat <br />
+                  ekosistem BONI
+                </h2>
+              </div>
+              <div className="md:col-span-6 md:pt-1">
+                <p className="max-w-lg text-sm leading-relaxed text-[#2D5542] sm:text-base">
+                  Lihat bagaimana kebiasaan pilah sampah dari rumah terhubung langsung dengan verifikasi foto berbasis
+                  AI, rute pengumpulan warga, dan penukaran voucher di UMKM lokal Surabaya.
+                </p>
+              </div>
+            </div>
+
+            {/* Tengah: Stage Video dengan animasi lingkaran Play naik lalu meluas membuka thumbnail */}
+            <div ref={videoStageRef} className="relative mt-10 aspect-video w-full sm:mt-12">
+              {isVideoPlaying ? (
+                <div className="h-full w-full overflow-hidden rounded-2xl bg-[#0A2315] shadow-[0_32px_80px_-32px_rgba(15,61,46,0.28)]" />
+              ) : (
+                <button
+                  type="button"
+                  onClick={startVideo}
+                  aria-label="Putar video pengenalan ekosistem BONI"
+                  className="group relative flex h-full w-full items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]"
+                >
+                  {/* Thumbnail meluas dari lingkaran tengah */}
+                  <motion.div
+                    initial={{ clipPath: "circle(36px at 50% 50%)", opacity: 0 }}
+                    animate={
+                      videoExpanded
+                        ? { clipPath: "circle(100% at 50% 50%)", opacity: 1 }
+                        : { clipPath: "circle(36px at 50% 50%)", opacity: 0 }
+                    }
+                    transition={{
+                      clipPath: { duration: 1.45, ease: EASE_OUT_EXPO },
+                      opacity: { duration: 0.75, ease: EASE_OUT_EXPO },
+                    }}
+                    className="absolute inset-0 overflow-hidden rounded-2xl bg-[#0A2315] shadow-[0_32px_80px_-32px_rgba(15,61,46,0.28)]"
+                  >
+                    <Image
+                      src="https://i.ytimg.com/vi/ZrTQqDXzVYQ/hqdefault.jpg"
+                      alt="Pratinjau video pengenalan ekosistem BONI"
+                      fill
+                      unoptimized
+                      className="scale-[1.14] object-cover transition-transform duration-700 ease-out group-hover:scale-[1.17]"
+                    />
+                  </motion.div>
+
+                  {/* Lingkaran Play muncul pelan dari bawah terlebih dahulu */}
+                  <motion.span
+                    initial={{ y: 160, opacity: 0, scale: 0.85 }}
+                    animate={
+                      isVideoInView
+                        ? { y: 0, opacity: 1, scale: 1 }
+                        : { y: 160, opacity: 0, scale: 0.85 }
+                    }
+                    transition={{ duration: 1.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-[#0F3D2E] shadow-2xl ring-8 ring-white/25 transition-colors duration-300 group-hover:scale-105 group-hover:bg-[#1D9E75] group-hover:text-white sm:h-20 sm:w-20"
+                  >
+                    <Play size={26} className="ml-1 fill-current" aria-hidden="true" />
+                  </motion.span>
+                </button>
+              )}
+            </div>
+
+            {/* Baris Bawah: 3 Highlight Metrik Ekosistem (gaya Enterprise) */}
+            <div className="mt-10 grid gap-8 sm:mt-12 sm:grid-cols-3 sm:gap-10">
+              <div>
+                <p className="text-3xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-4xl">31</p>
+                <p className="mt-1 text-sm font-bold text-[#0F3D2E]">Kecamatan Surabaya</p>
+                <p className="mt-2 text-xs leading-relaxed text-[#426352] sm:text-sm">
+                  Pemantauan agregat aksi bersih warga dan titik laporan sampah lintas wilayah kota.
+                </p>
+              </div>
+              <div>
+                <p className="text-3xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-4xl">5</p>
+                <p className="mt-1 text-sm font-bold text-[#0F3D2E]">Kategori Aksi Hijau</p>
+                <p className="mt-2 text-xs leading-relaxed text-[#426352] sm:text-sm">
+                  Pilah sampah, jelantah, tanam pohon, hemat energi, dan transportasi rendah emisi.
+                </p>
+              </div>
+              <div>
+                <p className="text-3xl font-extrabold tracking-tight text-[#0F3D2E] sm:text-4xl">8+</p>
+                <p className="mt-1 text-sm font-bold text-[#0F3D2E]">Mitra UMKM Lokal</p>
+                <p className="mt-2 text-xs leading-relaxed text-[#426352] sm:text-sm">
+                  Penukaran EcoPoints langsung menjadi voucher belanja di warung serta usaha kampung.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 6. Tim Pengembang BONI (Hero10 fanned portrait layout, sebelum section kutipan) */}
+      <TeamFanSection
+        id="tim-pengembang"
+        title="Di balik ekosistem"
+        titleLine2Prefix="Tim"
+        titleHighlight={teamConfig.teamName}
+        description={`Dirancang dan dibangun oleh tim ${teamConfig.teamName} dari ${teamConfig.institution}.`}
+        footnote={`${teamConfig.institutionShort} · Tim Pengembang BONI`}
+        animation="subtle"
+        members={teamConfig.members.map((name) => {
+          if (name === "Muhammad Ananda Hariadi") {
+            return {
+              name,
+              role: `Tim ${teamConfig.teamName}`,
+              image: "/images/team-ananda.png",
+              mascot: {
+                image: "/images/mascot-ananda.png",
+                style: {
+                  left: "-8%",
+                  top: "-30%",
+                  width: "66.31%",
+                  height: "61.13%",
+                },
+              },
+            };
+          }
+          if (name === "Firzan Syaroni") {
+            return {
+              name,
+              role: `Tim ${teamConfig.teamName}`,
+              image: "/images/team-firzan.png",
+              popoutBox: {
+                left: "-29.88%",
+                top: "-39%",
+                width: "139%",
+                height: "162.82%",
+                clipBottom: "25%",
+              },
+              mascot: {
+                image: "/images/mascot-firzan.png",
+                style: {
+                  left: "37%",
+                  top: "-22%",
+                  width: "59.61%",
+                  height: "59.7%",
+                },
+              },
+            };
+          }
+          if (name === "Moch. Refi Febrian Alfani") {
+            return {
+              name,
+              role: `Tim ${teamConfig.teamName}`,
+              image: "/images/team-refi.png",
+              popoutBox: {
+                left: "-33%",
+                top: "-67%",
+                width: "176%",
+                height: "210%",
+                topOnlyPopout: true,
+              },
+              mascot: {
+                image: "/images/mascot-refi.png",
+                style: {
+                  left: "56%",
+                  top: "-26%",
+                  width: "66.27%",
+                  height: "60.61%",
+                },
+              },
+            };
+          }
+          return {
+            name,
+            role: `Tim ${teamConfig.teamName}`,
+          };
+        })}
+      />
+
+      {/* 7. Kutipan Gerakan Warga Surabaya (paling bawah sebelum footer) */}
       <section
         aria-label="Semangat gerakan pilah dari rumah"
-        className="border-t border-emerald-900/10 bg-[#FAFDFB] px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28"
+        className="bg-[#FAFDFB] px-6 pb-16 pt-20 text-center sm:pb-20 sm:pt-28"
       >
         <motion.div
           initial={{ opacity: 0, y: 36, filter: "blur(6px)" }}

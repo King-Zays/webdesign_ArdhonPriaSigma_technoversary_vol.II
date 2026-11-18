@@ -130,7 +130,7 @@ export default function AboutSection3() {
   };
 
   return (
-    <section className="border-b border-emerald-900/10 bg-[#F5FAF7] px-4 py-10 sm:px-6 sm:py-16" ref={heroRef}>
+    <section className="bg-gradient-to-b from-[#EEF6F1] via-[#F4FAF6] via-[84%] to-[#FAFDFB] px-4 py-10 sm:px-6 sm:py-16" ref={heroRef}>
       <div className="mx-auto max-w-6xl">
         <div className="relative">
           {/* Baris atas di dalam ruang cutout atas (0% - 84%): Judul halaman & navigasi bagian */}
